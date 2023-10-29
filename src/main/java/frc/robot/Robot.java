@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -16,6 +18,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    DataLogManager.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
+    System.out.println("Robot Initialized");
   }
 
   @Override
@@ -24,13 +29,16 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    System.out.println("Robot Disabled");
+  }
 
   @Override
   public void disabledPeriodic() {}
 
   @Override
   public void autonomousInit() {
+    System.out.println("Robot Autonomous");
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -44,7 +52,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-
+    System.out.println("Robot Teleop");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -55,13 +63,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    System.out.println("Robot Test");
     CommandScheduler.getInstance().cancelAll();
   }
   @Override
   public void testPeriodic() {}
   
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    System.out.println("Robot Simulation");
+  }
 
   @Override
   public void simulationPeriodic() {}

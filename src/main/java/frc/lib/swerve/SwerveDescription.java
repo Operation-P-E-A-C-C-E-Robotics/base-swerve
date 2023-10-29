@@ -25,7 +25,10 @@ public class SwerveDescription {
                                 PidGains angleGains,
                                 int pigeonCANId,
                                 boolean invertSteerMotors){
-        SwerveDrivetrainConstants swerveConstants = new SwerveDrivetrainConstants().withPigeon2Id(pigeonCANId);
+        SwerveDrivetrainConstants swerveConstants = new SwerveDrivetrainConstants()
+                                                    .withPigeon2Id(pigeonCANId)
+                                                    .withSupportsPro(false)
+                                                    .withCANbusName("rio");
         SwerveModuleConstantsFactory globalModuleConstants = new SwerveModuleConstantsFactory()
                                     .withDriveMotorGearRatio(gearing.driveRatio)
                                     .withSteerMotorGearRatio(gearing.steerRatio)

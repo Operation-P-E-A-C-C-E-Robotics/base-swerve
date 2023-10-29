@@ -23,12 +23,18 @@ public final class Constants {
     public static final CANIDs rearRightIDs = new CANIDs(2, 4, 3);
 
     public static final Gearing gearing = new Gearing(DriveGearRatios.SDSMK4i_L2, ((150.0 / 7.0) / 1.0), 2.0, 0);
-    public static final EncoderOffsets offsets = new EncoderOffsets(267.09, 350.15, 348.83, 57.39); //degrees
-    public static final Inversion inversion = new Inversion(false, false); //todo
-    public static final Physics physics = new Physics(0.001, 0.0001, 800, 10); //todo
+    // public static final EncoderOffsets offsets = new EncoderOffsets(
+    //   Units.degreesToRadians(267.09), 
+    //   Units.degreesToRadians(350.15), 
+    //   Units.degreesToRadians(348.83), 
+    //   Units.degreesToRadians(57.39)
+    // ); //degrees
+    public static final EncoderOffsets offsets = new EncoderOffsets(0, 0, 0, 0);
+    public static final Inversion inversion = new Inversion(false, true); //todo
+    public static final Physics physics = new Physics(1, 1, 800, 10); //todo
   
     public static final PidGains driveGains = new PidGains(0.05, 0, 0, 0, 0); //todo
-    public static final PidGains angleGains = new PidGains(0.15, 0, 0, 0, 0); //todo
+    public static final PidGains angleGains = new PidGains(3, 0, 0, 0, 0); //todo
   
     public static final int pigeonCANId = 14;
     public static final boolean invertSteerMotors = true;

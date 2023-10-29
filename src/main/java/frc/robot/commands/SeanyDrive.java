@@ -8,7 +8,9 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
 /**
@@ -72,6 +74,14 @@ public class SeanyDrive extends Command {
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
         linearVelocity = smoothAndDeadband(linearVelocity);
         angularVelocity = smoothAndDeadband(angularVelocity);
+
+        SmartDashboard.putNumberArray("swerve requested velocity", new double[] {linearVelocity.getX(), linearVelocity.getY(), angularVelocity});
+        SmartDashboard.putBoolean("isAutoHeading", isAutoHeading);
+        SmartDashboard.putBoolean("isFieldRelative", isFieldRelative);
+        SmartDashboard.putBoolean("isOpenLoop", isOpenLoop);
+        SmartDashboard.putBoolean("isLockIn", isLockIn);
+
+
 
         //handle lock in
         if (isLockIn) {
