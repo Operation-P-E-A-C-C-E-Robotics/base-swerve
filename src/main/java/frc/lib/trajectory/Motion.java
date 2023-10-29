@@ -3,8 +3,6 @@ package frc.lib.trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.lib.util.Util;
 
-import javax.sound.sampled.Line;
-
 public class Motion {
     public final double deltaPosition, initialVelocity, finalVelocity, acceleration, time;
     public final boolean inverted;

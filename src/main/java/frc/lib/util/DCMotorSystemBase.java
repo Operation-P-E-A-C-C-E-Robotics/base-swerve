@@ -10,13 +10,11 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.LinearSystemLoop;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.trajectory.Trajectory;
-import frc.lib.trajectory.TrapezoidalMotion;
 
 import java.util.ArrayList;
 import java.util.function.DoubleConsumer;
@@ -36,7 +34,6 @@ public class DCMotorSystemBase extends SubsystemBase {
     private Trajectory trajectory;
     private State trajectoryStart = new State(0,0), trajectoryEnd = new State(0,0);
     private boolean recalculateTrajectory = false; //whether we need to recalculate the trajectory
-    private double lookahead = 0; //how far ahead to look in the trajectory (todo may not be used)
 
     private DoubleConsumer voltDriveFunction;
     private DoubleSupplier getPosition, getVelocity;

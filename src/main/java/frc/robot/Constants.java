@@ -4,23 +4,26 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
+import static frc.lib.swerve.SwerveDescription.*;
 
 public final class Constants {
   public static final class Swerve {
-    //velocity controller gains:
-    private static final SwervePidGains steerGains = new SwervePidGains(50, 0, 0.05, 0,0);
-    private static final SwervePidGains driveGains = new SwervePidGains(3, 0, 0, 0, 0);
+    public static final Dimensions dimensions = new Dimensions(0,0);
 
-  }
+    public static final CANIDs frontLeftIDs = new CANIDs(0, 0, 0);
+    public static final CANIDs frontRighIDs = new CANIDs(0, 0, 0);
+    public static final CANIDs rearLeftIDs = new CANIDs(0, 0, 0);
+    public static final CANIDs rearRightIDs = new CANIDs(0, 0, 0);
 
-  static class SwervePidGains extends Slot0Configs {
-    public SwervePidGains(double kP, double kI, double kD, double kV, double kS) {
-      this.kP = kP;
-      this.kI = kI;
-      this.kD = kD;
-      this.kV = kV;
-      this.kS = kS;
-      }
+    public static final Gearing gearing = new Gearing(0, 0, 0, 0);
+    public static final EncoderOffsets offsets = new EncoderOffsets(0, 0, 0, 0);
+    public static final Inversion inversion = new Inversion(false, true);
+    public static final Physics physics = new Physics(0, 0, 0, 0);
+  
+    public static final PidGains driveGains = new PidGains(0, 0, 0, 0, 0);
+    public static final PidGains angleGains = new PidGains(0, 0, 0, 0, 0);
+  
+    public static final int pigeonCANId = 0;
+    public static final boolean invertSteerMotors = false;
   }
 }

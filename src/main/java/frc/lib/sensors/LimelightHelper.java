@@ -18,7 +18,7 @@ public class LimelightHelper {
     private DoubleArraySubscriber botpose, campose, camtran, tcornxy, tc;
     private DoubleSubscriber tv, tx, ty, ta, ts, tl, tshort, tlong, thor, tvert;
     private IntegerSubscriber getpipe, tid;
-    private IntegerPublisher ledMode, camMode, stream, snapshot, pipeline;
+    private IntegerPublisher ledMode, camMode, stream, pipeline;
     private DoubleArrayPublisher crop;
     private MedianFilter xFilter = new MedianFilter(10);
 

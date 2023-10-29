@@ -9,7 +9,6 @@ public class TrapezoidalMotion {
     private final double maxAcceleration;
     private State currentState = new State(0,0);
     private State goalState = new State(0,0);
-    private State deltaState = new State(0,0);
 
     /**
      * This class is a better version of the TrapezoidalMotion class. It generates trapezoidal
