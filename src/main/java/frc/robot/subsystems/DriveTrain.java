@@ -53,6 +53,7 @@ public class DriveTrain extends SubsystemBase {
     @Override
     public void periodic() {
         field.setRobotPose(getPose());
+        System.out.println(getPose());
     }
 
     @Override
@@ -60,75 +61,79 @@ public class DriveTrain extends SubsystemBase {
         swerve.updateSimState(0.02, 12);
     }
 
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Subsystem");
-
-        builder.addBooleanProperty(".hasDefault", () -> getDefaultCommand() != null, null);
-        builder.addStringProperty(
-            ".default",
-            () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none",
-            null);
-        builder.addBooleanProperty(".hasCommand", () -> getCurrentCommand() != null, null);
-        builder.addStringProperty(
-            ".command",
-            () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none",
-            null);
-        builder.addDoubleProperty(
-            "module 0 angle", 
-            () -> getModuleAngleDeg(0),
-            null    
-        );
-        builder.addDoubleProperty(
-            "module 0 speed", 
-            () -> getModuleSpeed(0),
-            null    
-        );
-        builder.addDoubleProperty(
-            "module 1 angle", 
-            () -> getModuleAngleDeg(1),
-            null    
-        );
-        builder.addDoubleProperty(
-            "module 1 speed", 
-            () -> getModuleSpeed(1),
-            null    
-        );
-        builder.addDoubleProperty(
-            "module 2 angle", 
-            () -> getModuleAngleDeg(2),
-            null    
-        );
-        builder.addDoubleProperty(
-            "module 2 speed", 
-            () -> getModuleSpeed(2),
-            null    
-        );
-        builder.addDoubleProperty(
-            "module 3 angle", 
-            () -> getModuleAngleDeg(3),
-            null    
-        );
-        builder.addDoubleProperty(
-            "module 3 speed", 
-            () -> getModuleSpeed(3),
-            null    
-        );
-        builder.addBooleanProperty("odometry valid", 
-            swerve::odometryIsValid, 
-            null
-        );
+    public void zeroOdometry() {
+        swerve.tareEverything();
     }
 
-    public double getModuleAngleDeg (int i) {
-        if (i < 0 || i > 3) return 0;
-        // if (!swerve.odometryIsValid()) return 0;
-        return swerve.getModule(i).getCurrentState().angle.getDegrees();
-    }
-    public double getModuleSpeed (int i) {
-        if (i < 0 || i > 3) return 0;
-        // if (!swerve.odometryIsValid()) return 0;
-        return swerve.getModule(i).getCurrentState().speedMetersPerSecond;
-    }
+    // @Override
+    // public void initSendable(SendableBuilder builder) {
+    //     builder.setSmartDashboardType("Subsystem");
+
+    //     builder.addBooleanProperty(".hasDefault", () -> getDefaultCommand() != null, null);
+    //     builder.addStringProperty(
+    //         ".default",
+    //         () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none",
+    //         null);
+    //     builder.addBooleanProperty(".hasCommand", () -> getCurrentCommand() != null, null);
+    //     builder.addStringProperty(
+    //         ".command",
+    //         () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none",
+    //         null);
+    //     builder.addDoubleProperty(
+    //         "module 0 angle", 
+    //         () -> getModuleAngleDeg(0),
+    //         null    
+    //     );
+    //     builder.addDoubleProperty(
+    //         "module 0 speed", 
+    //         () -> getModuleSpeed(0),
+    //         null    
+    //     );
+    //     builder.addDoubleProperty(
+    //         "module 1 angle", 
+    //         () -> getModuleAngleDeg(1),
+    //         null    
+    //     );
+    //     builder.addDoubleProperty(
+    //         "module 1 speed", 
+    //         () -> getModuleSpeed(1),
+    //         null    
+    //     );
+    //     builder.addDoubleProperty(
+    //         "module 2 angle", 
+    //         () -> getModuleAngleDeg(2),
+    //         null    
+    //     );
+    //     builder.addDoubleProperty(
+    //         "module 2 speed", 
+    //         () -> getModuleSpeed(2),
+    //         null    
+    //     );
+    //     builder.addDoubleProperty(
+    //         "module 3 angle", 
+    //         () -> getModuleAngleDeg(3),
+    //         null    
+    //     );
+    //     builder.addDoubleProperty(
+    //         "module 3 speed", 
+    //         () -> getModuleSpeed(3),
+    //         null    
+    //     );
+    //     builder.addBooleanProperty("odometry valid", 
+    //         swerve::odometryIsValid, 
+    //         null
+    //     );
+    // }
+
+    // public double getModuleAngleDeg (int i) {
+    //     if (i < 0 || i > 3) return 0;
+    //     // if (!swerve.odometryIsValid()) return 0;
+    //     return swerve.getModule(i).getCurrentState().angle.getDegrees();
+    // }
+    // public double getModuleSpeed (int i) {
+    //     if (i < 0 || i > 3) return 0;
+    //     // if (!swerve.odometryIsValid()) return 0;
+    //     return swerve.getModule(i).getCurrentState().speedMetersPerSecond;
+    // }
 }
 
