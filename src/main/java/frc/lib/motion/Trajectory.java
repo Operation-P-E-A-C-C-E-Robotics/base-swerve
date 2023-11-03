@@ -1,4 +1,4 @@
-package frc.lib.trajectory;
+package frc.lib.motion;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 

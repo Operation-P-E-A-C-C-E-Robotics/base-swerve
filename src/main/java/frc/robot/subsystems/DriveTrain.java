@@ -37,7 +37,7 @@ public class DriveTrain extends SubsystemBase {
             angleGains, 
             pigeonCANId, 
             invertSteerMotors
-        );
+        ); 
 
         //pathplanner config
         AutoBuilder.configureHolonomic(
