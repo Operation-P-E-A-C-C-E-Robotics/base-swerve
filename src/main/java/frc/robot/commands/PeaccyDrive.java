@@ -25,9 +25,9 @@ public class PeaccyDrive extends Command {
 
     private final double linearSpeedDeadband = 0.02,
                          angularVelocityDeadband = 0.02;
-    private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(5);
-    private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(2);
-    private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(3);
+    private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
+    private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
+    private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
     private BooleanSupplier isZeroOdometry;
 
 
@@ -94,8 +94,8 @@ public class PeaccyDrive extends Command {
 
         // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
-        linearVelocity = smoothAndDeadband(linearVelocity).times(5);
-        angularVelocity = smoothAndDeadband(angularVelocity) * 5;
+        linearVelocity = smoothAndDeadband(linearVelocity).times(Constants.Swerve.teleopLinearMultiplier);
+        angularVelocity = smoothAndDeadband(angularVelocity) * Constants.Swerve.teleopAngularMultiplier;
 
         // log data
         SmartDashboard.putNumberArray("swerve requested velocity", new double[] {linearVelocity.getX(), linearVelocity.getY(), angularVelocity});
@@ -181,6 +181,14 @@ public class PeaccyDrive extends Command {
         return angularVelocity;
     }
 
+    /**
+     * This function handles deadband by increases the slope of the output after
+     * the deadband, so the output is 0 at the end of the deadband but still 100% for 100% input. 
+     * This preserves fine control while still eliminating unnecessary current draw and preventing joystick drift.
+     * @param deadband the deadband to use
+     * @param value the value to apply the deadband to
+     * @return the value with the deadband applied (like magic)
+     */
     private double handleDeadbandFixSlope (double deadband, double value) {
         if (Math.abs(value) < deadband) return 0;
         return (value - (deadband * Math.signum(value)))/(1 - deadband);

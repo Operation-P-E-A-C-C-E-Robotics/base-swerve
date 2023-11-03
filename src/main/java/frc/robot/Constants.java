@@ -19,6 +19,14 @@ import frc.lib.swerve.SwerveDescription.PidGains;
 
 public final class Constants {
   public static final class Swerve {
+    //speeds in m/s (probably)
+    public static final double teleopLinearMultiplier = 7.0;
+    public static final double teleopAngularMultiplier = 7.0;
+
+    //smoothing
+    public static final double teleopLinearSpeedLimit = 5.0;
+    public static final double teleopLinearAngleLimit = 2.0;
+    public static final double teleopAngularRateLimit = 3.0;
 
     //CTRE SWERVE CONSTANTS:
     public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(24.75));
