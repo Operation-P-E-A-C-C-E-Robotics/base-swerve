@@ -23,6 +23,7 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
+    DataLogManager.logNetworkTables(true);
     System.out.println("Robot Initialized");
     isInMatch = Inspiration.initializeInspirationOpt1();
     if(isInMatch){

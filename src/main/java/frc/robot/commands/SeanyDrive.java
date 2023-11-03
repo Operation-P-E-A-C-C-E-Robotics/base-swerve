@@ -58,7 +58,7 @@ public class SeanyDrive extends Command {
         this.isLockInSup = isLockInSup;
         this.isZeroOdometry = isZeroOdometry;
         this.driveTrain = driveTrain;
-        autoHeadingRequest.HeadingController.setP(0.5);
+        autoHeadingRequest.HeadingController.setP(2);
         addRequirements(driveTrain);
     }
 
@@ -77,7 +77,7 @@ public class SeanyDrive extends Command {
         System.out.println(autoHeadingAngle);
         System.out.println(isAutoHeading);
 
-        if(isZeroOdometry.getAsBoolean()) driveTrain.zeroOdometry();
+        if(isZeroOdometry.getAsBoolean()) driveTrain.resetOdometry();
 
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
         linearVelocity = smoothAndDeadband(linearVelocity).times(5);

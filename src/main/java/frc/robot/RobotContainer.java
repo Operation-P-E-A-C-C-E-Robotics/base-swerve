@@ -22,6 +22,7 @@ public class RobotContainer {
   private final JoystickButton fieldCentricButton = new JoystickButton(driverController, 7);
   private final JoystickButton lockInButton = new JoystickButton(driverController, 8);
   private final JoystickButton zeroButton = new JoystickButton(driverController, 1);
+  private final JoystickButton closedLoopButton = new JoystickButton(driverController, 2);
 
   private final SeanyDrive seanyDrive = new SeanyDrive(
     () -> -driverController.getRawAxis(translationAxis),
@@ -30,7 +31,7 @@ public class RobotContainer {
     () -> (double) driverController.getPOV(),
     () -> driverController.getPOV() != -1,
     () -> !fieldCentricButton.getAsBoolean(),
-    () -> false,
+    () -> closedLoopButton.getAsBoolean(),
     () -> lockInButton.getAsBoolean(),
     () -> zeroButton.getAsBoolean(),
     driveTrain

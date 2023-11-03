@@ -31,7 +31,7 @@ public class SwerveDescription {
      * @param invertSteerMotors whether or not to invert the steer motors
      * @return a CTRE swerve drivetrain
      */
-    public static SwerveDrivetrain generateDrivetrain (
+    public static RealSwerveDrivetrain generateDrivetrain (
                                 Dimensions dimensions, 
                                 CANIDs frontLeftIDs,
                                 CANIDs frontRightIDs,
@@ -104,7 +104,7 @@ public class SwerveDescription {
             inversion.rearRight
         );
 
-        return new SwerveDrivetrain(
+        return new RealSwerveDrivetrain(
             swerveConstants,
             frontLeft,
             frontRight,
@@ -141,7 +141,7 @@ public class SwerveDescription {
          * the physical parameters of the drivetrain. Inertia is only used for simulation (I'm pretty sure).
          * @param linearInertia the linear inertia of the drivetrain in unknown units (maybe kg*m^2)
          * @param angularInertia the angular inertia of the drivetrain in unknown units
-         * @param wheelSlipCurrent the current at which the wheels begin to slip in amps
+         * @param wheelSlipCurrent the current at which the wheels begin to slip in amps I THINK (not sure)
          * @param freeSpeed the free speed of the drivetrain in meters per second
          */
         public Physics (double linearInertia, double angularInertia, double wheelSlipCurrent, double freeSpeed) {
@@ -215,7 +215,7 @@ public class SwerveDescription {
          * You can leave it 0 and you'll be just fine.
          * @param driveRatio ratio of drive motor turns to wheel turns
          * @param steerRatio ratio of steer motor turns to steer turns
-         * @param wheelRadius radius of the wheel in meters
+         * @param wheelRadius radius of the wheel in INCHES WTF CTRE
          * @param steerCouplingRatio ratio of steer motor turns to wheel turns.
          */
         public Gearing (double driveRatio, double steerRatio, double wheelRadius, double steerCouplingRatio) {
