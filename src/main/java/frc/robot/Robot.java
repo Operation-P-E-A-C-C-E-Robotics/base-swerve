@@ -9,11 +9,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.safety.Inspiration;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  private boolean isInMatch = false;
 
   @Override
   public void robotInit() {
@@ -21,11 +24,18 @@ public class Robot extends TimedRobot {
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
     System.out.println("Robot Initialized");
+    isInMatch = Inspiration.initializeInspirationOpt1();
+    if(isInMatch){
+      Inspiration.inspireDriversInit();
+    } else {
+      Inspiration.inspireProgrammersInit();
+    }
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    Inspiration.updateSlowPrinter();
   }
 
   @Override
@@ -39,6 +49,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     System.out.println("Robot Autonomous");
+    Inspiration.inspireAutonomous(isInMatch);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -52,6 +63,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    Inspiration.inspireTeleopInit(true);
     System.out.println("Robot Teleop");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

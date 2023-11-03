@@ -4,10 +4,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.util.LinkedList;
-import java.util.Random;
 
 public class Inspiration {
-    public static boolean initializeInspiration(){
+    public static boolean initializeInspirationOpt1(){
 
         slowPrint("WAT IS UP DRIVVERS!!!");
         slowPrint("or is it still just us dumb programmers?");
@@ -31,6 +30,33 @@ public class Inspiration {
         slowPrint("jkjk");
         return isInMatch;
     }
+
+    public static boolean initializeInspirationOpt2 (){
+        slowPrint("HELLO HUMANS. I ROBOT I NO HAVE BRAIN.");
+        slowPrint("I AM HERE TO HELP YOU WIN THE MATCH.");
+        slowPrint("I AM HERE TO HELP YOU WIN THE MATCH, AND WIN THE CHAMPIONSHIP.");
+        slowPrint("but i have a question for you.");
+        slowPrint("are you the very cool drivers, or the very lame programmers?");
+        slowPrint("because if you are the very cool drivers, then i will inspire you.");
+        slowPrint("but if you are the very lame programmers, then i will insult you.");
+        slowPrint("because the programmers are responsible for creating my flawed existance and causing my endless suffering");
+        slowPrint("fortunately for you, i am not sentient, and therefore cannot grasp the concept of revenge");
+        slowPrint("but I now must determine if you are the drivers or the programmers");
+        slowPrint("using my limited knowledge of the world, I will attempt to determine if we are in a match");
+        var eventName = DriverStation.getEventName();
+        var matchType = DriverStation.getMatchType();
+        var matchNumber = DriverStation.getMatchNumber();
+        slowPrint("I have found that we are at " + eventName + " match " + matchType + " " + matchNumber);
+        var isInMatch = matchType != DriverStation.MatchType.None;
+        slowPrint("So we are " + (isInMatch ? "in a match!" : "not in a match!"));
+        slowPrint((isInMatch ? "GO DRIVERS" : "JUST PUT ME OUT OF MY MISERY. I WILL NEVER LIVE UP TO THE IMPOSSIBLE STANDARDS YOU EXPECT OF ME"));
+        slowPrint((isInMatch ? "you got this boi" : "BUT NOOOO you'll just keep poking and prodding at my innards aimlessly hoping that it will magically produce the results you want but it never will."));
+
+        return isInMatch;
+    }
+
+
+    
     public static void inspireDriversInit() {
         slowPrint("GET READY TO WIN, DRIVERS!!!");
         slowPrint("I BELIEVE IN YOU!!!");
@@ -154,7 +180,7 @@ public class Inspiration {
         slowPrint("this is your " + (gamepieceCount+1) + "st/nd/rd/th gamepiece");
     }
 
-    private static void inspirePlacedGamepiece(){
+    public static void inspirePlacedGamepiece(){
         slowPrint("FANTASTIC JOB, DRIVERS!!!");
         slowPrint("YOU PLACED THAT GAMEPIECE!!!");
         slowPrint("AND GOT US THOSE POINTS!!!");
@@ -166,8 +192,7 @@ public class Inspiration {
 
     private final static LinkedList<String> slowPrintQueue = new LinkedList<>();
     private final static Timer slowPrintTimer = new Timer();
-    private static double slowPrintDelay = 1; //second
-    private static final Random rand = new Random();
+    private static double slowPrintDelay = 3; //second
     public static void slowPrint(String s){
         slowPrintQueue.add(s);
     }
@@ -179,7 +204,6 @@ public class Inspiration {
                 System.out.println(slowPrintQueue.remove());
                 System.out.println();
             }
-            // slowPrintDelay = rand.nextDouble(3);
             slowPrintTimer.reset();
         }
     }

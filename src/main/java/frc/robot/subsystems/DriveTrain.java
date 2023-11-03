@@ -16,8 +16,6 @@ public class DriveTrain extends SubsystemBase {
 
     private final Field2d field = new Field2d();
 
-    private SwerveRequest lastRequest = new SwerveRequest.Idle();
-
     public DriveTrain() {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
@@ -42,7 +40,6 @@ public class DriveTrain extends SubsystemBase {
 
     public void drive(SwerveRequest request) {
         swerve.setControl(request);
-        lastRequest = request;
     }
 
     public Pose2d getPose () {
