@@ -17,24 +17,36 @@ public final class Constants {
   public static final class Swerve {
     public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(24.75));
 
-    public static final CANIDs frontLeftIDs = new CANIDs(8, 10, 9);
-    public static final CANIDs frontRighIDs = new CANIDs(5, 7, 6);
-    public static final CANIDs rearLeftIDs = new CANIDs(11, 13, 12);
-    public static final CANIDs rearRightIDs = new CANIDs(2, 4, 3);
+    public static final CANIDs frontLeftIDs = new CANIDs(8, 10, 9); //module 3 / 2
+    public static final CANIDs frontRighIDs = new CANIDs(5, 7, 6); //module 2 / 1
+    public static final CANIDs rearLeftIDs = new CANIDs(11, 13, 12); //module 4 / 3
+    public static final CANIDs rearRightIDs = new CANIDs(2, 4, 3); //module 1 / 0
 
     public static final Gearing gearing = new Gearing(DriveGearRatios.SDSMK4i_L2, ((150.0 / 7.0) / 1.0), 2.0, 0);
     // public static final EncoderOffsets offsets = new EncoderOffsets(
-    //   Units.degreesToRadians(267.09), 
-    //   Units.degreesToRadians(350.15), 
-    //   Units.degreesToRadians(348.83), 
-    //   Units.degreesToRadians(57.39)
+    //   Units.degreesToRotations(267.09),
+    //   Units.degreesToRotations(350.15), 
+    //   Units.degreesToRotations(348.83), 
+    //   Units.degreesToRotations(57.39)
     // ); //degrees
-    public static final EncoderOffsets offsets = new EncoderOffsets(0, 0, 0, 0);
-    public static final Inversion inversion = new Inversion(false, true); //todo
-    public static final Physics physics = new Physics(1, 1, 800, 10); //todo
+    // public static final EncoderOffsets offsets = new EncoderOffsets(
+    //   267.09, 
+    //   350.15, 
+    //   348.83, 
+    //   57.39
+    // );
+    // public static final EncoderOffsets offsets = new EncoderOffsets(0.057617, 0.697754, 0.235596, 0.692627);
+    public static final EncoderOffsets offsets = new EncoderOffsets(
+      -0, 
+      -0.227539, 
+      -0.708496, 
+      -0.407959);
+
+    public static final Inversion inversion = new Inversion(true, true, false, true); //todo
+    public static final Physics physics = new Physics(0.0001, 0.0001, 800, 10); //todo
   
-    public static final PidGains driveGains = new PidGains(0.05, 0, 0, 0, 0); //todo
-    public static final PidGains angleGains = new PidGains(3, 0, 0, 0, 0); //todo
+    public static final PidGains driveGains = new PidGains(0.2, 0, 0, 0, 0); //todo
+    public static final PidGains angleGains = new PidGains(70, 0, 0, 0, 0); //todo
   
     public static final int pigeonCANId = 14;
     public static final boolean invertSteerMotors = true;

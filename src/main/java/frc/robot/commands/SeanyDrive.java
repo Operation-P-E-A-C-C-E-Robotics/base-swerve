@@ -35,6 +35,7 @@ public class SeanyDrive extends Command {
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(5);
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(2);
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(3);
+    private BooleanSupplier isZeroOdometry;
 
 
     public SeanyDrive(DoubleSupplier xVelocitySup,
@@ -45,6 +46,7 @@ public class SeanyDrive extends Command {
                       BooleanSupplier isFieldRelativeSup,
                       BooleanSupplier isOpenLoopSup,
                       BooleanSupplier isLockInSup,
+                      BooleanSupplier isZeroOdometry,
                       DriveTrain driveTrain) {
         this.xVelocitySup = xVelocitySup;
         this.yVelocitySup = yVelocitySup;
@@ -54,7 +56,9 @@ public class SeanyDrive extends Command {
         this.isFieldRelativeSup = isFieldRelativeSup;
         this.isOpenLoopSup = isOpenLoopSup;
         this.isLockInSup = isLockInSup;
+        this.isZeroOdometry = isZeroOdometry;
         this.driveTrain = driveTrain;
+        autoHeadingRequest.HeadingController.setP(0.5);
         addRequirements(driveTrain);
     }
 
@@ -70,9 +74,14 @@ public class SeanyDrive extends Command {
         boolean isOpenLoop = isOpenLoopSup.getAsBoolean();
         boolean isLockIn = isLockInSup.getAsBoolean();
 
+        System.out.println(autoHeadingAngle);
+        System.out.println(isAutoHeading);
+
+        if(isZeroOdometry.getAsBoolean()) driveTrain.zeroOdometry();
+
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
-        linearVelocity = smoothAndDeadband(linearVelocity);
-        angularVelocity = smoothAndDeadband(angularVelocity);
+        linearVelocity = smoothAndDeadband(linearVelocity).times(5);
+        angularVelocity = smoothAndDeadband(angularVelocity) * 5;
 
         SmartDashboard.putNumberArray("swerve requested velocity", new double[] {linearVelocity.getX(), linearVelocity.getY(), angularVelocity});
         SmartDashboard.putBoolean("isAutoHeading", isAutoHeading);
@@ -95,7 +104,8 @@ public class SeanyDrive extends Command {
             autoHeadingRequest.withIsOpenLoop(isOpenLoop)
                             .withVelocityX(linearVelocity.getX())
                             .withVelocityY(linearVelocity.getY())
-                            .withTargetDirection(Rotation2d.fromDegrees(autoHeadingAngle)); // todo do we need rotational deadband?
+                            .withTargetDirection(Rotation2d.fromDegrees(autoHeadingAngle))
+                            .withRotationalDeadband(0.1); // todo do we need rotational deadband?
 
             driveTrain.drive(autoHeadingRequest);
             return;
