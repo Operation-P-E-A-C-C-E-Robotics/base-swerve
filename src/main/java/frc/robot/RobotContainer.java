@@ -21,8 +21,8 @@ public class RobotContainer {
 
   private final JoystickButton fieldCentricButton = new JoystickButton(driverController, 7);
   private final JoystickButton lockInButton = new JoystickButton(driverController, 8);
-  private final JoystickButton zeroButton = new JoystickButton(driverController, 1);
-  private final JoystickButton closedLoopButton = new JoystickButton(driverController, 2);
+  private final JoystickButton zeroButton = new JoystickButton(driverController, 9);
+  private final JoystickButton closedLoopButton = new JoystickButton(driverController, 5);
 
   private final PeaccyDrive seanyDrive = new PeaccyDrive(
     () -> -driverController.getRawAxis(translationAxis),
