@@ -35,7 +35,7 @@ public final class Constants {
     public static final Inversion inversion = new Inversion(true, true, false, true);
 
     //inertia only used for simulation, which doesn't seem to work regardless. tf ctre.
-    public static final Physics physics = new Physics(0.0001, 0.0001, 800, 10);
+    public static final Physics physics = new Physics(0.01, 50, 800, 10);
     
     //unknown units. tf ctre.
     public static final PidGains driveGains = new PidGains(0.2, 0, 0, 0, 0); 
@@ -43,6 +43,10 @@ public final class Constants {
   
     public static final int pigeonCANId = 14;
     public static final boolean invertSteerMotors = true;
+
+    public static final double autoHeadingKP = 2.0;
+    public static final double autoHeadingKI = 0.0;
+    public static final double autoHeadingKD = 0.0;
 
 
     public static final HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(

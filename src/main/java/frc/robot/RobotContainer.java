@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.SeanyDrive;
+import frc.robot.commands.PeaccyDrive;
 import frc.robot.subsystems.DriveTrain;
 
 public class RobotContainer {
@@ -24,7 +24,7 @@ public class RobotContainer {
   private final JoystickButton zeroButton = new JoystickButton(driverController, 1);
   private final JoystickButton closedLoopButton = new JoystickButton(driverController, 2);
 
-  private final SeanyDrive seanyDrive = new SeanyDrive(
+  private final PeaccyDrive seanyDrive = new PeaccyDrive(
     () -> -driverController.getRawAxis(translationAxis),
     () -> -driverController.getRawAxis(strafeAxis),
     () -> -driverController.getRawAxis(rotationAxis),

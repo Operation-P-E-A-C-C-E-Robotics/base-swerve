@@ -10,17 +10,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
-/**
- * SeanyDrive is a swerve drive command designed to handle all the different
- * modes of driving that we want to use.
- *
- * It has advanced input smoothing and deadbanding,
- * field centric and robot centric modes,
- * and auto angle (automatic heading adjustment) modes.
- */
-public class SeanyDrive extends Command {
+public class PeaccyDrive extends Command {
     private final DoubleSupplier xVelocitySup, yVelocitySup, angularVelocitySup, autoHeadingAngleSup;
     private final BooleanSupplier isAutoAngleSup, isFieldRelativeSup, isOpenLoopSup, isLockInSup;
     private final DriveTrain driveTrain;
@@ -38,7 +31,25 @@ public class SeanyDrive extends Command {
     private BooleanSupplier isZeroOdometry;
 
 
-    public SeanyDrive(DoubleSupplier xVelocitySup,
+    /**
+     * PeaccyDrive is a swerve drive command designed to handle all the different
+     * modes of driving that we want to use.
+     *
+     * It has advanced input smoothing and deadbanding,
+     * field centric and robot centric modes,
+     * and auto angle (automatic heading adjustment) modes.
+     * @param xVelocitySup the requested x velocity
+     * @param yVelocitySup the requested y velocity
+     * @param angularVelocitySup the requested angular velocity
+     * @param autoHeadingAngleSup the requested auto heading angle
+     * @param isAutoAngleSup whether or not to use automatic heading adjustment
+     * @param isFieldRelativeSup whether or not to use field centric mode
+     * @param isOpenLoopSup whether or not to use open loop controls
+     * @param isLockInSup whether or not to X-lock the wheels when stopped
+     * @param isZeroOdometry whether or not to zero the odometry
+     * @param driveTrain the swerve subsystem
+     */
+    public PeaccyDrive(DoubleSupplier xVelocitySup,
                       DoubleSupplier yVelocitySup,
                       DoubleSupplier angularVelocitySup,
                       DoubleSupplier autoHeadingAngleSup,
@@ -58,7 +69,12 @@ public class SeanyDrive extends Command {
         this.isLockInSup = isLockInSup;
         this.isZeroOdometry = isZeroOdometry;
         this.driveTrain = driveTrain;
-        autoHeadingRequest.HeadingController.setP(2);
+
+        //WHY ARE YOU LIKE THIS CTRE
+        autoHeadingRequest.HeadingController.setP(Constants.Swerve.autoHeadingKP);
+        autoHeadingRequest.HeadingController.setI(Constants.Swerve.autoHeadingKI);
+        autoHeadingRequest.HeadingController.setD(Constants.Swerve.autoHeadingKD);
+
         addRequirements(driveTrain);
     }
 
@@ -74,15 +90,14 @@ public class SeanyDrive extends Command {
         boolean isOpenLoop = isOpenLoopSup.getAsBoolean();
         boolean isLockIn = isLockInSup.getAsBoolean();
 
-        System.out.println(autoHeadingAngle);
-        System.out.println(isAutoHeading);
-
         if(isZeroOdometry.getAsBoolean()) driveTrain.resetOdometry();
 
+        // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
         linearVelocity = smoothAndDeadband(linearVelocity).times(5);
         angularVelocity = smoothAndDeadband(angularVelocity) * 5;
 
+        // log data
         SmartDashboard.putNumberArray("swerve requested velocity", new double[] {linearVelocity.getX(), linearVelocity.getY(), angularVelocity});
         SmartDashboard.putBoolean("isAutoHeading", isAutoHeading);
         SmartDashboard.putBoolean("isFieldRelative", isFieldRelative);
