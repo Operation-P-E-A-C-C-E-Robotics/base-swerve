@@ -32,7 +32,7 @@ public final class Constants {
     //CTRE SWERVE CONSTANTS:
     public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(24.75));
 
-    //to: whoever did this; why tf did you label the modules differetly on the robot vs the tuner????? -love, sean
+    //to: whoever did this; why did you label the modules differetly on the robot vs the tuner????? -love, sean
     public static final CANIDs frontLeftIDs =   new CANIDs(8,   10,   9); //module 3 (tuner) / 2 (robot)
     public static final CANIDs frontRighIDs =   new CANIDs(5,   7,    6); //module (tuner) 2 / (robot) 1
     public static final CANIDs rearLeftIDs =    new CANIDs(11,  13,   12); //module (tuner) 4 / (robot) 3
@@ -63,7 +63,7 @@ public final class Constants {
       new PIDConstants(10, 0, 0), 
       1, 
       dimensions.frontLeft.getNorm(), 
-      new ReplanningConfig(true, true),
+      new ReplanningConfig(false, false),
       0.004
     );
   }

@@ -70,10 +70,10 @@ public class DriveTrainTuneable extends SubsystemBase {
         //log swerve state data as fast as it comes in
         swerve.registerTelemetry((SwerveDriveState state) -> {
             field.setRobotPose(state.Pose);
-            SmartDashboard.putNumber("Front Left Module Angle", state.ModuleStates[0].angle.getDegrees());
-            SmartDashboard.putNumber("Front Right Module Angle", state.ModuleStates[1].angle.getDegrees());
-            SmartDashboard.putNumber("Rear Left Module Angle", state.ModuleStates[2].angle.getDegrees());
-            SmartDashboard.putNumber("Rear Right Module Angle", state.ModuleStates[3].angle.getDegrees());
+            SmartDashboard.putNumber("Front Left Module Angle", state.ModuleStates[0].angle.getRotations());
+            SmartDashboard.putNumber("Front Right Module Angle", state.ModuleStates[1].angle.getRotations());
+            SmartDashboard.putNumber("Rear Left Module Angle", state.ModuleStates[2].angle.getRotations());
+            SmartDashboard.putNumber("Rear Right Module Angle", state.ModuleStates[3].angle.getRotations());
             SmartDashboard.putNumber("Front Left Module Speed", state.ModuleStates[0].speedMetersPerSecond);
             SmartDashboard.putNumber("Front Right Module Speed", state.ModuleStates[1].speedMetersPerSecond);
             SmartDashboard.putNumber("Rear Left Module Speed", state.ModuleStates[2].speedMetersPerSecond);
@@ -249,6 +249,11 @@ public class DriveTrainTuneable extends SubsystemBase {
                             .withRotationalRate(angularVelocity);
 
         swerve.setControl(robotCentricRequest);
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        swerve.updateSimState(0.02,12);
     }
 
     
