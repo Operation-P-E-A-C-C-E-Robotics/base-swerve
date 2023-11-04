@@ -9,6 +9,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.lib.swerve.SwerveDescription.CANIDs;
 import frc.lib.swerve.SwerveDescription.Dimensions;
 import frc.lib.swerve.SwerveDescription.EncoderOffsets;
@@ -43,7 +44,7 @@ public final class Constants {
     public static final Inversion inversion = new Inversion(true, true, false, true);
 
     //inertia only used for simulation, which doesn't seem to work regardless. tf ctre.
-    public static final Physics physics = new Physics(0.01, 50, 800, 10);
+    public static final Physics physics = new Physics(0.01, 50, 40, 10);
     
     //unknown units. tf ctre.
     public static final PidGains driveGains = new PidGains(0.2, 0, 0, 0, 0); 
@@ -65,6 +66,11 @@ public final class Constants {
       new ReplanningConfig(true, true),
       0.004
     );
+  }
+
+  public static final class Core {
+    public static final int PDPCanId = 0;
+    public static final ModuleType PDPModuleType = ModuleType.kCTRE;
   }
 
   public class DriveGearRatios{

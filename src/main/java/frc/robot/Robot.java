@@ -6,31 +6,41 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.safety.Inspiration;
+import frc.robot.Constants.Core;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
 
+  private PowerDistribution pdp = new PowerDistribution(Core.PDPCanId, Core.PDPModuleType);
+
   private boolean isInMatch = false;
 
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+
     DataLogManager.start();
-    DriverStation.startDataLog(DataLogManager.getLog());
     DataLogManager.logNetworkTables(true);
-    System.out.println("Robot Initialized");
+    DriverStation.startDataLog(DataLogManager.getLog());
+
+    SmartDashboard.putData("PDP", pdp);
+    
     isInMatch = Inspiration.initializeInspirationOpt1();
     if(isInMatch){
       Inspiration.inspireDriversInit();
     } else {
       Inspiration.inspireProgrammersInit();
     }
+    
+    System.out.println("Robot Initialized");
   }
 
   @Override

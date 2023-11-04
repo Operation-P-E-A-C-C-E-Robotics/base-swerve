@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.motion.Trajectory;
 import frc.lib.util.ServoMotor.SystemConstants;
-import frc.robot.Constants;
 
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
@@ -25,7 +24,6 @@ public class ServoArm extends SubsystemBase {
     private final LinearSystem<N2, N1, N1> plant;
     private final LinearSystemLoop<N2, N1, N1> loop;
     private final SystemConstants constants;
-    private final DoubleSupplier armLength;
     private Trajectory trajectory;
     private State trajectoryStart, trajectoryEnd;
     private boolean recalculateTrajectory = false; //whether we need to recalculate the trajectory
@@ -36,7 +34,6 @@ public class ServoArm extends SubsystemBase {
     private DoubleConsumer voltDriveFunction;
     private DoubleSupplier getPosition, getVelocity;
     private Runnable superPeriodic;
-    private double armMass; //TODO make final once we're done tuning.
     /**
      * A messy ass helper class to run trajectories on an arm
      * @param constants The constants for the system
@@ -70,12 +67,6 @@ public class ServoArm extends SubsystemBase {
                 constants.maxVoltage,
                 constants.dt
         );
-        this.armLength = armLength;
-        this.armMass = armMass;
-        if(Constants.TUNING_MODE){
-            SmartDashboard.putNumber("Arm Mass", armMass);
-            SmartDashboard.putNumber("Arm Length", armLength.getAsDouble());
-        }
     }
 
     /**
@@ -118,15 +109,15 @@ public class ServoArm extends SubsystemBase {
      * calculate additional feedforward to account for gravity
      */
     public double calculateGravityFeedforward(double position, double velocity){
-        var armLength = this.armLength.getAsDouble();
-        var force = armMass     * armLength
-                                * 9.8
-                                * 3.0
-                                * constants.inertia
-                                / (armMass * armLength * armLength)
-                                * Math.cos(position - Math.PI*1.5);
-        //account for gearing:
-        force /= constants.gearing;
+        // var armLength = this.armLength.getAsDouble();
+        // var force = armMass     * armLength
+        //                         * 9.8
+        //                         * 3.0
+        //                         * constants.inertia
+        //                         / (armMass * armLength * armLength)
+        //                         * Math.cos(position - Math.PI*1.5);
+        // //account for gearing:
+        // force /= constants.gearing;
         //calculate voltage needed to counteract force:
         return 0;// constants.motor.getVoltage(force, velocity);
     }
@@ -197,17 +188,12 @@ public class ServoArm extends SubsystemBase {
 
     @Override
     public final void periodic() {
-        //update the weight and length of the arm from the dashboard if we're in tuning mode:
-        if(Constants.TUNING_MODE){
-            armMass = SmartDashboard.getNumber("Arm Mass", armMass);
-//            armLength = SmartDashboard.getNumber("Arm Length", this.armLength.getAsDouble());
-        }
          // run the subsystem's periodic code
          if(superPeriodic != null) superPeriodic.run();
          if(!looping) return; // don't run the feedback loop if it's not enabled
 
          var time = profileTimer.get(); // get the time since the profile started
-         double position = getPosition.getAsDouble(), velocity = getVelocity.getAsDouble();
+         double position = getPosition.getAsDouble();
 
          var feedforward = 0.0;
 

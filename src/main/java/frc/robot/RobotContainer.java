@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.PeaccyDrive;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.DriveTrainTuneable;
 
 public class RobotContainer {
   private final int translationAxis = 3;
@@ -27,7 +26,7 @@ public class RobotContainer {
   private final JoystickButton zeroButton = new JoystickButton(driverController, 9);
   private final JoystickButton closedLoopButton = new JoystickButton(driverController, 5);
 
-  private final PeaccyDrive seanyDrive = new PeaccyDrive(
+  private final PeaccyDrive peaccyDrive = new PeaccyDrive(
     () -> -driverController.getRawAxis(translationAxis),
     () -> -driverController.getRawAxis(strafeAxis),
     () -> -driverController.getRawAxis(rotationAxis),
@@ -45,7 +44,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    driveTrain.setDefaultCommand(seanyDrive);
+    driveTrain.setDefaultCommand(peaccyDrive);
   }
 
 

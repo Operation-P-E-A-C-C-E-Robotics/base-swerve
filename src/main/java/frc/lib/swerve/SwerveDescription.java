@@ -140,7 +140,7 @@ public class SwerveDescription {
          * the physical parameters of the drivetrain. Inertia is only used for simulation (I'm pretty sure).
          * @param linearInertia the linear inertia of the drivetrain in unknown units (maybe kg*m^2)
          * @param angularInertia the angular inertia of the drivetrain in unknown units
-         * @param wheelSlipCurrent the current at which the wheels begin to slip in amps I THINK (not sure)
+         * @param wheelSlipCurrent the current at which the wheels begin to slip in amps I THINK (not sure) WRONG!!!!!!! ITS THE GODDAMN CURRENT LIMIT.
          * @param freeSpeed the free speed of the drivetrain in meters per second
          */
         public Physics (double linearInertia, double angularInertia, double wheelSlipCurrent, double freeSpeed) {
