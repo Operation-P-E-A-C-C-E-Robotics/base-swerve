@@ -9,13 +9,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.PeaccyDrive;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.DriveTrainTuneable;
 
 public class RobotContainer {
   private final int translationAxis = 3;
   private final int strafeAxis = 2;
   private final int rotationAxis = 0;
 
+  //ONE OF THESE MUST BE COMMENTED OUT. ONLY USE THE TUNEABLE ONE FOR TUNING.
   private final DriveTrain driveTrain = new DriveTrain();
+  //private final DriveTrainTuneable driveTrainTuneable = new DriveTrainTuneable();
 
   private final Joystick driverController = new Joystick(0);
 
