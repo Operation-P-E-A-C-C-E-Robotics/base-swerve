@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.sensors.LimelightHelper;
 import frc.lib.swerve.RealSwerveDrivetrain;
 import frc.lib.swerve.SwerveDescription;
 import frc.robot.Constants;
@@ -22,7 +23,9 @@ public class DriveTrain extends SubsystemBase {
 
     private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds();
 
-    public DriveTrain() {
+    private LimelightHelper limelight;
+
+    public DriveTrain(LimelightHelper limelight) {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
             frontLeftIDs, 
@@ -65,6 +68,8 @@ public class DriveTrain extends SubsystemBase {
         SmartDashboard.putData("Field", field);
 
         System.out.println("DriveTrain Initialized");
+
+        this.limelight = limelight;
     }
 
     /**
@@ -119,6 +124,7 @@ public class DriveTrain extends SubsystemBase {
 
     @Override
     public void periodic() {
+        limelight.updateCTRESwerveOdometry(swerve, getPose(), getChassisSpeeds());
     }
 
     @Override
