@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -57,14 +58,28 @@ public final class Constants {
     public static final double autoHeadingKI = 0.0;
     public static final double autoHeadingKD = 0.0;
 
+    //TODO
+    public static final double measuredMaxVelocity = 1.0,
+                              measuredMaxAcceleration = 1.0,
+                              measuredMaxAngularVelocity = 1.0,
+                              measuredMaxAngularAcceleration = 1.0;
+    
+    public static final double autoMaxSpeedSafetyScalar = 0.9;
+
+    public static final PathConstraints autoMaxSpeed = new PathConstraints(
+      measuredMaxVelocity * autoMaxSpeedSafetyScalar, 
+      measuredMaxAcceleration * autoMaxSpeedSafetyScalar, 
+      measuredMaxAngularVelocity * autoMaxSpeedSafetyScalar, 
+      measuredMaxAngularAcceleration * autoMaxSpeedSafetyScalar
+    );
 
     public static final HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(
       new PIDConstants(10, 0, 0), 
       new PIDConstants(10, 0, 0), 
-      1, 
+      measuredMaxVelocity, 
       dimensions.frontLeft.getNorm(), 
       new ReplanningConfig(false, false),
-      0.004
+      0.02
     );
   }
 
