@@ -14,7 +14,9 @@
       "/LiveWindow/Ungrouped/Talon FX (Pro) [7]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX (Pro) [8]": "Motor Controller",
       "/SmartDashboard/DriveTrain": "Subsystem",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/angular curve chooser": "String Chooser",
+      "/SmartDashboard/linear curve chooser": "String Chooser"
     },
     "windows": {
       "/SmartDashboard/Field": {
@@ -28,6 +30,12 @@
     "transitory": {
       "SmartDashboard": {
         "DriveTrain": {
+          "open": true
+        },
+        "double[]##v_/SmartDashboard/angle motor errors": {
+          "open": true
+        },
+        "double[]##v_/SmartDashboard/drive motor errors": {
           "open": true
         },
         "double[]##v_/SmartDashboard/swerve requested velocity": {

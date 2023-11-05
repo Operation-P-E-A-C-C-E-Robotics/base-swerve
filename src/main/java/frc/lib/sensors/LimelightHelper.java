@@ -6,12 +6,14 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.safety.Value;
+import frc.lib.swerve.RealSwerveDrivetrain;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -300,6 +302,28 @@ public class LimelightHelper {
         var stdev = getVisionStdev(visionPose, robotPose, leftVelocity, rightVelocity);
         SmartDashboard.putString("current vision stdev", stdev.toString());
         estimator.addVisionMeasurement(visionPose,Timer.getFPGATimestamp() - 0.5, stdev);
+    }
+
+    public void updateCTRESwerveOdometry(RealSwerveDrivetrain estimator, Pose2d robotPose, ChassisSpeeds speeds) {
+        var botposeReading = botpose.getAtomic();
+        var botposeArray = botposeReading.value;
+
+        if(botposeArray.length == 0) return;
+        if(botposeArray[0] == 0) return;
+        if(!hasTarget()) return;
+
+        var visionPose = new Pose2d(
+            botposeArray[0] + halfFieldWidth,
+            botposeArray[1] + halfFieldHeight,
+            Rotation2d.fromDegrees(botposeArray[5])
+        );
+
+        visionAgreesWithOdometry = visionPose.getTranslation().getDistance(robotPose.getTranslation()) < 0.03
+                && Math.abs(visionPose.getRotation().getRadians() - robotPose.getRotation().getRadians()) < 0.01;
+
+        // var stdev = getVisionStdev(visionPose, robotPose, leftVelocity, rightVelocity);
+        // SmartDashboard.putString("current vision stdev", stdev.toString());
+        estimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp()); //todo add correct timestamp and stdevs
     }
 
     public boolean isOdometryCorrected(){

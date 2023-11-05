@@ -4,6 +4,9 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 
+/**
+ * A class from our 2023 codebase to filter the pose of a fixed point on the field, used for aggressively smoothing gamepiece poses
+ */
 public class AveragePose {
     public static final double TRANSLATION_RATE_LIMIT = 0.001;
     public static final double ROTATION_RATE_LIMIT = 0.1;

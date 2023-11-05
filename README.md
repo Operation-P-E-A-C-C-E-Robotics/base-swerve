@@ -7,7 +7,6 @@ This is FRC team 3461's possible base robot code for the 2024 season.
 - Odometry and 2024 pathplanner support
 - Toggleable X-locked braking
 - Nice joystick smoothing to make it more precise on tiny gamepad joysticks(needs tuning)
-- Coming Soonish: better data logging
 This project only works with WPILib 2024 beta, and with all CTRE devices running phoenix 6 firmware.
 Easy to set up, just update constants.
 # default button mapping

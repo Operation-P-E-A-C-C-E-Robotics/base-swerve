@@ -8,11 +8,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerve.RealSwerveDrivetrain;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
+import frc.lib.util.Curves;
 
 import static frc.robot.Constants.Swerve.*;
 
@@ -41,6 +43,20 @@ public class DriveTrainTuneable extends SubsystemBase {
     private SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(teleopLinearAngleLimit);
     private SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(teleopAngularRateLimit);
 
+    private double linearCurveSensitivity = 6;
+    private double angularCurveSensitivity = 6;
+
+    private SendableChooser<Curves.CurveType> linearCurveChooser = new SendableChooser<>();
+    private SendableChooser<Curves.CurveType> angularCurveChooser = new SendableChooser<>();
+
+    private double maxLinearSpeed = 0;
+    private double maxLinearAcceleration = 0;
+    private double maxAngularVelocity = 0;
+    private double maxAngularAcceleration = 0;
+
+    private Translation2d lastChassisSpeed = new Translation2d(0,0);
+
+    private double lastRotationalSpeed;
 
     /**
      * DO NOT USE THIS INSTEAD OF DriveTrain.java
@@ -49,6 +65,8 @@ public class DriveTrainTuneable extends SubsystemBase {
      * It is not used in the actual robot code.
      * It adds a bunch of SmartDashboard stuff to make it easier to tune the drivetrain.
      * I'm sure it will end up being a hot mess - Sean (before writing this hot mess - Sean (after writing this hot mess))
+     * IMPORTANT!!: THE ONLY REASON I'M ALLOWING THIS DUMPSTER FIRE TO EXIST IS BECAUSE IT WILL NEVER EVER EVER BE RUN AT COMPETITION. RIGHT???
+     * I say run at competition above, however i have come to the conclusion that it will be a miracle if it ever runs at all. - Sean
      */
     public DriveTrainTuneable() {
         swerve = SwerveDescription.generateDrivetrain(
@@ -80,6 +98,7 @@ public class DriveTrainTuneable extends SubsystemBase {
             SmartDashboard.putNumber("Rear Right Module Speed", state.ModuleStates[3].speedMetersPerSecond);
         });
 
+        //log current gains
         SmartDashboard.putNumber("drive kp", driveGains.kP);
         SmartDashboard.putNumber("drive ki", driveGains.kI);
         SmartDashboard.putNumber("drive kd", driveGains.kD);
@@ -119,7 +138,44 @@ public class DriveTrainTuneable extends SubsystemBase {
 
         SmartDashboard.putNumber("auto heading angle", 0);
 
+        SmartDashboard.putNumber("linear curve sensitivity", linearCurveSensitivity);
+        SmartDashboard.putNumber("angular curve sensitivity", angularCurveSensitivity);
 
+
+        //different input curves to play with
+        linearCurveChooser.setDefaultOption("Linear", Curves.CurveType.LINEAR);
+        linearCurveChooser.addOption("Power", Curves.CurveType.POWER);
+        linearCurveChooser.addOption("Exponential", Curves.CurveType.EXPONENTIAL);
+        linearCurveChooser.addOption("FS2 Default", Curves.CurveType.FS2_DEFAULT);
+        linearCurveChooser.addOption("FS2 Windows", Curves.CurveType.FS2_WINDOWS);
+        linearCurveChooser.addOption("Herra 4.5 F Curve", Curves.CurveType.HERRA4_5_F_CURVE);
+        linearCurveChooser.addOption("Herra 9 F Curve", Curves.CurveType.HERRA9_F_CURVE);
+        linearCurveChooser.addOption("Herra Mixed", Curves.CurveType.HERRA_MIXED);
+        linearCurveChooser.addOption("Cheesy Curve", Curves.CurveType.CHEESY_CURVE);
+        SmartDashboard.putData("linear curve chooser", linearCurveChooser);
+
+        angularCurveChooser.setDefaultOption("Linear", Curves.CurveType.LINEAR);
+        angularCurveChooser.addOption("Power", Curves.CurveType.POWER);
+        angularCurveChooser.addOption("Exponential", Curves.CurveType.EXPONENTIAL);
+        angularCurveChooser.addOption("FS2 Default", Curves.CurveType.FS2_DEFAULT);
+        angularCurveChooser.addOption("FS2 Windows", Curves.CurveType.FS2_WINDOWS);
+        angularCurveChooser.addOption("Herra 4.5 F Curve", Curves.CurveType.HERRA4_5_F_CURVE);
+        angularCurveChooser.addOption("Herra 9 F Curve", Curves.CurveType.HERRA9_F_CURVE);
+        angularCurveChooser.addOption("Herra Mixed", Curves.CurveType.HERRA_MIXED);
+        angularCurveChooser.addOption("Cheesy Curve", Curves.CurveType.CHEESY_CURVE);
+        SmartDashboard.putData("angular curve chooser", angularCurveChooser);
+
+        //we want to be able to measure max speed and acceleration for auto and what not
+        SmartDashboard.putNumber("max linear speed", maxLinearSpeed);
+        SmartDashboard.putNumber("max linear acceleration", maxLinearAcceleration);
+        SmartDashboard.putNumber("max angular velocity", 0);
+        SmartDashboard.putNumber("max angular acceleration", 0);
+        SmartDashboard.putNumber("linear speed", 0);
+        SmartDashboard.putNumber("linear acceleration", 0);
+        SmartDashboard.putNumber("angular velocity", 0);
+        SmartDashboard.putNumber("angular acceleration", 0);
+
+        SmartDashboard.putBoolean("reset max measurements", false);
 
         SmartDashboard.putData("Field", field);
 
@@ -181,18 +237,22 @@ public class DriveTrainTuneable extends SubsystemBase {
 
     @Override
     public void periodic() {
-        //the whole drive command again.
+        //do we want to reset the drivetrain with new constants?
         if(SmartDashboard.getBoolean("update drive", false)) {
             updateDrive();
             SmartDashboard.putBoolean("update drive", false);
         }
 
+        //let me graph the errors for pid tuning
+        SmartDashboard.putNumberArray("drive motor errors", swerve.getDriveClosedLoopErrors());
+        SmartDashboard.putNumberArray("angle motor errors", swerve.getAngleClosedLoopErrors());
+
         //only drive if we want to
         if(!SmartDashboard.getBoolean("enable tuning drive", false)) return;
 
-        double xVelocity = driverController.getRawAxis(0);
-        double yVelocity = driverController.getRawAxis(1);
-        double angularVelocity = driverController.getRawAxis(2);
+        double xVelocity = driverController.getRawAxis(3);
+        double yVelocity = driverController.getRawAxis(2);
+        double angularVelocity = driverController.getRawAxis(0);
 
         double autoHeadingAngle = SmartDashboard.getNumber("auto heading angle", 0);
         boolean isAutoHeading = SmartDashboard.getBoolean("auto heading", false);
@@ -205,6 +265,47 @@ public class DriveTrainTuneable extends SubsystemBase {
             swerve.tareEverything();
             SmartDashboard.putBoolean("zero odometry", false);
         }
+
+        if(SmartDashboard.getBoolean("reset max measurements", false)) {
+            maxLinearSpeed = 0;
+            maxLinearAcceleration = 0;
+            maxAngularVelocity = 0;
+            maxAngularAcceleration = 0;
+            SmartDashboard.putBoolean("reset max measurements", false);
+        }
+
+        //handle max linear speed and acceleration
+        var currentChassisSpeed = swerve.getChassisSpeeds();
+        Translation2d currentLinearVelocity = new Translation2d(currentChassisSpeed.vxMetersPerSecond, currentChassisSpeed.vyMetersPerSecond);
+        double currentLinearSpeed = currentLinearVelocity.getNorm();
+        double currentLinearAcceleration = (currentLinearSpeed - lastChassisSpeed.getNorm())/0.02;
+        lastChassisSpeed = currentLinearVelocity;
+
+        maxLinearSpeed = Math.max(maxLinearSpeed, currentLinearSpeed);
+        maxLinearAcceleration = Math.max(maxLinearAcceleration, currentLinearAcceleration);
+
+        SmartDashboard.putNumber("max linear speed", maxLinearSpeed);
+        SmartDashboard.putNumber("max linear acceleration", maxLinearAcceleration);
+        SmartDashboard.putNumber("linear speed", currentLinearSpeed);
+        SmartDashboard.putNumber("linear acceleration", currentLinearAcceleration);
+
+        //handle max angular velocity and acceleration
+        double currentAngularVelocity = currentChassisSpeed.omegaRadiansPerSecond;
+        double currentAngularAcceleration = (currentAngularVelocity - lastRotationalSpeed)/0.02;
+        lastRotationalSpeed = currentAngularVelocity;
+
+        maxAngularVelocity = Math.max(maxAngularVelocity, currentAngularVelocity);
+        maxAngularAcceleration = Math.max(maxAngularAcceleration, currentAngularAcceleration);
+
+        SmartDashboard.putNumber("max angular velocity", maxAngularVelocity);
+        SmartDashboard.putNumber("max angular acceleration", maxAngularAcceleration);
+        SmartDashboard.putNumber("angular velocity", currentAngularVelocity);
+        SmartDashboard.putNumber("angular acceleration", currentAngularAcceleration);
+    
+
+
+        angularCurveSensitivity = SmartDashboard.getNumber("angular curve sensitivity", angularCurveSensitivity);
+        angularVelocity = Curves.curve(angularCurveChooser.getSelected(), angularCurveSensitivity, angularVelocity);
 
         // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
@@ -262,11 +363,16 @@ public class DriveTrainTuneable extends SubsystemBase {
         double rawLinearSpeed = handleDeadbandFixSlope(linearSpeedDeadband,linearVelocity.getNorm());
         if(Math.abs(rawLinearSpeed) < linearSpeedDeadband) linearSpeedLimiter.reset(0);
 
+        linearCurveSensitivity = SmartDashboard.getNumber("linear curve sensitivity", linearCurveSensitivity);
+
+        rawLinearSpeed = Curves.curve(linearCurveChooser.getSelected(), linearCurveSensitivity, rawLinearSpeed);
+
         //smooth the linear speed
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);
 
         //smooth the linear angle
         double rawLinearAngle = linearVelocity.getAngle().getRadians();
+
         double linearAngle = linearAngleLimiter.calculate(rawLinearAngle);
 
         // override the smoothing if it lags too far behind the raw value
