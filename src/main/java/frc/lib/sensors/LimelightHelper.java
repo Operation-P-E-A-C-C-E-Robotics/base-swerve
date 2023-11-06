@@ -23,7 +23,7 @@ public class LimelightHelper {
     NetworkTableInstance networkTables = NetworkTableInstance.getDefault();
     NetworkTable limelight;
 
-    private DoubleArraySubscriber botpose, campose, camtran, tcornxy, tc;
+    private DoubleArraySubscriber botpose, campose, targetpose_robotspace, camtran, tcornxy, tc;
     private DoubleSubscriber tv, tx, ty, ta, ts, tl, tshort, tlong, thor, tvert;
     private IntegerSubscriber getpipe, tid;
     private IntegerPublisher ledMode, camMode, stream, pipeline;
@@ -131,6 +131,13 @@ public class LimelightHelper {
     public Value<double[]> getCameraTranslation(){
         if(camtran == null) camtran = daSub("camtran");
         var val = camtran.get();
+        if(val.length != 6) return Value.notAvailable();
+        return new Value<>(val);
+    }
+
+    public Value<double[]> getTagFromRobot(){
+        if(targetpose_robotspace == null) targetpose_robotspace = daSub("targetpose_robotspace");
+        var val = targetpose_robotspace.get();
         if(val.length != 6) return Value.notAvailable();
         return new Value<>(val);
     }

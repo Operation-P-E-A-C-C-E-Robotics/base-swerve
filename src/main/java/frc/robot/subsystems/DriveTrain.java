@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.sensors.LimelightHelper;
 import frc.lib.swerve.RealSwerveDrivetrain;
 import frc.lib.swerve.SwerveDescription;
+import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
-import frc.robot.telemetry.SwerveTelemetry;
 
 import static frc.robot.Constants.Swerve.*;
 
@@ -116,7 +116,7 @@ public class DriveTrain extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        swerve.updateSimState(0.02, 12);
+        swerve.updateSimState(Constants.period, 12);
     }
 
     

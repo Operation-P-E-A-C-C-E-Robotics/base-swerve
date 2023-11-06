@@ -25,6 +25,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     super(Constants.period);
+    CommandScheduler.getInstance().setPeriod(Constants.period);
   }
 
   @Override
