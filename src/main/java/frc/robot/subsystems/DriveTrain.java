@@ -18,7 +18,8 @@ import static frc.robot.Constants.Swerve.*;
 public class DriveTrain extends SubsystemBase {
     private final RealSwerveDrivetrain swerve;
 
-    private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds();
+    private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds()
+                                                                                        .withIsOpenLoop(false);
 
     // private LimelightHelper limelight;
 
