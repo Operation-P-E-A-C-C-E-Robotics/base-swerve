@@ -57,8 +57,8 @@ public class SwerveTelemetry {
         rearLeftModule.append(rearLeftLigament);
         rearRightModule.append(rearRightLigament);
 
-        SmartDashboard.putData("swerve mech", swerve);
-        SmartDashboard.putData("field", field);
+        SmartDashboard.putData("Swerve Mech", swerve);
+        SmartDashboard.putData("Field", field);
     }
 
     public static void updateSwerveState(SwerveDriveState state, ChassisSpeeds measuredSpeeds) {

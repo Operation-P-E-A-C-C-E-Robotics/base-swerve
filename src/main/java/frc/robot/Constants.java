@@ -45,7 +45,7 @@ public final class Constants {
     public static final Inversion inversion = new Inversion(true, true, false, true);
 
     //inertia only used for simulation, which doesn't seem to work regardless. tf ctre.
-    public static final Physics physics = new Physics(0.01, 50, 40, 10);
+    public static final Physics physics = new Physics(0.01,0.001, 40, 10);
     
     //unknown units. tf ctre.
     public static final PidGains driveGains = new PidGains(0.2, 0, 0, 0, 0); 

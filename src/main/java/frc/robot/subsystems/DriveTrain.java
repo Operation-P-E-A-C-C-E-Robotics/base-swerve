@@ -6,8 +6,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.sensors.LimelightHelper;
 import frc.lib.swerve.RealSwerveDrivetrain;
@@ -20,11 +18,9 @@ import static frc.robot.Constants.Swerve.*;
 public class DriveTrain extends SubsystemBase {
     private final RealSwerveDrivetrain swerve;
 
-    private final Field2d field = new Field2d();
-
     private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds();
 
-    private LimelightHelper limelight;
+    // private LimelightHelper limelight;
 
     public DriveTrain(LimelightHelper limelight) {
         swerve = SwerveDescription.generateDrivetrain(
@@ -58,11 +54,9 @@ public class DriveTrain extends SubsystemBase {
             SwerveTelemetry.updateSwerveState(state, getChassisSpeeds());
         });
 
-        SmartDashboard.putData("Field", field);
-
         System.out.println("DriveTrain Initialized");
 
-        this.limelight = limelight;
+        // this.limelight = limelight;
     }
 
     /**
@@ -117,7 +111,7 @@ public class DriveTrain extends SubsystemBase {
 
     @Override
     public void periodic() {
-        limelight.updateCTRESwerveOdometry(swerve, getPose(), getChassisSpeeds());
+        // limelight.updateCTRESwerveOdometry(swerve, getPose(), getChassisSpeeds()); causes errer for some reason
     }
 
     @Override
