@@ -59,6 +59,12 @@
         "Command": {
           "open": true
         },
+        "Pose3d##v_/Swerve/Robot Pose": {
+          "Translation3d##v_translation": {
+            "open": true
+          },
+          "open": true
+        },
         "open": true
       }
     }

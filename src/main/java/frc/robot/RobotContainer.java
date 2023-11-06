@@ -4,8 +4,15 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
+import java.util.List;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -64,6 +71,14 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
+      new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)),
+      new Pose2d(1, 1, new Rotation2d())
+    );
+    PathPlannerPath test = new PathPlannerPath(
+      bezierPoints,
+      Constants.Swerve.autoMaxSpeed, new GoalEndState(0, new Rotation2d())
+    );
+    return AutoBuilder.followPathWithEvents(test);
   }
 }

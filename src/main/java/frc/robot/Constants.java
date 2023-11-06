@@ -75,8 +75,8 @@ public final class Constants {
     );
 
     public static final HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(
-      new PIDConstants(10, 0, 0), 
-      new PIDConstants(10, 0, 0), 
+      new PIDConstants(0.7, 0, 0), 
+      new PIDConstants(1, 0, 0), 
       measuredMaxVelocity, 
       dimensions.frontLeft.getNorm(), 
       new ReplanningConfig(false, false),
