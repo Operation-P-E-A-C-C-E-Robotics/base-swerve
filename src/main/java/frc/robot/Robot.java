@@ -23,6 +23,10 @@ public class Robot extends TimedRobot {
 
   private boolean isInMatch = false;
 
+  public Robot() {
+    super(Constants.period);
+  }
+
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();

@@ -15,6 +15,7 @@ import frc.lib.swerve.RealSwerveDrivetrain;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.util.Curves;
+import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
 
@@ -278,7 +279,7 @@ public class DriveTrainTuneable extends SubsystemBase {
         var currentChassisSpeed = swerve.getChassisSpeeds();
         Translation2d currentLinearVelocity = new Translation2d(currentChassisSpeed.vxMetersPerSecond, currentChassisSpeed.vyMetersPerSecond);
         double currentLinearSpeed = currentLinearVelocity.getNorm();
-        double currentLinearAcceleration = (currentLinearSpeed - lastChassisSpeed.getNorm())/0.02;
+        double currentLinearAcceleration = (currentLinearSpeed - lastChassisSpeed.getNorm())/Constants.period;
         lastChassisSpeed = currentLinearVelocity;
 
         maxLinearSpeed = Math.max(maxLinearSpeed, currentLinearSpeed);
@@ -354,7 +355,7 @@ public class DriveTrainTuneable extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        swerve.updateSimState(0.02,12);
+        swerve.updateSimState(Constants.period,12);
     }
 
     

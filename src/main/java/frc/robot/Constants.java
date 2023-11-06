@@ -20,6 +20,7 @@ import frc.lib.swerve.SwerveDescription.Physics;
 import frc.lib.swerve.SwerveDescription.PidGains;
 
 public final class Constants {
+  public static final double period = 0.02;
   public static final class Swerve {
     //speeds in m/s (probably)
     public static final double teleopLinearMultiplier = 7.0;
@@ -79,7 +80,7 @@ public final class Constants {
       measuredMaxVelocity, 
       dimensions.frontLeft.getNorm(), 
       new ReplanningConfig(false, false),
-      0.02
+      period
     );
   }
 
