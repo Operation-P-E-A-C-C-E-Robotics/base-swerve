@@ -45,7 +45,7 @@ public class RobotContainer {
     () -> (double) driverController.getPOV(),
     () -> driverController.getPOV() != -1,
     () -> !fieldCentricButton.getAsBoolean(),
-    () -> closedLoopButton.getAsBoolean(),
+    () -> !closedLoopButton.getAsBoolean(),
     () -> lockInButton.getAsBoolean(),
     () -> zeroButton.getAsBoolean(),
     driveTrain
