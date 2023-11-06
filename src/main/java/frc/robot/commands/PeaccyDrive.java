@@ -116,6 +116,11 @@ public class PeaccyDrive extends Command {
 
         //handle auto angle
         if (isAutoHeading) {
+            //convert angle to be -180 to 180
+            autoHeadingAngle = Math.IEEEremainder(autoHeadingAngle, 360);
+            if (autoHeadingAngle > 180) autoHeadingAngle -= 360;
+            if (autoHeadingAngle < -180) autoHeadingAngle += 360;
+
             autoHeadingRequest.withIsOpenLoop(isOpenLoop)
                             .withVelocityX(linearVelocity.getX())
                             .withVelocityY(linearVelocity.getY())
