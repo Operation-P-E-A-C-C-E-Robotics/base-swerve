@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.telemetry.SwerveTelemetry;
 
 public class PeaccyDrive extends Command {
     private final DoubleSupplier xVelocitySup, yVelocitySup, angularVelocitySup, autoHeadingAngleSup;
@@ -28,7 +29,7 @@ public class PeaccyDrive extends Command {
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
-    private BooleanSupplier isZeroOdometry;
+    private BooleanSupplier isZeroOdometrySup;
 
 
     /**
@@ -67,10 +68,9 @@ public class PeaccyDrive extends Command {
         this.isFieldRelativeSup = isFieldRelativeSup;
         this.isOpenLoopSup = isOpenLoopSup;
         this.isLockInSup = isLockInSup;
-        this.isZeroOdometry = isZeroOdometry;
+        this.isZeroOdometrySup = isZeroOdometry;
         this.driveTrain = driveTrain;
 
-        //WHY ARE YOU LIKE THIS CTRE
         autoHeadingRequest.HeadingController.setP(Constants.Swerve.autoHeadingKP);
         autoHeadingRequest.HeadingController.setI(Constants.Swerve.autoHeadingKI);
         autoHeadingRequest.HeadingController.setD(Constants.Swerve.autoHeadingKD);
@@ -89,8 +89,9 @@ public class PeaccyDrive extends Command {
         boolean isFieldRelative = isFieldRelativeSup.getAsBoolean();
         boolean isOpenLoop = isOpenLoopSup.getAsBoolean();
         boolean isLockIn = isLockInSup.getAsBoolean();
+        boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean();
 
-        if(isZeroOdometry.getAsBoolean()) driveTrain.resetOdometry();
+        if(isZeroOdometry) driveTrain.resetOdometry();
 
         // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
@@ -98,11 +99,17 @@ public class PeaccyDrive extends Command {
         angularVelocity = smoothAndDeadband(angularVelocity) * Constants.Swerve.teleopAngularMultiplier;
 
         // log data
-        SmartDashboard.putNumberArray("swerve requested velocity", new double[] {linearVelocity.getX(), linearVelocity.getY(), angularVelocity});
-        SmartDashboard.putBoolean("isAutoHeading", isAutoHeading);
-        SmartDashboard.putBoolean("isFieldRelative", isFieldRelative);
-        SmartDashboard.putBoolean("isOpenLoop", isOpenLoop);
-        SmartDashboard.putBoolean("isLockIn", isLockIn);
+        SwerveTelemetry.updateSwerveCommand(
+            linearVelocity.getX(), 
+            linearVelocity.getY(), 
+            angularVelocity, 
+            autoHeadingAngle, 
+            isAutoHeading, 
+            isFieldRelative, 
+            isOpenLoop, 
+            isLockIn, 
+            isZeroOdometry
+        );
 
 
 
