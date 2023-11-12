@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.telemetry.SwerveTelemetry;
+import frc.lib.util.Curves;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
@@ -23,8 +24,8 @@ public class PeaccyDrive extends Command {
     private final SwerveRequest.FieldCentricFacingAngle autoHeadingRequest = new SwerveRequest.FieldCentricFacingAngle();
     private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake();
 
-    private final double linearSpeedDeadband = 0.02,
-                         angularVelocityDeadband = 0.02;
+    private final double linearSpeedDeadband = 0.1,
+                         angularVelocityDeadband = 0.13;
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
@@ -161,6 +162,7 @@ public class PeaccyDrive extends Command {
         //handle deadband and reset the rate limiter if we're in the deadband
         double rawLinearSpeed = handleDeadbandFixSlope(linearSpeedDeadband,linearVelocity.getNorm());
         if(Math.abs(rawLinearSpeed) < linearSpeedDeadband) linearSpeedLimiter.reset(0);
+        rawLinearSpeed = Curves.herraFCurve(rawLinearSpeed, 6, 4.5);
 
         //smooth the linear speed
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);

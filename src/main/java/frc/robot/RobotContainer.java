@@ -21,11 +21,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.sensors.LimelightHelper;
 import frc.robot.commands.PeaccyDrive;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.DriveTrainTuneable;
 
 public class RobotContainer {
   /* OI CONSTANTS */
-  private final int translationAxis = 3;
-  private final int strafeAxis = 2;
+  private final int translationAxis = 5;
+  private final int strafeAxis = 4;
   private final int rotationAxis = 0;
 
   /* SENSORS */
@@ -34,14 +35,14 @@ public class RobotContainer {
   /* SUBSYSTEMS */
   //ONE OF THESE MUST BE COMMENTED OUT. ONLY USE THE TUNEABLE ONE FOR TUNING.
   private final DriveTrain driveTrain = new DriveTrain(limelight);
-  //private final DriveTrainTuneable driveTrainTuneable = new DriveTrainTuneable();
+  // private final DriveTrainTuneable driveTrainTuneable = new DriveTrainTuneable();
 
   /* OI DEFINITIONS */
   private final Joystick driverController = new Joystick(0);
 
   private final JoystickButton fieldCentricButton = new JoystickButton(driverController, 7);
   private final JoystickButton lockInButton = new JoystickButton(driverController, 8);
-  private final JoystickButton zeroButton = new JoystickButton(driverController, 9);
+  private final JoystickButton zeroButton = new JoystickButton(driverController, 7);
   private final JoystickButton closedLoopButton = new JoystickButton(driverController, 5);
 
   /* COMMANDS */
@@ -49,20 +50,20 @@ public class RobotContainer {
     () -> -driverController.getRawAxis(translationAxis),
     () -> -driverController.getRawAxis(strafeAxis),
     () -> -driverController.getRawAxis(rotationAxis),
-    () -> (double) driverController.getPOV(),
+    () -> (double) -driverController.getPOV(),
     () -> driverController.getPOV() != -1,
-    () -> !fieldCentricButton.getAsBoolean(),
+    () -> driverController.getRawAxis(2) < 0.2,
     () -> !closedLoopButton.getAsBoolean(),
-    () -> lockInButton.getAsBoolean(),
+    () -> driverController.getRawAxis(3) > 0.2,
     () -> zeroButton.getAsBoolean(),
     driveTrain
   );
 
-  private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
+  // private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
   public RobotContainer() {
     configureBindings();
-    SmartDashboard.putData("AUTO MODE", autoChooser);
+    // SmartDashboard.putData("AUTO MODE", autoChooser);
   }
 
   private void configureBindings() {

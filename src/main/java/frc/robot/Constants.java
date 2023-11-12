@@ -41,21 +41,21 @@ public final class Constants {
     public static final CANIDs rearRightIDs =   new CANIDs(2,   4,    3); //module (tuner) 1 / (robot) 0
 
     public static final Gearing gearing = new Gearing(DriveGearRatios.SDSMK4i_L2, ((150.0 / 7.0) / 1.0), 2.0, 0);
-    public static final EncoderOffsets offsets = new EncoderOffsets(-0, -0.227539, -0.708496, -0.407959); //todo these offsets are very wrong.
+    public static final EncoderOffsets offsets = new EncoderOffsets(-0.488770, -0.225342, -0.224609, -0.906738); //todo these offsets are very wrong.
 
-    public static final Inversion inversion = new Inversion(true, true, false, true);
+    public static final Inversion inversion = new Inversion(false, true, true, false); //herra 4.5, 6
 
     //inertia only used for simulation, which doesn't seem to work regardless. tf ctre.
-    public static final Physics physics = new Physics(0.0001,0.01, 800, 10);
+    public static final Physics physics = new Physics(0.0001,0.01, 50, 10);
     
     //unknown units. tf ctre.
     public static final PidGains driveGains = new PidGains(0.2, 0, 0, 0, 0); 
-    public static final PidGains angleGains = new PidGains(70, 0, 0, 0, 0);
+    public static final PidGains angleGains = new PidGains(90, 0, 0.001, 0, 0);
 
     public static final int pigeonCANId = 14;
     public static final boolean invertSteerMotors = Robot.isReal(); //cant invert in simulation which is dumb.
 
-    public static final double autoHeadingKP = 2.0;
+    public static final double autoHeadingKP = 8.0;
     public static final double autoHeadingKI = 0.0;
     public static final double autoHeadingKD = 0.0;
 

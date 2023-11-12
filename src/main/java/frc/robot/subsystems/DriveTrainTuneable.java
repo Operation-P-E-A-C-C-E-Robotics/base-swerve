@@ -26,8 +26,8 @@ public class DriveTrainTuneable extends SubsystemBase {
 
     private final Joystick driverController = new Joystick(0);
 
-    double linearSpeedDeadband = 0.02,
-           angularVelocityDeadband = 0.02;
+    double linearSpeedDeadband = 0.1,
+           angularVelocityDeadband = 0.1;
 
     private final SwerveRequest.FieldCentric fieldCentricRequest = new SwerveRequest.FieldCentric();
     private final SwerveRequest.RobotCentric robotCentricRequest = new SwerveRequest.RobotCentric();
@@ -219,21 +219,21 @@ public class DriveTrainTuneable extends SubsystemBase {
         linearSpeedDeadband = SmartDashboard.getNumber("teleop linear deadband", 0.02);
         angularVelocityDeadband = SmartDashboard.getNumber("teleop angular deadband", 0.02);
 
-        swerve = SwerveDescription.generateDrivetrain(
-            dimensions, 
-            frontLeftIDs, 
-            frontRighIDs, 
-            rearLeftIDs, 
-            rearRightIDs, 
-            gearing, 
-            offsets, 
-            inversion, 
-            physics, 
-            newDriveGains, 
-            newAngleGains, 
-            pigeonCANId, 
-            invertSteerMotors
-        ); 
+        // swerve = SwerveDescription.generateDrivetrain(
+        //     dimensions, 
+        //     frontLeftIDs, 
+        //     frontRighIDs, 
+        //     rearLeftIDs, 
+        //     rearRightIDs, 
+        //     gearing, 
+        //     offsets, 
+        //     inversion, 
+        //     physics, 
+        //     newDriveGains, 
+        //     newAngleGains, 
+        //     pigeonCANId, 
+        //     invertSteerMotors
+        // ); 
     }
 
     @Override
@@ -251,8 +251,8 @@ public class DriveTrainTuneable extends SubsystemBase {
         //only drive if we want to
         if(!SmartDashboard.getBoolean("enable tuning drive", false)) return;
 
-        double xVelocity = driverController.getRawAxis(3);
-        double yVelocity = driverController.getRawAxis(2);
+        double xVelocity = driverController.getRawAxis(5);
+        double yVelocity = driverController.getRawAxis(4);
         double angularVelocity = driverController.getRawAxis(0);
 
         double autoHeadingAngle = SmartDashboard.getNumber("auto heading angle", 0);
