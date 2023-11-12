@@ -1,4 +1,4 @@
-﻿# base-swerve-2024 
+# base-swerve-2024 
 ## CTRE Phoenix 6 base swerve code
 This is FRC team 3461's possible base robot code for the 2024 season.
 - Based on the new CTRE swerve framework
@@ -7,6 +7,7 @@ This is FRC team 3461's possible base robot code for the 2024 season.
 - Odometry and 2024 pathplanner support
 - Toggleable X-locked braking
 - Nice joystick smoothing to make it more precise on tiny gamepad joysticks(needs tuning)
+- Extensive telemetry designed to work with advantagescope (no advantagekit because of ctre's multithreading)
 This project only works with WPILib 2024 beta, and with all CTRE devices running phoenix 6 firmware.
 Easy to set up, just update constants.
 # default button mapping
