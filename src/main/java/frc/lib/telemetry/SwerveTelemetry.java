@@ -1,6 +1,9 @@
 package frc.lib.telemetry;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
+import com.pathplanner.lib.util.PathPlannerLogging;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -8,6 +11,7 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -21,16 +25,25 @@ import frc.robot.Constants;
  */
 public class SwerveTelemetry {
     private static final NetworkTable swerveTable = NetworkTableInstance.getDefault().getTable("Swerve");
+
     private static final StructPublisher<Pose3d> swervePosePublisher = swerveTable.getStructTopic("Robot Pose", Pose3d.struct).publish();
+    private static final StructPublisher<Pose3d> pathplannerTargetPosePublisher = swerveTable.getStructTopic("Target Pose", Pose3d.struct).publish();
+    private static final StructArrayPublisher <Pose2d> pathplannerTrajectoryPublisher = swerveTable.getStructArrayTopic("Path", Pose2d.struct).publish();
+    
     private static final DoubleArrayPublisher swerveDataPublisher = swerveTable.getDoubleArrayTopic("Swerve Data").publish();
     private static final DoublePublisher measuredXVelocity = swerveTable.getDoubleTopic("Measured X Velocity").publish();
     private static final DoublePublisher measuredYVelocity = swerveTable.getDoubleTopic("Measured Y Velocity").publish();
     private static final DoublePublisher measuredAngularVelocity = swerveTable.getDoubleTopic("Measured Angular Velocity").publish();
+    
     private static final DoublePublisher odometryPeriod = swerveTable.getDoubleTopic("Odometry Period").publish();
 
+
+
     private static final NetworkTable swerveCommandTable = swerveTable.getSubTable("Command");
+    
     private static final DoublePublisher swerveRequestedXVelocity = swerveCommandTable.getDoubleTopic("Requested X Velocity").publish();
     private static final DoublePublisher swerveRequestedYVelocity = swerveCommandTable.getDoubleTopic("Requested Y Velocity").publish();
+    
     private static final DoublePublisher swerveRequestedAngularVelocity = swerveCommandTable.getDoubleTopic("Requested Angular Velocity").publish();
     private static final DoublePublisher swerveRequestedAutoHeadingAngle = swerveCommandTable.getDoubleTopic("Requested Auto Heading Angle").publish();
     private static final BooleanPublisher requestFieldCentricPublisher = swerveCommandTable.getBooleanTopic("Request Field Centric").publish();
@@ -39,6 +52,8 @@ public class SwerveTelemetry {
     private static final BooleanPublisher requestLockInPublisher = swerveCommandTable.getBooleanTopic("Request Lock In").publish();
     private static final BooleanPublisher requestZeroOdometryPublisher = swerveCommandTable.getBooleanTopic("Request Zero Odometry").publish();
 
+
+    
     private static final Mechanism2d swerve = new Mechanism2d(5, 5);
     private static final MechanismRoot2d frontLeftModule = swerve.getRoot("front left", 1, 1);
     private static final MechanismRoot2d frontRightModule = swerve.getRoot("front right", 1, 4);
@@ -60,6 +75,17 @@ public class SwerveTelemetry {
 
         SmartDashboard.putData("Swerve Mech", swerve);
         SmartDashboard.putData("Field", field);
+
+        PathPlannerLogging.setLogActivePathCallback((poses) -> {
+            var poseArray = poses.toArray(new Pose2d[0]);
+            pathplannerTrajectoryPublisher.accept(poseArray);
+            field.getObject("Path").setPoses(poseArray);
+        });
+
+        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+            pathplannerTargetPosePublisher.accept(new Pose3d(pose));
+            field.getObject("Target Pose").setPose(pose);
+        });
     }
 
     public static void updateSwerveState(SwerveDriveState state, ChassisSpeeds measuredSpeeds) {

@@ -20,7 +20,7 @@ import frc.lib.swerve.SwerveDescription.Gearing;
 import frc.lib.swerve.SwerveDescription.Inversion;
 import frc.lib.swerve.SwerveDescription.Physics;
 import frc.lib.swerve.SwerveDescription.PidGains;
-import frc.lib.util.Curves;
+import frc.lib.util.JoystickCurves;
 
 public final class Constants {
   public static final double period = 0.02;
@@ -39,8 +39,8 @@ public final class Constants {
     public static final double teleopLinearSpeedDeadband = 0.1;
     public static final double teleopAngularVelocityDeadband = 0.13;
 
-    public static final DoubleFunction <Double> teleopLinearSpeedCurve = (double linearSpeed) -> Curves.herraFCurve(linearSpeed, 6, 4.5); //a nice gentle curve which is Sean's (me!!) favorite :)
-    public static final DoubleFunction <Double> teleopAngularVelocityCurve = (double angularVelocity) -> Curves.powerCurve(angularVelocity, 2); //TODO decide if the driver (me) wants a curve on this or not.
+    public static final DoubleFunction <Double> teleopLinearSpeedCurve = (double linearSpeed) -> JoystickCurves.herraFCurve(linearSpeed, 6, 4.5); //a nice gentle curve which is Sean's (me!!) favorite :)
+    public static final DoubleFunction <Double> teleopAngularVelocityCurve = (double angularVelocity) -> JoystickCurves.powerCurve(angularVelocity, 2); //TODO decide if the driver (me) wants a curve on this or not.
 
     /* CTRE SWERVE CONSTANTS */
     public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(24.75));

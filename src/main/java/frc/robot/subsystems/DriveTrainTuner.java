@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
-import frc.lib.util.Curves;
+import frc.lib.util.JoystickCurves;
 import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
@@ -47,8 +47,8 @@ public class DriveTrainTuner extends SubsystemBase {
     private double linearCurveSensitivity = 6;
     private double angularCurveSensitivity = 6;
 
-    private SendableChooser<Curves.CurveType> linearCurveChooser = new SendableChooser<>();
-    private SendableChooser<Curves.CurveType> angularCurveChooser = new SendableChooser<>();
+    private SendableChooser<JoystickCurves.CurveType> linearCurveChooser = new SendableChooser<>();
+    private SendableChooser<JoystickCurves.CurveType> angularCurveChooser = new SendableChooser<>();
 
     private double maxLinearSpeed = 0;
     private double maxLinearAcceleration = 0;
@@ -144,26 +144,26 @@ public class DriveTrainTuner extends SubsystemBase {
 
 
         //different input curves to play with
-        linearCurveChooser.addOption("Linear", Curves.CurveType.LINEAR);
-        linearCurveChooser.addOption("Power", Curves.CurveType.POWER);
-        linearCurveChooser.addOption("Exponential", Curves.CurveType.EXPONENTIAL);
-        linearCurveChooser.addOption("FS2 Default", Curves.CurveType.FS2_DEFAULT);
-        linearCurveChooser.addOption("FS2 Windows", Curves.CurveType.FS2_WINDOWS);
-        linearCurveChooser.setDefaultOption("Herra 4.5 F Curve", Curves.CurveType.HERRA4_5_F_CURVE);
-        linearCurveChooser.addOption("Herra 9 F Curve", Curves.CurveType.HERRA9_F_CURVE);
-        linearCurveChooser.addOption("Herra Mixed", Curves.CurveType.HERRA_MIXED);
-        linearCurveChooser.addOption("Cheesy Curve", Curves.CurveType.CHEESY_CURVE);
+        linearCurveChooser.addOption("Linear", JoystickCurves.CurveType.LINEAR);
+        linearCurveChooser.addOption("Power", JoystickCurves.CurveType.POWER);
+        linearCurveChooser.addOption("Exponential", JoystickCurves.CurveType.EXPONENTIAL);
+        linearCurveChooser.addOption("FS2 Default", JoystickCurves.CurveType.FS2_DEFAULT);
+        linearCurveChooser.addOption("FS2 Windows", JoystickCurves.CurveType.FS2_WINDOWS);
+        linearCurveChooser.setDefaultOption("Herra 4.5 F Curve", JoystickCurves.CurveType.HERRA4_5_F_CURVE);
+        linearCurveChooser.addOption("Herra 9 F Curve", JoystickCurves.CurveType.HERRA9_F_CURVE);
+        linearCurveChooser.addOption("Herra Mixed", JoystickCurves.CurveType.HERRA_MIXED);
+        linearCurveChooser.addOption("Cheesy Curve", JoystickCurves.CurveType.CHEESY_CURVE);
         SmartDashboard.putData("linear curve chooser", linearCurveChooser);
 
-        angularCurveChooser.setDefaultOption("Linear", Curves.CurveType.LINEAR);
-        angularCurveChooser.addOption("Power", Curves.CurveType.POWER);
-        angularCurveChooser.addOption("Exponential", Curves.CurveType.EXPONENTIAL);
-        angularCurveChooser.addOption("FS2 Default", Curves.CurveType.FS2_DEFAULT);
-        angularCurveChooser.addOption("FS2 Windows", Curves.CurveType.FS2_WINDOWS);
-        angularCurveChooser.addOption("Herra 4.5 F Curve", Curves.CurveType.HERRA4_5_F_CURVE);
-        angularCurveChooser.addOption("Herra 9 F Curve", Curves.CurveType.HERRA9_F_CURVE);
-        angularCurveChooser.addOption("Herra Mixed", Curves.CurveType.HERRA_MIXED);
-        angularCurveChooser.addOption("Cheesy Curve", Curves.CurveType.CHEESY_CURVE);
+        angularCurveChooser.setDefaultOption("Linear", JoystickCurves.CurveType.LINEAR);
+        angularCurveChooser.addOption("Power", JoystickCurves.CurveType.POWER);
+        angularCurveChooser.addOption("Exponential", JoystickCurves.CurveType.EXPONENTIAL);
+        angularCurveChooser.addOption("FS2 Default", JoystickCurves.CurveType.FS2_DEFAULT);
+        angularCurveChooser.addOption("FS2 Windows", JoystickCurves.CurveType.FS2_WINDOWS);
+        angularCurveChooser.addOption("Herra 4.5 F Curve", JoystickCurves.CurveType.HERRA4_5_F_CURVE);
+        angularCurveChooser.addOption("Herra 9 F Curve", JoystickCurves.CurveType.HERRA9_F_CURVE);
+        angularCurveChooser.addOption("Herra Mixed", JoystickCurves.CurveType.HERRA_MIXED);
+        angularCurveChooser.addOption("Cheesy Curve", JoystickCurves.CurveType.CHEESY_CURVE);
         SmartDashboard.putData("angular curve chooser", angularCurveChooser);
 
         //we want to be able to measure max speed and acceleration for auto and what not
@@ -293,7 +293,7 @@ public class DriveTrainTuner extends SubsystemBase {
 
 
         angularCurveSensitivity = SmartDashboard.getNumber("angular curve sensitivity", angularCurveSensitivity);
-        angularVelocity = Curves.curve(angularCurveChooser.getSelected(), angularCurveSensitivity, angularVelocity);
+        angularVelocity = JoystickCurves.curve(angularCurveChooser.getSelected(), angularCurveSensitivity, angularVelocity);
 
         // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
@@ -354,7 +354,7 @@ public class DriveTrainTuner extends SubsystemBase {
 
         linearCurveSensitivity = SmartDashboard.getNumber("linear curve sensitivity", linearCurveSensitivity);
 
-        rawLinearSpeed = Curves.curve(linearCurveChooser.getSelected(), linearCurveSensitivity, rawLinearSpeed);
+        rawLinearSpeed = JoystickCurves.curve(linearCurveChooser.getSelected(), linearCurveSensitivity, rawLinearSpeed);
 
         //smooth the linear speed
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);

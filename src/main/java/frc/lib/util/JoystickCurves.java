@@ -5,7 +5,7 @@ package frc.lib.util;
  * Mostly taken from FS2Open's joystick curves.
  * https://github.com/achilleas-k/fs2open.github.com/blob/joystick_curves/joy_curve_notes/new_curves.md
  */
-public class Curves {
+public class JoystickCurves {
     public static double powerCurve(double I, double s) {
         return Math.copySign(Math.pow(I, s), I);
     }

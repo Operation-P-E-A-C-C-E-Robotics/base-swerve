@@ -111,20 +111,15 @@ public class Motion {
     }
 
     public static void main(String[] args){
-        var test = Motion.fromTime(0, 1, 1);
-        var test1 = Motion.fromState(new State(test.deltaPosition,test.finalVelocity), new State(2,1));
-        var test2 = Motion.fromState(new State(test.deltaPosition + test1.deltaPosition,test1.finalVelocity), new State(3,0));
+        var test = Motion.fromPositionAcceleration(0, 1, 1);
         System.out.println(test);
         for(double i = 0; i <= test.time; i += 0.01){
             System.out.println(test.interpolateTime(i).deltaPosition);
         }
-        var pos = test.deltaPosition;
-        for(double i = 0; i <= test1.time; i += 0.01){
-            System.out.println(pos + test1.interpolateTime(i).deltaPosition);
-        }
-        pos += test1.deltaPosition;
-        for(double i = 0; i <= test2.time; i += 0.01){
-            System.out.println(pos + test2.interpolateTime(i).deltaPosition);
+        test = test.limitAccelerationConstantPosition(0.1);
+        System.out.println(test);
+        for(double i = 0; i <= test.time; i += 0.01){
+            System.out.println(test.interpolateTime(i).deltaPosition);
         }
     }
 }

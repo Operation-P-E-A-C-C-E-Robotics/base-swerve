@@ -3,6 +3,7 @@ package frc.lib.motion;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.lib.util.Util;
 
+@Deprecated
 public class TrapezoidalMotion {
 
     private final double maxVelocity;
@@ -15,6 +16,7 @@ public class TrapezoidalMotion {
      * This class is a better version of the TrapezoidalMotion class. It generates trapezoidal
      * motion profiles on the fly, rather than pre-generating them. This allows for more accurate
      * motion profiles, and allows for the robot to be able to change its motion profile in real-time.
+     * DEPRICATED USE Trajectory.trapezoidTrajectory() INSTEAD
      * How it works:
      * <br/>1. Calculate the position at which the robot will start decelerating. Based on this, we know if we are in the acceleration phase or the deceleration phase.
      * <br/><br/>2. If we are in acceleration/coast, calculate the total acceleration and velocity required to reach the goal position.
