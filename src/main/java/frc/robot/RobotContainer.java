@@ -4,16 +4,11 @@
 
 package frc.robot;
 
-import java.util.List;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.sensors.LimelightHelper;
@@ -42,23 +37,23 @@ public class RobotContainer {
 
   /* COMMANDS */
   private final PeaccyDrive peaccyDrive = new PeaccyDrive(
-    () -> -driverController.getRawAxis(translationAxis),
-    () -> -driverController.getRawAxis(strafeAxis),
-    () -> -driverController.getRawAxis(rotationAxis),
-    () -> (double) -driverController.getPOV(),
-    () -> driverController.getPOV() != -1,
-    () -> driverController.getRawAxis(2) < 0.2,
-    () -> !closedLoopButton.getAsBoolean(),
-    () -> driverController.getRawAxis(3) > 0.2,
-    () -> zeroButton.getAsBoolean(),
+    () -> -driverController.getRawAxis(translationAxis),  //translation
+    () -> -driverController.getRawAxis(strafeAxis),       //strafe
+    () -> -driverController.getRawAxis(rotationAxis),     //rotation
+    () -> (double) -driverController.getPOV(),            //auto heading angle
+    () -> driverController.getPOV() != -1,                //auto heading enabled
+    () -> driverController.getRawAxis(2) < 0.2,      //field oriented
+    () -> !closedLoopButton.getAsBoolean(),               //open loop
+    () -> driverController.getRawAxis(3) > 0.2,      //X lock wheels enabled
+    () -> zeroButton.getAsBoolean(),                      //zero odometry
     driveTrain
   );
 
-  // private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
+  private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
   public RobotContainer() {
     configureBindings();
-    // SmartDashboard.putData("AUTO MODE", autoChooser);
+    SmartDashboard.putData("AUTO MODE", autoChooser);
   }
 
   private void configureBindings() {
@@ -67,16 +62,6 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    // List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
-    //   new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)),
-    //   // new Pose2d(0.5, 1, new Rotation2d()),
-    //   new Pose2d(0, 1, new Rotation2d())
-    // );
-    // PathPlannerPath test = new PathPlannerPath(
-    //   bezierPoints,
-    //   Constants.Swerve.autoMaxSpeed, new GoalEndState(0, new Rotation2d())
-    // );
-    // return AutoBuilder.followPathWithEvents(test);
     return AutoBuilder.followPathWithEvents(PathPlannerPath.fromPathFile("Example Path"));
   }
 }

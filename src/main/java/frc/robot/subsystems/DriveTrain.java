@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.sensors.LimelightHelper;
-import frc.lib.swerve.RealSwerveDrivetrain;
+import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
@@ -16,7 +16,7 @@ import frc.robot.Constants;
 import static frc.robot.Constants.Swerve.*;
 
 public class DriveTrain extends SubsystemBase {
-    protected final RealSwerveDrivetrain swerve;
+    protected final PeaccefulSwerve swerve;
 
     private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds()
                                                                                         .withIsOpenLoop(false);
@@ -38,7 +38,9 @@ public class DriveTrain extends SubsystemBase {
             angleGains, 
             pigeonCANId, 
             invertSteerMotors
-        ); 
+        );
+
+        swerve.setSteerCurrentLimit(steerMotorCurrentLimit);
 
         //pathplanner config
         AutoBuilder.configureHolonomic(

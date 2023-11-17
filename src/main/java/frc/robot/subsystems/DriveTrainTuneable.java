@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.swerve.RealSwerveDrivetrain;
+import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.util.Curves;
@@ -19,8 +19,8 @@ import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
 
-public class DriveTrainTuneable_old extends SubsystemBase {
-    private RealSwerveDrivetrain swerve;
+public class DriveTrainTuneable extends SubsystemBase {
+    private PeaccefulSwerve swerve;
 
     private final Field2d field = new Field2d();
 
@@ -69,7 +69,7 @@ public class DriveTrainTuneable_old extends SubsystemBase {
      * IMPORTANT!!: THE ONLY REASON I'M ALLOWING THIS DUMPSTER FIRE TO EXIST IS BECAUSE IT WILL NEVER EVER EVER BE RUN AT COMPETITION. RIGHT???
      * I say run at competition above, however i have come to the conclusion that it will be a miracle if it ever runs at all. - Sean
      */
-    public DriveTrainTuneable_old() {
+    public DriveTrainTuneable() {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
             frontLeftIDs, 
@@ -180,7 +180,7 @@ public class DriveTrainTuneable_old extends SubsystemBase {
 
         SmartDashboard.putData("Field", field);
 
-        System.out.println("DriveTrain Initialized");
+        System.err.println("WARNING: You have instantiated DriveTrainTuneable. Unless you are Sean, or have asked Sean, or are Sean's clone, you should not be doing this. (unless you're on another team. in which case, hi!)");
     }
 
     //re initialize the drivetrain with new gains
@@ -220,22 +220,7 @@ public class DriveTrainTuneable_old extends SubsystemBase {
         angularVelocityDeadband = SmartDashboard.getNumber("teleop angular deadband", 0.02);
 
         swerve.applyDriveConfigs(newDriveGains);
-
-        // swerve = SwerveDescription.generateDrivetrain(
-        //     dimensions, 
-        //     frontLeftIDs, 
-        //     frontRighIDs, 
-        //     rearLeftIDs, 
-        //     rearRightIDs, 
-        //     gearing, 
-        //     offsets, 
-        //     inversion, 
-        //     physics, 
-        //     newDriveGains, 
-        //     newAngleGains, 
-        //     pigeonCANId, 
-        //     invertSteerMotors
-        // ); 
+        swerve.applySteerConfigs(newAngleGains);
     }
 
     @Override

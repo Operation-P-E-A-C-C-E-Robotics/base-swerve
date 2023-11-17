@@ -26,6 +26,7 @@ public class SwerveTelemetry {
     private static final DoublePublisher measuredXVelocity = swerveTable.getDoubleTopic("Measured X Velocity").publish();
     private static final DoublePublisher measuredYVelocity = swerveTable.getDoubleTopic("Measured Y Velocity").publish();
     private static final DoublePublisher measuredAngularVelocity = swerveTable.getDoubleTopic("Measured Angular Velocity").publish();
+    private static final DoublePublisher odometryPeriod = swerveTable.getDoubleTopic("Odometry Period").publish();
 
     private static final NetworkTable swerveCommandTable = swerveTable.getSubTable("Command");
     private static final DoublePublisher swerveRequestedXVelocity = swerveCommandTable.getDoubleTopic("Requested X Velocity").publish();
@@ -95,6 +96,7 @@ public class SwerveTelemetry {
         measuredXVelocity.accept(measuredSpeeds.vxMetersPerSecond);
         measuredYVelocity.accept(measuredSpeeds.vyMetersPerSecond);
         measuredAngularVelocity.accept(measuredSpeeds.omegaRadiansPerSecond);
+        odometryPeriod.accept(state.OdometryPeriod);
     }
 
     public static void updateSwerveCommand(double requestedXVelocity, 

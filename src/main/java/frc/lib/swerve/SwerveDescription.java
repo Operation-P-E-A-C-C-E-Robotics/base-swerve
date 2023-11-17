@@ -30,7 +30,7 @@ public class SwerveDescription {
      * @param invertSteerMotors whether or not to invert the steer motors
      * @return a CTRE swerve drivetrain
      */
-    public static RealSwerveDrivetrain generateDrivetrain (
+    public static PeaccefulSwerve generateDrivetrain (
                                 Dimensions dimensions, 
                                 CANIDs frontLeftIDs,
                                 CANIDs frontRightIDs,
@@ -103,7 +103,7 @@ public class SwerveDescription {
             inversion.rearRight
         );
 
-        return new RealSwerveDrivetrain(
+        return new PeaccefulSwerve(
             swerveConstants,
             frontLeft,
             frontRight,

@@ -1,5 +1,6 @@
 package frc.lib.swerve;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
@@ -12,18 +13,18 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * ADD ONE FUNCTION SO I CAN GET THE GODDAMN KNEMATICS DONT MAKE THEM """"PROTECTED"""" SO I HAVE TO DO ALL THIS NONSENSE JUST TO GET THE
  * CHASSIS SPEEDS. 
  */
-public class RealSwerveDrivetrain extends SwerveDrivetrain {
-    public RealSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
+public class PeaccefulSwerve extends SwerveDrivetrain {
+    public PeaccefulSwerve(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency,
             SwerveModuleConstants[] modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
     }
 
-    public RealSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants,
+    public PeaccefulSwerve(SwerveDrivetrainConstants driveTrainConstants,
             SwerveModuleConstants[] modules, int pigeonCANId) {
         super(driveTrainConstants, modules);
     }
  
-    public RealSwerveDrivetrain(SwerveDrivetrainConstants swerveConstants, SwerveModuleConstants frontLeft,
+    public PeaccefulSwerve(SwerveDrivetrainConstants swerveConstants, SwerveModuleConstants frontLeft,
             SwerveModuleConstants frontRight, SwerveModuleConstants rearLeft, SwerveModuleConstants rearRight) {
         super(swerveConstants, frontLeft, frontRight, rearLeft, rearRight);
     }
@@ -59,6 +60,15 @@ public class RealSwerveDrivetrain extends SwerveDrivetrain {
     public void applySteerConfigs (Slot0Configs configs) {
         for (SwerveModule module : Modules) {
             module.getSteerMotor().getConfigurator().apply(configs);
+        }
+    }
+
+    public void setSteerCurrentLimit (double amps) {
+        var limit = new CurrentLimitsConfigs();
+        limit.StatorCurrentLimit = amps;
+        limit.StatorCurrentLimitEnable = true;
+        for (SwerveModule module : Modules) {
+            module.getSteerMotor().getConfigurator().apply(limit);
         }
     }
 

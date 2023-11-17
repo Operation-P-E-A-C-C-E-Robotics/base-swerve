@@ -13,7 +13,7 @@ import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.safety.Value;
-import frc.lib.swerve.RealSwerveDrivetrain;
+import frc.lib.swerve.PeaccefulSwerve;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -311,7 +311,7 @@ public class LimelightHelper {
         estimator.addVisionMeasurement(visionPose,Timer.getFPGATimestamp() - 0.5, stdev);
     }
 
-    public void updateCTRESwerveOdometry(RealSwerveDrivetrain estimator, Pose2d robotPose, ChassisSpeeds speeds) {
+    public void updateCTRESwerveOdometry(PeaccefulSwerve estimator, Pose2d robotPose, ChassisSpeeds speeds) {
         var botposeReading = botpose.getAtomic();
         var botposeArray = botposeReading.value;
 

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.DoubleFunction;
+
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -18,10 +20,12 @@ import frc.lib.swerve.SwerveDescription.Gearing;
 import frc.lib.swerve.SwerveDescription.Inversion;
 import frc.lib.swerve.SwerveDescription.Physics;
 import frc.lib.swerve.SwerveDescription.PidGains;
+import frc.lib.util.Curves;
 
 public final class Constants {
   public static final double period = 0.02;
   public static final class Swerve {
+    /* TELEOP */
     //speeds in m/s (probably)
     public static final double teleopLinearMultiplier = 7.0;
     public static final double teleopAngularMultiplier = 7.0;
@@ -31,7 +35,14 @@ public final class Constants {
     public static final double teleopLinearAngleLimit = 2.0;
     public static final double teleopAngularRateLimit = 3.0;
 
-    //CTRE SWERVE CONSTANTS:
+    //deadband
+    public static final double teleopLinearSpeedDeadband = 0.1;
+    public static final double teleopAngularVelocityDeadband = 0.13;
+
+    public static final DoubleFunction <Double> teleopLinearSpeedCurve = (double linearSpeed) -> Curves.herraFCurve(linearSpeed, 6, 4.5); //a nice gentle curve which is Sean's (me!!) favorite :)
+    public static final DoubleFunction <Double> teleopAngularVelocityCurve = (double angularVelocity) -> Curves.powerCurve(angularVelocity, 2); //TODO decide if the driver (me) wants a curve on this or not.
+
+    /* CTRE SWERVE CONSTANTS */
     public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(24.75));
 
     //to: whoever did this; why did you label the modules differetly on the robot vs the tuner????? -love, sean
@@ -45,10 +56,10 @@ public final class Constants {
 
     public static final Inversion inversion = new Inversion(false, true, true, false); //herra 4.5, 6
 
-    //inertia only used for simulation, which doesn't seem to work regardless. tf ctre.
+    //inertia only used for simulation
     public static final Physics physics = new Physics(0.0001,0.01, 50, 10);
+    public static final double steerMotorCurrentLimit = 20; //amps
     
-    //unknown units. tf ctre.
     public static final PidGains driveGains = new PidGains(0.35, 0, 0, 0.11, 0.3); 
     public static final PidGains angleGains = new PidGains(90, 0, 0.001, 0, 0);
 

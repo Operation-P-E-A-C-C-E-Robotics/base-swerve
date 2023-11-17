@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.telemetry.SwerveTelemetry;
-import frc.lib.util.Curves;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
@@ -22,10 +21,8 @@ public class PeaccyDrive extends Command {
     private final SwerveRequest.FieldCentric fieldCentricRequest = new SwerveRequest.FieldCentric();
     private final SwerveRequest.RobotCentric robotCentricRequest = new SwerveRequest.RobotCentric();
     private final SwerveRequest.FieldCentricFacingAngle autoHeadingRequest = new SwerveRequest.FieldCentricFacingAngle();
-    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withIsOpenLoop(false);
 
-    private final double linearSpeedDeadband = 0.1,
-                         angularVelocityDeadband = 0.13;
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
@@ -160,18 +157,18 @@ public class PeaccyDrive extends Command {
 
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
         //handle deadband and reset the rate limiter if we're in the deadband
-        double rawLinearSpeed = handleDeadbandFixSlope(linearSpeedDeadband,linearVelocity.getNorm());
-        if(Math.abs(rawLinearSpeed) < linearSpeedDeadband) linearSpeedLimiter.reset(0);
-        rawLinearSpeed = Curves.herraFCurve(rawLinearSpeed, 6, 4.5);
+        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,linearVelocity.getNorm());
+        if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
+        rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
-        //smooth the linear speed
+        //limit the linear acceleration
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);
 
-        //smooth the linear angle
+        //limit the change in direction
         double rawLinearAngle = linearVelocity.getAngle().getRadians();
         double linearAngle = linearAngleLimiter.calculate(rawLinearAngle);
 
-        // override the smoothing if it lags too far behind the raw value
+        // override the smoothing of the direction if it lags too far behind the raw value
         // (mainly after stopping and changing direction)
         if (Math.abs(linearAngle - rawLinearAngle) > Math.PI/4) {
             linearAngleLimiter.reset(rawLinearAngle);
@@ -183,12 +180,11 @@ public class PeaccyDrive extends Command {
 
     private double smoothAndDeadband (double angularVelocity) {
         //apply deadband to angular velocity
-        angularVelocity = handleDeadbandFixSlope(angularVelocityDeadband, angularVelocity);
+        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, angularVelocity);
 
-        //simple square curve on the angular velocity to make it more responsive
-        angularVelocity = Math.copySign(Math.pow(angularVelocity, 2), angularVelocity);
+        angularVelocity = Constants.Swerve.teleopAngularVelocityCurve.apply(angularVelocity);
 
-        //limit the angular velocity
+        //limit the angular acceleration
         angularVelocity = angularVelocityLimiter.calculate(angularVelocity);
 
         return angularVelocity;
