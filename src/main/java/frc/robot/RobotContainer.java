@@ -14,14 +14,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.sensors.LimelightHelper;
 import frc.robot.commands.PeaccyDrive;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.DriveTrainTuneable;
 
 public class RobotContainer {
   /* OI CONSTANTS */
@@ -35,13 +32,11 @@ public class RobotContainer {
   /* SUBSYSTEMS */
   //ONE OF THESE MUST BE COMMENTED OUT. ONLY USE THE TUNEABLE ONE FOR TUNING.
   private final DriveTrain driveTrain = new DriveTrain(limelight);
-  // private final DriveTrainTuneable driveTrainTuneable = new DriveTrainTuneable();
+  // private final DriveTrainTuneable_old driveTrainTuneable = new DriveTrainTuneable();
 
   /* OI DEFINITIONS */
   private final Joystick driverController = new Joystick(0);
-
-  private final JoystickButton fieldCentricButton = new JoystickButton(driverController, 7);
-  private final JoystickButton lockInButton = new JoystickButton(driverController, 8);
+  
   private final JoystickButton zeroButton = new JoystickButton(driverController, 7);
   private final JoystickButton closedLoopButton = new JoystickButton(driverController, 5);
 
@@ -72,14 +67,16 @@ public class RobotContainer {
 
 
   public Command getAutonomousCommand() {
-    List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
-      new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)),
-      new Pose2d(1, 1, new Rotation2d())
-    );
-    PathPlannerPath test = new PathPlannerPath(
-      bezierPoints,
-      Constants.Swerve.autoMaxSpeed, new GoalEndState(0, new Rotation2d())
-    );
-    return AutoBuilder.followPathWithEvents(test);
+    // List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
+    //   new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)),
+    //   // new Pose2d(0.5, 1, new Rotation2d()),
+    //   new Pose2d(0, 1, new Rotation2d())
+    // );
+    // PathPlannerPath test = new PathPlannerPath(
+    //   bezierPoints,
+    //   Constants.Swerve.autoMaxSpeed, new GoalEndState(0, new Rotation2d())
+    // );
+    // return AutoBuilder.followPathWithEvents(test);
+    return AutoBuilder.followPathWithEvents(PathPlannerPath.fromPathFile("Example Path"));
   }
 }

@@ -19,7 +19,7 @@ import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
 
-public class DriveTrainTuneable extends SubsystemBase {
+public class DriveTrainTuneable_old extends SubsystemBase {
     private RealSwerveDrivetrain swerve;
 
     private final Field2d field = new Field2d();
@@ -69,7 +69,7 @@ public class DriveTrainTuneable extends SubsystemBase {
      * IMPORTANT!!: THE ONLY REASON I'M ALLOWING THIS DUMPSTER FIRE TO EXIST IS BECAUSE IT WILL NEVER EVER EVER BE RUN AT COMPETITION. RIGHT???
      * I say run at competition above, however i have come to the conclusion that it will be a miracle if it ever runs at all. - Sean
      */
-    public DriveTrainTuneable() {
+    public DriveTrainTuneable_old() {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
             frontLeftIDs, 
@@ -218,6 +218,8 @@ public class DriveTrainTuneable extends SubsystemBase {
 
         linearSpeedDeadband = SmartDashboard.getNumber("teleop linear deadband", 0.02);
         angularVelocityDeadband = SmartDashboard.getNumber("teleop angular deadband", 0.02);
+
+        swerve.applyDriveConfigs(newDriveGains);
 
         // swerve = SwerveDescription.generateDrivetrain(
         //     dimensions, 

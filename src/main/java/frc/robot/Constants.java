@@ -49,7 +49,7 @@ public final class Constants {
     public static final Physics physics = new Physics(0.0001,0.01, 50, 10);
     
     //unknown units. tf ctre.
-    public static final PidGains driveGains = new PidGains(0.2, 0, 0, 0, 0); 
+    public static final PidGains driveGains = new PidGains(0.35, 0, 0, 0.11, 0.3); 
     public static final PidGains angleGains = new PidGains(90, 0, 0.001, 0, 0);
 
     public static final int pigeonCANId = 14;
@@ -60,12 +60,12 @@ public final class Constants {
     public static final double autoHeadingKD = 0.0;
 
     //TODO
-    public static final double measuredMaxVelocity = 1.0,
-                              measuredMaxAcceleration = 1.0,
-                              measuredMaxAngularVelocity = 1.0,
-                              measuredMaxAngularAcceleration = 1.0;
+    public static final double measuredMaxVelocity = 3,
+                              measuredMaxAcceleration = 3,
+                              measuredMaxAngularVelocity = 360,
+                              measuredMaxAngularAcceleration = 360;
     
-    public static final double autoMaxSpeedSafetyScalar = 0.9;
+    public static final double autoMaxSpeedSafetyScalar = 1;
 
     public static final PathConstraints autoMaxSpeed = new PathConstraints(
       measuredMaxVelocity * autoMaxSpeedSafetyScalar, 
@@ -75,8 +75,8 @@ public final class Constants {
     );
 
     public static final HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(
-      new PIDConstants(0.7, 0, 0), 
-      new PIDConstants(1, 0, 0), 
+      new PIDConstants(10, 0, 0), 
+      new PIDConstants(5, 0, 0), 
       measuredMaxVelocity, 
       dimensions.frontLeft.getNorm(), 
       new ReplanningConfig(false, false),

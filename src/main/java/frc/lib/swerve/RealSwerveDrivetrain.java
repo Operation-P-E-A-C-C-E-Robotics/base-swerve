@@ -1,5 +1,6 @@
 package frc.lib.swerve;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
@@ -48,4 +49,17 @@ public class RealSwerveDrivetrain extends SwerveDrivetrain {
         }
         return errors;
     }
+
+    public void applyDriveConfigs (Slot0Configs configs) {
+        for (SwerveModule module : Modules) {
+            module.getDriveMotor().getConfigurator().apply(configs);
+        }
+    }
+
+    public void applySteerConfigs (Slot0Configs configs) {
+        for (SwerveModule module : Modules) {
+            module.getSteerMotor().getConfigurator().apply(configs);
+        }
+    }
+
 }
