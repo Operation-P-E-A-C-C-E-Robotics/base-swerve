@@ -19,7 +19,7 @@ import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
 
-public class DriveTrainTuneable extends SubsystemBase {
+public class DriveTrainTuner extends SubsystemBase {
     private PeaccefulSwerve swerve;
 
     private final Field2d field = new Field2d();
@@ -69,7 +69,7 @@ public class DriveTrainTuneable extends SubsystemBase {
      * IMPORTANT!!: THE ONLY REASON I'M ALLOWING THIS DUMPSTER FIRE TO EXIST IS BECAUSE IT WILL NEVER EVER EVER BE RUN AT COMPETITION. RIGHT???
      * I say run at competition above, however i have come to the conclusion that it will be a miracle if it ever runs at all. - Sean
      */
-    public DriveTrainTuneable() {
+    public DriveTrainTuner() {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
             frontLeftIDs, 
@@ -144,12 +144,12 @@ public class DriveTrainTuneable extends SubsystemBase {
 
 
         //different input curves to play with
-        linearCurveChooser.setDefaultOption("Linear", Curves.CurveType.LINEAR);
+        linearCurveChooser.addOption("Linear", Curves.CurveType.LINEAR);
         linearCurveChooser.addOption("Power", Curves.CurveType.POWER);
         linearCurveChooser.addOption("Exponential", Curves.CurveType.EXPONENTIAL);
         linearCurveChooser.addOption("FS2 Default", Curves.CurveType.FS2_DEFAULT);
         linearCurveChooser.addOption("FS2 Windows", Curves.CurveType.FS2_WINDOWS);
-        linearCurveChooser.addOption("Herra 4.5 F Curve", Curves.CurveType.HERRA4_5_F_CURVE);
+        linearCurveChooser.setDefaultOption("Herra 4.5 F Curve", Curves.CurveType.HERRA4_5_F_CURVE);
         linearCurveChooser.addOption("Herra 9 F Curve", Curves.CurveType.HERRA9_F_CURVE);
         linearCurveChooser.addOption("Herra Mixed", Curves.CurveType.HERRA_MIXED);
         linearCurveChooser.addOption("Cheesy Curve", Curves.CurveType.CHEESY_CURVE);
@@ -298,6 +298,7 @@ public class DriveTrainTuneable extends SubsystemBase {
         // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
         linearVelocity = smoothAndDeadband(linearVelocity).times(newTeleopLinearMultiplier);
+        SmartDashboard.putNumber("requested linear velocity", linearVelocity.getNorm());
         angularVelocity = smoothAndDeadband(angularVelocity) * newTeleopAngularMultiplier;
 
         //handle lock in
