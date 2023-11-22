@@ -17,7 +17,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.motion.Trajectory;
 
-public class GodMode implements SwerveRequest {
+public class PeaccyRequest implements SwerveRequest {
 
     //Input parameters
     public double VelocityX = 0;
@@ -58,7 +58,7 @@ public class GodMode implements SwerveRequest {
      * The most epic swerve request ever. Does all the things.
      * Made by the one and only Peaccy.
      */
-    public GodMode(double maxAngularVelocity, 
+    public PeaccyRequest(double maxAngularVelocity, 
                     double maxAngularAcceleration, 
                     double holdHeadingkP, 
                     double holdHeadingkV, 
@@ -104,57 +104,57 @@ public class GodMode implements SwerveRequest {
         return StatusCode.OK;
     }
 
-    public GodMode withVelocityX(double velocityX) {
+    public PeaccyRequest withVelocityX(double velocityX) {
         this.VelocityX = velocityX;
         return this;
     }
 
-    public GodMode withVelocityY(double velocityY) {
+    public PeaccyRequest withVelocityY(double velocityY) {
         this.VelocityY = velocityY;
         return this;
     }
 
-    public GodMode withRotationalRate(double rotationalRate) {
+    public PeaccyRequest withRotationalRate(double rotationalRate) {
         this.RotationalRate = rotationalRate;
         return this;
     }
 
-    public GodMode withHeading(double heading) {
+    public PeaccyRequest withHeading(double heading) {
         this.Heading = heading;
         return this;
     }
 
-    public GodMode withRotationalDeadband(double rotationalDeadband) {
+    public PeaccyRequest withRotationalDeadband(double rotationalDeadband) {
         this.RotationalDeadband = rotationalDeadband;
         return this;
     }
 
-    public GodMode withHoldHeading(boolean holdHeading) {
+    public PeaccyRequest withHoldHeading(boolean holdHeading) {
         this.HoldHeading = holdHeading;
         return this;
     }
 
-    public GodMode withSoftHoldHeading(boolean softHoldHeading) {
+    public PeaccyRequest withSoftHoldHeading(boolean softHoldHeading) {
         this.SoftHoldHeading = softHoldHeading;
         return this;
     }
 
-    public GodMode withIsOpenLoop(boolean isOpenLoop) {
+    public PeaccyRequest withIsOpenLoop(boolean isOpenLoop) {
         this.IsOpenLoop = isOpenLoop;
         return this;
     }
 
-    public GodMode withIsFieldCentric(boolean isFieldCentric) {
+    public PeaccyRequest withIsFieldCentric(boolean isFieldCentric) {
         this.IsFieldCentric = isFieldCentric;
         return this;
     }
 
-    public GodMode withPositionCorrectionIterations(double positionCorrectionIterations) {
+    public PeaccyRequest withPositionCorrectionIterations(double positionCorrectionIterations) {
         this.PositionCorrectionIterations = positionCorrectionIterations;
         return this;
     }
 
-    public GodMode withPositionCorrectionWeight(double positionCorrectionWeight) {
+    public PeaccyRequest withPositionCorrectionWeight(double positionCorrectionWeight) {
         this.PositionCorrectionWeight = positionCorrectionWeight;
         return this;
     }
