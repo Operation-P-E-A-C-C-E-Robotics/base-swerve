@@ -187,7 +187,7 @@ public class GodMode implements SwerveRequest {
         }
 
         //calculate the correction
-        var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get()).velocity;
+        var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod).velocity;
         var feedforward = headingFeedforward.calculate(target);
         var pGain = (target - currentHeading) * holdHeadingkP * parameters.updatePeriod;
         var delta = pGain + feedforward;
