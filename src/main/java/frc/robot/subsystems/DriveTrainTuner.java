@@ -7,13 +7,13 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
+import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.JoystickCurves;
 import frc.robot.Constants;
 
@@ -21,8 +21,6 @@ import static frc.robot.Constants.Swerve.*;
 
 public class DriveTrainTuner extends SubsystemBase {
     private PeaccefulSwerve swerve;
-
-    private final Field2d field = new Field2d();
 
     private final Joystick driverController = new Joystick(0);
 
@@ -88,7 +86,7 @@ public class DriveTrainTuner extends SubsystemBase {
 
         //log swerve state data as fast as it comes in
         swerve.registerTelemetry((SwerveDriveState state) -> {
-            field.setRobotPose(state.Pose);
+            SwerveTelemetry.updateSwerveState(state, swerve.getChassisSpeeds());
             SmartDashboard.putNumber("Front Left Module Angle", state.ModuleStates[0].angle.getRotations());
             SmartDashboard.putNumber("Front Right Module Angle", state.ModuleStates[1].angle.getRotations());
             SmartDashboard.putNumber("Rear Left Module Angle", state.ModuleStates[2].angle.getRotations());
@@ -177,8 +175,6 @@ public class DriveTrainTuner extends SubsystemBase {
         SmartDashboard.putNumber("angular acceleration", 0);
 
         SmartDashboard.putBoolean("reset max measurements", false);
-
-        SmartDashboard.putData("Field", field);
 
         System.err.println("WARNING: You have instantiated DriveTrainTuneable. Unless you are Sean, or have asked Sean, or are Sean's clone, you should not be doing this. (unless you're on another team. in which case, hi!)");
     }
