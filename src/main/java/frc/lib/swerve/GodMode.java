@@ -34,7 +34,7 @@ public class GodMode implements SwerveRequest {
     //integrates the requested velocities on top of the past robot pose to figure out where we actually wanted the robot to be,
     //and modify the requested velocities to compensate for the error
     public double PositionCorrectionIterations = 0; //how many past inputs to integrate
-    public double PositionCorrectionP = 0;
+    public double PositionCorrectionWeight = 1;
 
     //heading controller stuff
     private Trajectory headingTrajectory = new Trajectory(new TrapezoidProfile.State(0, 0)); //make it smooth
@@ -154,6 +154,11 @@ public class GodMode implements SwerveRequest {
         return this;
     }
 
+    public GodMode withPositionCorrectionWeight(double positionCorrectionWeight) {
+        this.PositionCorrectionWeight = positionCorrectionWeight;
+        return this;
+    }
+
     /**
      * Get the rotation rate to apply to the robot to go to the target heading
      */
@@ -211,6 +216,9 @@ public class GodMode implements SwerveRequest {
 
         if (positionCorrectionRealPositions.size() > PositionCorrectionIterations) {
             positionCorrectionRealPositions.removeFirst();
+        }
+
+        if (positionCorrectionRequestedVelocities.size() > PositionCorrectionIterations) {
             positionCorrectionRequestedVelocities.removeFirst();
         }
 
@@ -219,12 +227,11 @@ public class GodMode implements SwerveRequest {
         for (Translation2d requestedVelocity : positionCorrectionRequestedVelocities) {
             requestedPositionDelta = requestedPositionDelta.plus(requestedVelocity.times(updatePeriod));
         }
-        //TODO this is BS use a trajectory and a percentage between the raw and the corrected request
+
         Translation2d realPositionDelta = currentPose.getTranslation().minus(positionCorrectionRealPositions.getFirst());
         Translation2d positionError = requestedPositionDelta.minus(realPositionDelta);
-        return new Translation2d(
-            requestedTranslation.getNorm() + (positionError.getNorm() * PositionCorrectionP),
-            positionError.getAngle()
-        );
+
+        Translation2d newRequestedVelocity = requestedTranslation.plus(positionError.times(PositionCorrectionWeight));
+        return newRequestedVelocity;
     }
 }
