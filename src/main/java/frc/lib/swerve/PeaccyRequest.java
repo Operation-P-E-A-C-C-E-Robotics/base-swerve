@@ -91,8 +91,20 @@ public class PeaccyRequest implements SwerveRequest {
             Heading = parameters.currentPose.getRotation().getRadians();
         }
 
-        ChassisSpeeds speeds = ChassisSpeeds.discretize(ChassisSpeeds.fromFieldRelativeSpeeds(toApplyTranslation.getX(), toApplyTranslation.getY(), toApplyRotation,
-                    parameters.currentPose.getRotation()), parameters.updatePeriod);
+        ChassisSpeeds speeds = ChassisSpeeds.discretize(
+            IsFieldCentric ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                toApplyTranslation.getX(), 
+                toApplyTranslation.getY(), 
+                toApplyRotation,
+                parameters.currentPose.getRotation()
+            ) : ChassisSpeeds.fromRobotRelativeSpeeds(
+                toApplyTranslation.getX(), 
+                toApplyTranslation.getY(), 
+                toApplyRotation,
+                parameters.currentPose.getRotation()
+            ),
+            parameters.updatePeriod
+        );
 
         var states = parameters.kinematics.toSwerveModuleStates(speeds, new Translation2d());
 
