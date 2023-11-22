@@ -112,7 +112,6 @@ public class PeaccyRequest implements SwerveRequest {
             modulesToApply[i].apply(states[i], IsOpenLoop);
         }
 
-        
         return StatusCode.OK;
     }
 
