@@ -21,7 +21,7 @@ import frc.lib.sensors.LimelightHelper;
  *    <li>Raw botpose as pose3d</li>
  * </ul>
  * 
- * A HOT MESS COURTESY OF SEAN
+ * A HOT MESS COURTESY OF PEACCY
  */
 public class LimelightTelemetry {
     private static final NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("Limelight");

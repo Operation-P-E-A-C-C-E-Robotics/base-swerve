@@ -63,9 +63,9 @@ public class DriveTrainTuner extends SubsystemBase {
      * This is a copy of DriveTrain.java that is used for tuning the drivetrain.
      * It is not used in the actual robot code.
      * It adds a bunch of SmartDashboard stuff to make it easier to tune the drivetrain.
-     * I'm sure it will end up being a hot mess - Sean (before writing this hot mess - Sean (after writing this hot mess))
+     * I'm sure it will end up being a hot mess - Peaccy (before writing this hot mess - Peaccy (after writing this hot mess))
      * IMPORTANT!!: THE ONLY REASON I'M ALLOWING THIS DUMPSTER FIRE TO EXIST IS BECAUSE IT WILL NEVER EVER EVER BE RUN AT COMPETITION. RIGHT???
-     * I say run at competition above, however i have come to the conclusion that it will be a miracle if it ever runs at all. - Sean
+     * I say run at competition above, however i have come to the conclusion that it will be a miracle if it ever runs at all. - Peaccy
      */
     public DriveTrainTuner() {
         swerve = SwerveDescription.generateDrivetrain(
