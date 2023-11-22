@@ -35,6 +35,10 @@ public class Trajectory {
         return new State(position + interpolated.deltaPosition, interpolated.finalVelocity);
     }
 
+    public State getTarget(){
+        return finalState;
+    }
+
     public double getTotalTime(){
         var time = 0.0;
         for (Motion motion : waypoints) {
