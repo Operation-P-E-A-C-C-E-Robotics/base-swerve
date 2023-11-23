@@ -198,9 +198,9 @@ public class PeaccyRequest implements SwerveRequest {
         }
 
         //calculate the correction
-        var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod).velocity;
-        var feedforward = headingFeedforward.calculate(target);
-        var pGain = (target - currentHeading) * holdHeadingkP * parameters.updatePeriod;
+        var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod);
+        var feedforward = headingFeedforward.calculate(target.velocity);
+        var pGain = (target.position - currentHeading) * holdHeadingkP * parameters.updatePeriod;
         var delta = pGain + feedforward;
 
         if(SoftHoldHeading){
