@@ -3,9 +3,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.sensors.LimelightHelper;
 import frc.lib.swerve.PeaccefulSwerve;
@@ -14,6 +19,8 @@ import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
+
+import java.util.List;
 
 public class DriveTrain extends SubsystemBase {
     protected final PeaccefulSwerve swerve;
@@ -110,6 +117,25 @@ public class DriveTrain extends SubsystemBase {
      */
     public void resetOdometry(Pose2d pose) {
         swerve.seedFieldRelative(pose);
+    }
+
+    public Command driveToPoint(Pose2d target){
+        //the target rotation is the angle of the curve, and we want to go in a straight line, so it
+        //needs to be the angle between the robot and the target
+        Rotation2d targetRotation = target.minus(getPose()).getRotation();
+
+        List<Translation2d> waypoints = PathPlannerPath.bezierFromPoses(
+            getPose(), 
+            new Pose2d(target.getTranslation(), targetRotation)
+        );
+
+        PathPlannerPath path = new PathPlannerPath(
+            waypoints,
+            Constants.Swerve.autoMaxSpeed,
+            new GoalEndState(0.0, target.getRotation())
+        );
+
+        return AutoBuilder.followPathWithEvents(path);
     }
 
     @Override
