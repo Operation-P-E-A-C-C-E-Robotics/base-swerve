@@ -119,11 +119,17 @@ public class DriveTrain extends SubsystemBase {
         swerve.seedFieldRelative(pose);
     }
 
-    public Command driveToPoint(Pose2d target){
+    /**
+     * drive in a straight line to a target pose.
+     * @param target the goal pose
+     * @return the command to follow the path
+     */
+    public Command driveToPose(Pose2d target){
         //the target rotation is the angle of the curve, and we want to go in a straight line, so it
         //needs to be the angle between the robot and the target
         Rotation2d targetRotation = target.minus(getPose()).getRotation();
 
+        //bezier curve from the current pose to the target pose
         List<Translation2d> waypoints = PathPlannerPath.bezierFromPoses(
             getPose(), 
             new Pose2d(target.getTranslation(), targetRotation)
