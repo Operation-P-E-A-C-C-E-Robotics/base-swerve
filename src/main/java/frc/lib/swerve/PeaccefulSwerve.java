@@ -6,7 +6,10 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.RobotState;
 
 /**
  * OH MY LORD DONT MAKE ME EXTEND YOUR STUPID CLASS TO ADD BASIC FUNCTIONALITY.
@@ -69,6 +72,45 @@ public class PeaccefulSwerve extends SwerveDrivetrain {
         limit.StatorCurrentLimitEnable = true;
         for (SwerveModule module : Modules) {
             module.getSteerMotor().getConfigurator().apply(limit);
+        }
+    }
+
+    public double getModuleSteerCurrent(int i) {
+        return Modules[i].getSteerMotor().getStatorCurrent().getValueAsDouble();
+    }
+
+    public double getModuleDriveCurrent(int i) {
+        return Modules[i].getDriveMotor().getStatorCurrent().getValueAsDouble();
+    }
+
+    public double getModuleAngle(int i) {
+        return Modules[i].getCANcoder().getAbsolutePosition().getValueAsDouble();
+    }
+
+    public double getModuleAngleError(int i) {
+        return Modules[i].getSteerMotor().getClosedLoopError().getValueAsDouble();
+    }
+
+    public double getModuleRotationalRate(int i) {
+        return Modules[i].getCANcoder().getVelocity().getValueAsDouble();
+    }
+
+    public double getModuleDriveError(int i) {
+        return Modules[i].getDriveMotor().getClosedLoopError().getValueAsDouble();
+    }
+
+    /**
+     * ONLY USE IN TEST MODE. WILL DO NOTHING IF NOT IN TEST MODE.
+     * @param speed the speed to spin the angle motors at.
+     */
+    public void spinAngleMotors(double speed) {
+        if(!RobotState.isTest()){
+            System.err.println("WARNING (PeaccefulSwerve.spinAngleMotors): This method can only be used in test mode.");
+            return;
+        }
+        setControl(new SwerveRequest.Idle());
+        for (SwerveModule module : Modules) {
+            module.getSteerMotor().set(speed);
         }
     }
 
