@@ -68,6 +68,9 @@ public class PeaccyRequest implements SwerveRequest {
     private Supplier<ChassisSpeeds> getChassisSpeeds;
 
 
+    private final double CURRENT_LIMIT_THRESHOLD = 0.3; //percent of the current limit to start throttling at.
+
+
     /**
      * The most epic swerve request ever. Does all the things.
      * Made by the one and only Peaccy.
@@ -296,13 +299,14 @@ public class PeaccyRequest implements SwerveRequest {
         var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod);
         var feedforward = headingFeedforward.calculate(target.velocity);
         var pGain = (target.position - currentHeading) * holdHeadingkP * parameters.updatePeriod;
+        if(SoftHoldHeading) pGain = pGain * compress(totalDriveCurrent.getAsDouble(), totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
         var delta = pGain + feedforward;
 
-        if(SoftHoldHeading){
-            //scale by the percentage of allowed current for the correction
-            double limitPercentage = totalDriveCurrent.getAsDouble()/totalDriveCurrentLimit;
-            delta *= Math.max(1-limitPercentage, 0);
-        }
+        // if(SoftHoldHeading){
+        //     //scale by the percentage of allowed current for the correction
+        //     double limitPercentage = totalDriveCurrent.getAsDouble()/totalDriveCurrentLimit;
+        //     delta *= Math.max(1-(limitPercentage*CURRENT_LIMIT_THRESHOLD)+CURRENT_LIMIT_THRESHOLD, 0);
+        // }
 
         return delta;
     }
@@ -339,5 +343,18 @@ public class PeaccyRequest implements SwerveRequest {
 
         Translation2d newRequestedVelocity = requestedTranslation.plus(positionError.times(PositionCorrectionWeight));
         return newRequestedVelocity;
+    }
+
+    /**
+     * similar to an audio compressor. does nothing until the threshold, then scales the value linearly to the limit.
+     * @param value the value to compress
+     * @param limit the value where the output should go to 0
+     * @param threshold the threshold to start compressing at (as a percentage of the limit)
+     * @return the multiplier for compression
+     */
+    private static double compress(double value, double limit, double threshold) {
+        var l = (1-threshold)*limit;
+        var linear = (limit/l)-((1/l)*value);
+        return Util.limit(linear, 0, 1);
     }
 }
