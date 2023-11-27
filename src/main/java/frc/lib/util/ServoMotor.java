@@ -145,7 +145,7 @@ public class ServoMotor extends SubsystemBase {
      * and start following it
      * @param position position setpoin
      */
-    public void goToState(double position) { //TODO get rid of velocity parameter
+    public void goToState(double position) {
         if(!looping){
             throw new IllegalStateException("Cannot set state without enabling loop");
         }

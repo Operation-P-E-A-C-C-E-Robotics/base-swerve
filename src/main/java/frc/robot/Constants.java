@@ -70,7 +70,6 @@ public final class Constants {
     public static final double autoHeadingKI = 0.0;
     public static final double autoHeadingKD = 0.0;
 
-    //TODO
     public static final double measuredMaxVelocity = 3,
                               measuredMaxAcceleration = 3,
                               measuredMaxAngularVelocity = 360,

@@ -246,7 +246,7 @@ public class Util {
      */
     public static Pose3d localToGlobalPose(Pose3d localOrigin, Pose3d localPoint) {
         Translation3d rotatedTranslation = rotateBy(localPoint.getTranslation(), localOrigin.getRotation());
-        Rotation3d rotatedRotation = localPoint.getRotation().plus(localOrigin.getRotation()); //TODO plus or mines
+        Rotation3d rotatedRotation = localPoint.getRotation().plus(localOrigin.getRotation());
 
         return new Pose3d(
                 localOrigin.getTranslation().plus(rotatedTranslation),
@@ -264,7 +264,7 @@ public class Util {
     public static Pose3d globalToLocalPose(Pose3d localOrigin, Pose3d globalPoint) {
         Translation3d localTranslation = globalPoint.getTranslation().minus(localOrigin.getTranslation());
         Translation3d rotatedTranslation = rotateBy(localTranslation, new Rotation3d().minus(localOrigin.getRotation()));
-        Rotation3d rotatedRotation = globalPoint.getRotation().minus(localOrigin.getRotation()); //TODO plis or munesz
+        Rotation3d rotatedRotation = globalPoint.getRotation().minus(localOrigin.getRotation());
         return new Pose3d(
                 rotatedTranslation,
                 rotatedRotation

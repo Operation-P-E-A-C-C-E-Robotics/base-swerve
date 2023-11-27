@@ -53,7 +53,6 @@ public class LimelightHelper {
 
 
     /**
-     * TODO only initialize variables that are used, and cache values to avoid unnecessary resource usage
      * a nice limelight helper for color object and
      * apriltags
      * @param networktablesName the limelight's table in networktables
@@ -312,6 +311,15 @@ public class LimelightHelper {
     }
 
     public void updateCTRESwerveOdometry(PeaccefulSwerve estimator, Pose2d robotPose, ChassisSpeeds speeds) {
+        if(estimator == null) {
+            System.err.println("WARNING (LimelightHelper.updateCTRESwerveOdometry): Tried to update odometry with a null swerve parameter!");
+            return;
+        };
+        if(!estimator.odometryIsValid()) {
+            System.err.println("WARNING (LimelightHelper.updateCTRESwerveOdometry): Tried to update odometry when it was invalid!");
+            return;
+        }
+
         var botposeReading = botpose.getAtomic();
         var botposeArray = botposeReading.value;
 
