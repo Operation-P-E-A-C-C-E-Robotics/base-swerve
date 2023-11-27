@@ -302,12 +302,6 @@ public class PeaccyRequest implements SwerveRequest {
         if(SoftHoldHeading) pGain = pGain * compress(totalDriveCurrent.getAsDouble(), totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
         var delta = pGain + feedforward;
 
-        // if(SoftHoldHeading){
-        //     //scale by the percentage of allowed current for the correction
-        //     double limitPercentage = totalDriveCurrent.getAsDouble()/totalDriveCurrentLimit;
-        //     delta *= Math.max(1-(limitPercentage*CURRENT_LIMIT_THRESHOLD)+CURRENT_LIMIT_THRESHOLD, 0);
-        // }
-
         return delta;
     }
     
@@ -347,6 +341,9 @@ public class PeaccyRequest implements SwerveRequest {
 
     /**
      * similar to an audio compressor. does nothing until the threshold, then scales the value linearly to the limit.
+     * This function just returns the scalar for the value, so you can multiply it by the value to compress it.
+     * This lets you use it to "sidechain" the compressor to another value, like *ahem* using the drive current to compress 
+     * the heading correction.
      * @param value the value to compress
      * @param limit the value where the output should go to 0
      * @param threshold the threshold to start compressing at (as a percentage of the limit)

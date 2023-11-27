@@ -144,6 +144,10 @@ public class DriveTrain extends SubsystemBase {
         return AutoBuilder.followPathWithEvents(path);
     }
 
+    public double getTotalDriveCurrent(){
+        return swerve.getTotalDriveCurrent();
+    }
+
     @Override
     public void periodic() {
         // limelight.updateCTRESwerveOdometry(swerve, getPose(), getChassisSpeeds()); causes errer for some reason

@@ -74,7 +74,7 @@ public class TestPeaccyRequest extends Command {
             0.0, 
             0.0, 
             driveTrain::getChassisSpeeds, 
-            () -> 0, 
+            driveTrain::getTotalDriveCurrent, 
             20*4
         ).withRotationalDeadband(Constants.Swerve.teleopAngularVelocityDeadband)
         .withSoftHoldHeading(false)

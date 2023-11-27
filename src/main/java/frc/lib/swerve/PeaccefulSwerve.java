@@ -173,6 +173,14 @@ public class PeaccefulSwerve extends SwerveDrivetrain {
         return Modules[i].getDriveMotor().getClosedLoopError().getValueAsDouble();
     }
 
+    public double getTotalDriveCurrent(){
+        double total = 0;
+        for (SwerveModule module : Modules) {
+            total += module.getDriveMotor().getStatorCurrent().getValueAsDouble();
+        }
+        return total;
+    }
+
     /**
      * ONLY USE IN TEST MODE. WILL DO NOTHING IF NOT IN TEST MODE.
      * @param speed the speed to spin the angle motors at.
