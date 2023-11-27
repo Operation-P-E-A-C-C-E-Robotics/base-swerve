@@ -95,7 +95,7 @@ public class SwerveSelfCheck extends Command {
     private final double MAX_ACCUM_ERROR_ANGLE = 400; //arbitrary
     private final double MIN_ROTATIONAL_RATE = 1; //rotations per second (probably)
     private final double MAX_ACCUM_ERROR_DRIVE = 100; //arbitrary
-    private static final double MAX_ACCUM_CURRENT_DRIVE = 400;
+    private final double MAX_ACCUM_CURRENT_DRIVE = 400;
 
     //Weights of each parameter in module scores. Higher score = worse. 0 is "perfect".
     //TODO arbitrary selections

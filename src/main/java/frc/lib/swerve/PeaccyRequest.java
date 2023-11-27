@@ -16,10 +16,19 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.motion.Trajectory;
+import frc.lib.util.Util;
 
+/**
+ * The most epic swerve request ever. Does all the things. Made by the one and only Peaccy.
+ * Please help, I keep waking up with crappy code under my behind so I put it here.
+ * I don't know what I'm doing, it just falls out of my anus. It seems to work though. Occasionally
+ * I'll get a good one, but I don't know how to make it happen. I just keep putting coffee in my mouth and it keeps coming out.
+ * Anyway. This is a swerve request that does all the things. It's got a heading controller, a position correction controller,
+ * and a bunch of other stuff. It's pretty cool. I think. I don't know. I'm just a monkey with a keyboard.
+ */
 public class PeaccyRequest implements SwerveRequest {
 
-    //Input parameters
+    /* INPUT PARAMETERS */
     public double VelocityX = 0;
     public double VelocityY = 0;
     public double RotationalRate = 0;
@@ -36,18 +45,23 @@ public class PeaccyRequest implements SwerveRequest {
     public double PositionCorrectionIterations = 0; //how many past inputs to integrate
     public double PositionCorrectionWeight = 1;
 
-    //heading controller stuff
+    /* HEADING CONTROLLER */
     private Trajectory headingTrajectory = new Trajectory(new TrapezoidProfile.State(0, 0)); //make it smooth
     private SimpleMotorFeedforward headingFeedforward = new SimpleMotorFeedforward(0, 0, 0); //make it good
     private double holdHeadingkP = 0; //make it work
+
+    //heading trajectory constraints
     private double holdHeadingVelocity = 0;
     private double holdHeadingAcceleration = 0;
+
     private Timer holdHeadingTrajectoryTimer = new Timer();
+
+    //soft heading current limit parameters
     private DoubleSupplier totalDriveCurrent;
     private double totalDriveCurrentLimit;
 
     
-    //position correction stuff
+    /* POSITION CORRECTION PAST TRANSLATIONS */
     private LinkedList<Translation2d> positionCorrectionRealPositions = new LinkedList<>();
     private LinkedList<Translation2d> positionCorrectionRequestedVelocities = new LinkedList<>();
 
@@ -57,6 +71,14 @@ public class PeaccyRequest implements SwerveRequest {
     /**
      * The most epic swerve request ever. Does all the things.
      * Made by the one and only Peaccy.
+     * @param maxAngularVelocity the maximum angular velocity to use when turning to the set trajectory
+     * @param maxAngularAcceleration the maximum angular acceleration to use when turning to the set trajectory
+     * @param holdHeadingkP the proportional gain to use when turning to the set trajectory
+     * @param holdHeadingkV the velocity feedforward to use when turning to the set trajectory
+     * @param holdHeadingkA the acceleration feedforward to use when turning to the set trajectory
+     * @param chassisSpeedsSupplier a supplier for the current chassis speeds (I literally dont remember what this is for)
+     * @param totalDriveCurrentSupplier a supplier for the sum of current draw of all the drive motors (used for soft heading current limiting)
+     * @param softHeadingCurrentLimit the maximum current draw allowed for the heading correction in soft heading mode
      */
     public PeaccyRequest(double maxAngularVelocity, 
                     double maxAngularAcceleration, 
@@ -81,16 +103,21 @@ public class PeaccyRequest implements SwerveRequest {
         Translation2d toApplyTranslation = new Translation2d(VelocityX, VelocityY);
         double toApplyRotation = RotationalRate;
 
+        //position correction only works for field centric :|
         if(IsFieldCentric) toApplyTranslation = applyPositionCorrection(toApplyTranslation, parameters.currentPose, parameters.updatePeriod);
 
+        //we only do auto heading if there is no manually requested rotational rate
         if(toApplyRotation < RotationalDeadband) {
             toApplyRotation = 0;
             if (HoldHeading || SoftHoldHeading) toApplyRotation = applyAutoHeading(parameters);
         } else {
-            //unless the heading is overriden, we want to hold the current heading
+            //Update the set heading to the current heading. This means that when there is no rotational rate requested,
+            //the robot will hold its current heading if HoldHeading or SoftHoldHeading is true,
+            //unless Heading is explicitly set to something else.
             Heading = parameters.currentPose.getRotation().getRadians();
         }
 
+        //very standard ChassisSpeeds blah blah blah.
         ChassisSpeeds speeds = ChassisSpeeds.discretize(
             IsFieldCentric ? ChassisSpeeds.fromFieldRelativeSpeeds(
                 toApplyTranslation.getX(), 
@@ -106,6 +133,7 @@ public class PeaccyRequest implements SwerveRequest {
             parameters.updatePeriod
         );
 
+        //wowie make it go.
         var states = parameters.kinematics.toSwerveModuleStates(speeds, new Translation2d());
 
         for (int i = 0; i < modulesToApply.length; ++i) {
@@ -115,58 +143,125 @@ public class PeaccyRequest implements SwerveRequest {
         return StatusCode.OK;
     }
 
+    /**
+     * Set the x velocity. duh.
+     * @param velocityX the x velocity. duh.
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withVelocityX(double velocityX) {
         this.VelocityX = velocityX;
         return this;
     }
 
+    /**
+     * Set the y velocity. duh.
+     * @param velocityY the y velocity. duh.
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withVelocityY(double velocityY) {
         this.VelocityY = velocityY;
         return this;
     }
 
+    /**
+     * Set the rotational rate. duh.
+     * Also, this will override any set heading if it's over the rotational deadband.
+     * @param rotationalRate the rotational rate. duh.
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withRotationalRate(double rotationalRate) {
         this.RotationalRate = rotationalRate;
         return this;
     }
 
+    /**
+     * Set the robot's target heading when holding the heading.
+     * Won't do nothin of anything if HoldHeading and SoftHoldHeading are false.
+     * @param heading the target heading
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withHeading(double heading) {
         this.Heading = heading;
         return this;
     }
 
+    /**
+     * Set the deadband for rotation. THIS IS ACTUALLY IMPORTANT HERE!!
+     * Because heading correction is only applied if your requested rotational rate is under the rotational deadband,
+     * @param rotationalDeadband the rotational deadband
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withRotationalDeadband(double rotationalDeadband) {
         this.RotationalDeadband = rotationalDeadband;
         return this;
     }
 
+    /**
+     * Set whether or not to hold the heading.
+     * @param holdHeading whether or not to hold the heading
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withHoldHeading(boolean holdHeading) {
         this.HoldHeading = holdHeading;
         return this;
     }
 
+    /**
+     * Set whether or not to scale the heading correction by the allowed total drive current.
+     * Also, this will enable heading correction even if HoldHeading is false,
+     * but it overrides HoldHeading if both are true.
+     * @param softHoldHeading whether or not to scale the heading correction by the allowed total drive current
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withSoftHoldHeading(boolean softHoldHeading) {
         this.SoftHoldHeading = softHoldHeading;
         return this;
     }
 
+    /**
+     * Set whether or not to disable the drive velocity controllers.
+     * No promises on how good positional correction will be in open loop.
+     * @param isOpenLoop whether or not to disable the drive velocity controllers
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withIsOpenLoop(boolean isOpenLoop) {
         this.IsOpenLoop = isOpenLoop;
         return this;
     }
 
+    /**
+     * Set whether or not to use field centric mode.
+     * Position correction only works in field centric mode.
+     * Why would you not use field centric mode?
+     * Oh yea, auto :(
+     * @param isFieldCentric whether or not to use field centric mode
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withIsFieldCentric(boolean isFieldCentric) {
         this.IsFieldCentric = isFieldCentric;
         return this;
     }
 
+    /**
+     * If you're wondering what the heck position correction is, I've got no clue.
+     * It just seemed like a good idea at the time. It just looks at the past robot poses and
+     * inputs, tries to figure out where we actually wanted the robot to be, and then
+     * modifies the requested velocities to compensate for the error.
+     * @param positionCorrectionIterations how many past robot poses are considered in position correction
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withPositionCorrectionIterations(double positionCorrectionIterations) {
         this.PositionCorrectionIterations = positionCorrectionIterations;
         return this;
     }
 
+    /**
+     * If position correction ends up sucking, you can just turn it down.
+     * @param positionCorrectionWeight multiple of the position correction to apply to the requested velocities. BETWEEN 0 AND 1 PLEASE.
+     * @return this (so you can chain em nicely :D)
+     */
     public PeaccyRequest withPositionCorrectionWeight(double positionCorrectionWeight) {
-        this.PositionCorrectionWeight = positionCorrectionWeight;
+        this.PositionCorrectionWeight = Util.limit(positionCorrectionWeight,0,1);
         return this;
     }
 
@@ -176,7 +271,7 @@ public class PeaccyRequest implements SwerveRequest {
     private double applyAutoHeading(SwerveControlRequestParameters parameters) {
         var currentHeading = parameters.currentPose.getRotation().getRadians();
 
-        //make sure our odometry heading is within 180 degrees of the target heading to prevent it from wrapping
+        //make sure our odometry heading is within 180 degrees of the target heading to prevent it from wrapping LIKE CTRE DOES >:(
         while (Math.abs(currentHeading - Heading) > Math.PI) {
             if (currentHeading > Heading) {
                 currentHeading -= 2 * Math.PI;
