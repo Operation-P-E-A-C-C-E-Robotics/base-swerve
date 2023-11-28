@@ -6,7 +6,7 @@ This is FRC team 3461's base robot code for the 2024 season - currently (permane
 - Automatic heading control to keep robot facing cardinal directions and recover from bumps and drift
 - Odometry and 2024 pathplanner
 - X-locked braking
-- Advanced and highly configurable input [curves](src/main/java/frc/lib/util/JoystickCurves.java), smoothing, and deadbanding ([Drive Command](src/main/java/frc/robot/commands/PeaccyDrive.java))
+- Advanced and highly [configurable](src/main/java/frc/robot/subsystems/DriveTrainTuner.java) input [curves](src/main/java/frc/lib/util/JoystickCurves.java), smoothing, and deadbanding ([Drive Command](src/main/java/frc/robot/commands/PeaccyDrive.java))
 - Extensive [telemetry](src/main/java/lib/telemetry/SwerveTelemetry.java) designed to work with AdvantageScope (no AdvantageKit because CTRE uses multithreading for odometry)
 ### Untested / Future features
 - 3d odometry with IMU and limelight apriltags
