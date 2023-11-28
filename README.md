@@ -8,7 +8,7 @@ This is FRC team 3461's base robot code for the 2024 season - currently (permane
 - X-locked braking
 - Advanced and highly configurable input curves, smoothing, and deadbanding.
 - Extensive telemetry designed to work with advantagescope (no advantagekit because of ctre's multithreading)
-Untested / Future features
+### Untested / Future features
 - 3d odometry with IMU and limelight apriltags
 - Teleop position error correction for more consistent feel
 - Current-limited auto heading
