@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.motion.Trajectory;
 import frc.lib.util.Util;
 
@@ -68,7 +69,7 @@ public class PeaccyRequest implements SwerveRequest {
     private Supplier<ChassisSpeeds> getChassisSpeeds;
 
 
-    private final double CURRENT_LIMIT_THRESHOLD = 0.3; //percent of the current limit to start throttling at.
+    private final double CURRENT_LIMIT_THRESHOLD = 0.01; //percent of the current limit to start throttling at.
 
 
     /**
@@ -110,7 +111,7 @@ public class PeaccyRequest implements SwerveRequest {
         if(IsFieldCentric) toApplyTranslation = applyPositionCorrection(toApplyTranslation, parameters.currentPose, parameters.updatePeriod);
 
         //we only do auto heading if there is no manually requested rotational rate
-        if(toApplyRotation < RotationalDeadband) {
+        if(Math.abs(toApplyRotation) <= RotationalDeadband) {
             toApplyRotation = 0;
             if (HoldHeading || SoftHoldHeading) toApplyRotation = applyAutoHeading(parameters);
         } else {
@@ -268,6 +269,8 @@ public class PeaccyRequest implements SwerveRequest {
         return this;
     }
 
+    boolean autoHeadingDeadbandEnabled = true;
+
     /**
      * Get the rotation rate to apply to the robot to go to the target heading
      */
@@ -295,12 +298,19 @@ public class PeaccyRequest implements SwerveRequest {
             holdHeadingTrajectoryTimer.start();
         }
 
+        
         //calculate the correction
         var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod);
+        var error = target.position - currentHeading;
+
+        SmartDashboard.putNumber("target heading",target.position);
         var feedforward = headingFeedforward.calculate(target.velocity);
-        var pGain = (target.position - currentHeading) * holdHeadingkP * parameters.updatePeriod;
+        var pGain = error * holdHeadingkP * parameters.updatePeriod;
+        SmartDashboard.putNumber("heading error", target.position - currentHeading);
         if(SoftHoldHeading) pGain = pGain * compress(totalDriveCurrent.getAsDouble(), totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
         var delta = pGain + feedforward;
+
+        SmartDashboard.putNumber("holdheading gain", delta);
 
         return delta;
     }

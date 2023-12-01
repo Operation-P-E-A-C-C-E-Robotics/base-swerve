@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.sensors.LimelightHelper;
 import frc.robot.commands.PeaccyDrive;
+import frc.robot.commands.TestPeaccyRequest;
 import frc.robot.subsystems.DriveTrain;
 
 public class RobotContainer {
@@ -36,7 +37,7 @@ public class RobotContainer {
   private final JoystickButton closedLoopButton = new JoystickButton(driverController, 5);
 
   /* COMMANDS */
-  private final PeaccyDrive peaccyDrive = new PeaccyDrive(
+  private final TestPeaccyRequest peaccyDrive = new TestPeaccyRequest(
     () -> -driverController.getRawAxis(translationAxis),  //translation
     () -> -driverController.getRawAxis(strafeAxis),       //strafe
     () -> -driverController.getRawAxis(rotationAxis),     //rotation

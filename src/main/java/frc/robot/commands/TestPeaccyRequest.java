@@ -68,17 +68,17 @@ public class TestPeaccyRequest extends Command {
         this.driveTrain = driveTrain;
 
         help  = new PeaccyRequest(
-            Constants.Swerve.measuredMaxAngularVelocity, 
-            Constants.Swerve.measuredMaxAngularAcceleration,
-            Constants.Swerve.autoHeadingKP, 
+            50, 
+            70,
+            2600, 
             0.0, 
             0.0, 
             driveTrain::getChassisSpeeds, 
             driveTrain::getTotalDriveCurrent, 
-            20*4
+            30
         ).withRotationalDeadband(Constants.Swerve.teleopAngularVelocityDeadband)
         .withSoftHoldHeading(false)
-        .withPositionCorrectionIterations(0)
+        .withPositionCorrectionIterations(4)
         .withPositionCorrectionWeight(1);
 
         addRequirements(driveTrain);
@@ -97,7 +97,10 @@ public class TestPeaccyRequest extends Command {
         boolean isLockIn = isLockInSup.getAsBoolean();
         boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean();
 
-        if(isZeroOdometry) driveTrain.resetOdometry();
+        if(isZeroOdometry) {
+            driveTrain.resetOdometry();
+            help.withHeading(driveTrain.getPose().getRotation().getRadians());
+        }
 
         // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
@@ -130,12 +133,12 @@ public class TestPeaccyRequest extends Command {
        help.withVelocityX(linearVelocity.getX())
             .withVelocityY(linearVelocity.getY())
             .withRotationalRate(angularVelocity)
-            .withIsOpenLoop(isOpenLoop)
+            .withIsOpenLoop(true)
             .withIsFieldCentric(isFieldRelative)
-            .withHoldHeading(isAutoHeading);
+            .withHoldHeading(true);
 
         if(isAutoHeading) {
-            help.withHeading(autoHeadingAngle);
+            help.withHeading(Rotation2d.fromDegrees(autoHeadingAngle).getRadians());
         }
 
         driveTrain.drive(help);
