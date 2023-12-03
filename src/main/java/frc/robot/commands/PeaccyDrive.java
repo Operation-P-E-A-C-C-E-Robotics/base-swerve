@@ -5,7 +5,9 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +28,9 @@ public class PeaccyDrive extends Command {
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
     private BooleanSupplier isZeroOdometrySup;
+
+    private final Debouncer linearDeadbandDebouncer = new Debouncer(0.1, DebounceType.kBoth);
+    private final Debouncer angularDeadbandDebouncer = new Debouncer(0.1, DebounceType.kBoth);
 
 
     /**
@@ -146,7 +151,7 @@ public class PeaccyDrive extends Command {
 
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
         //handle deadband and reset the rate limiter if we're in the deadband
-        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,linearVelocity.getNorm());
+        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,linearVelocity.getNorm(), linearDeadbandDebouncer);
         if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
         rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
@@ -169,7 +174,7 @@ public class PeaccyDrive extends Command {
 
     private double smoothAndDeadband (double angularVelocity) {
         //apply deadband to angular velocity
-        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, angularVelocity);
+        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, angularVelocity, angularDeadbandDebouncer);
 
         angularVelocity = Constants.Swerve.teleopAngularVelocityCurve.apply(angularVelocity);
 
@@ -187,8 +192,8 @@ public class PeaccyDrive extends Command {
      * @param value the value to apply the deadband to
      * @return the value with the deadband applied (like magic)
      */
-    private double handleDeadbandFixSlope (double deadband, double value) {
-        if (Math.abs(value) < deadband) return 0;
+    private double handleDeadbandFixSlope (double deadband, double value, Debouncer debounce) {
+        if (debounce.calculate(Math.abs(value) < deadband)) return 0;
         return (value - (deadband * Math.signum(value)))/(1 - deadband);
     }
 }
