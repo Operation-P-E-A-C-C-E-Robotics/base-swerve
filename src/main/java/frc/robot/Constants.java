@@ -33,7 +33,10 @@ public final class Constants {
     //smoothing
     public static final double teleopLinearSpeedLimit = 5.0;
     public static final double teleopLinearAngleLimit = 2.0;
+    public static final double teleopNearLinearAngleLimit = 0.5;
     public static final double teleopAngularRateLimit = 3.0;
+
+    public static final double teleopNearLimitThreshold = 0.2; //how close to zero to use more extreme linear angle smoothing.
 
     //deadband
     public static final double teleopLinearSpeedDeadband = 0.1;

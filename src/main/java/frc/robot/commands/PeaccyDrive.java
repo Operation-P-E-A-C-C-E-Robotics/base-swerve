@@ -26,6 +26,7 @@ public class PeaccyDrive extends Command {
 
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
+    private final SlewRateLimiter nearLinearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopNearLinearAngleLimit); //more extreme limit near zero 
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
     private BooleanSupplier isZeroOdometrySup;
 
@@ -158,9 +159,11 @@ public class PeaccyDrive extends Command {
         //limit the linear acceleration
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);
 
+        boolean useNearLimiter = Math.abs(rawLinearSpeed) < Constants.Swerve.teleopNearLimitThreshold;
+
         //limit the change in direction
         double rawLinearAngle = linearVelocity.getAngle().getRadians();
-        double linearAngle = linearAngleLimiter.calculate(rawLinearAngle);
+        double linearAngle = useNearLimiter ? nearLinearAngleLimiter.calculate(rawLinearAngle) : linearAngleLimiter.calculate(rawLinearAngle);
 
         // override the smoothing of the direction if it lags too far behind the raw value
         // (mainly after stopping and changing direction)
