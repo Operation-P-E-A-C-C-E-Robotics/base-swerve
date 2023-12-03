@@ -9,6 +9,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.swerve.PeaccyRequest;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
@@ -18,9 +19,7 @@ public class PeaccyDrive extends Command {
     private final BooleanSupplier isAutoAngleSup, isFieldRelativeSup, isOpenLoopSup, isLockInSup;
     private final DriveTrain driveTrain;
 
-    private final SwerveRequest.FieldCentric fieldCentricRequest = new SwerveRequest.FieldCentric();
-    private final SwerveRequest.RobotCentric robotCentricRequest = new SwerveRequest.RobotCentric();
-    private final SwerveRequest.FieldCentricFacingAngle autoHeadingRequest = new SwerveRequest.FieldCentricFacingAngle();
+    private final PeaccyRequest request;
     private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withIsOpenLoop(false);
 
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
@@ -68,9 +67,19 @@ public class PeaccyDrive extends Command {
         this.isZeroOdometrySup = isZeroOdometry;
         this.driveTrain = driveTrain;
 
-        autoHeadingRequest.HeadingController.setP(Constants.Swerve.autoHeadingKP);
-        autoHeadingRequest.HeadingController.setI(Constants.Swerve.autoHeadingKI);
-        autoHeadingRequest.HeadingController.setD(Constants.Swerve.autoHeadingKD);
+        request  = new PeaccyRequest(
+            50, 
+            70,
+            2600, 
+            0.0, 
+            0.0, 
+            driveTrain::getChassisSpeeds, 
+            driveTrain::getTotalDriveCurrent, 
+            30
+        ).withRotationalDeadband(Constants.Swerve.teleopAngularVelocityDeadband)
+        .withSoftHoldHeading(false)
+        .withPositionCorrectionIterations(4)
+        .withPositionCorrectionWeight(1);
 
         addRequirements(driveTrain);
     }
@@ -88,7 +97,10 @@ public class PeaccyDrive extends Command {
         boolean isLockIn = isLockInSup.getAsBoolean();
         boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean();
 
-        if(isZeroOdometry) driveTrain.resetOdometry();
+        if(isZeroOdometry) {
+            driveTrain.resetOdometry();
+            request.withHeading(driveTrain.getPose().getRotation().getRadians());
+        }
 
         // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
@@ -118,41 +130,18 @@ public class PeaccyDrive extends Command {
             }
         }
 
-        //handle auto angle
-        if (isAutoHeading) {
-            //convert angle to be -180 to 180
-            autoHeadingAngle = Math.IEEEremainder(autoHeadingAngle, 360);
-            if (autoHeadingAngle > 180) autoHeadingAngle -= 360;
-            if (autoHeadingAngle < -180) autoHeadingAngle += 360;
+       request.withVelocityX(linearVelocity.getX())
+            .withVelocityY(linearVelocity.getY())
+            .withRotationalRate(angularVelocity)
+            .withIsOpenLoop(true)
+            .withIsFieldCentric(isFieldRelative)
+            .withHoldHeading(true);
 
-            autoHeadingRequest.withIsOpenLoop(isOpenLoop)
-                            .withVelocityX(linearVelocity.getX())
-                            .withVelocityY(linearVelocity.getY())
-                            .withTargetDirection(Rotation2d.fromDegrees(autoHeadingAngle))
-                            .withRotationalDeadband(0.1); // todo do we need rotational deadband?
-
-            driveTrain.drive(autoHeadingRequest);
-            return;
+        if(isAutoHeading) {
+            request.withHeading(Rotation2d.fromDegrees(autoHeadingAngle).getRadians());
         }
 
-        //handle field relative
-        if (isFieldRelative) {
-            fieldCentricRequest.withIsOpenLoop(isOpenLoop)
-                                .withVelocityX(linearVelocity.getX())
-                                .withVelocityY(linearVelocity.getY())
-                                .withRotationalRate(angularVelocity);
-
-            driveTrain.drive(fieldCentricRequest);
-            return;
-        }
-
-        //handle robot relative
-        robotCentricRequest.withIsOpenLoop(isOpenLoop)
-                            .withVelocityX(linearVelocity.getX())
-                            .withVelocityY(linearVelocity.getY())
-                            .withRotationalRate(angularVelocity);
-
-        driveTrain.drive(robotCentricRequest);
+        driveTrain.drive(request);
     }
 
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
