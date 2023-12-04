@@ -9,6 +9,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -70,6 +71,7 @@ public class PeaccyRequest implements SwerveRequest {
 
 
     private final double CURRENT_LIMIT_THRESHOLD = 0.01; //percent of the current limit to start throttling at.
+    private final SlewRateLimiter currentLimitSmoother = new SlewRateLimiter(10); //limit the amps per second for the current to change, to help find equilibrium.
 
 
     /**
@@ -307,7 +309,8 @@ public class PeaccyRequest implements SwerveRequest {
         var feedforward = headingFeedforward.calculate(target.velocity);
         var pGain = error * holdHeadingkP * parameters.updatePeriod;
         SmartDashboard.putNumber("heading error", target.position - currentHeading);
-        if(SoftHoldHeading) pGain = pGain * compress(totalDriveCurrent.getAsDouble(), totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
+        var currentDraw = currentLimitSmoother.calculate(totalDriveCurrent.getAsDouble());
+        if(SoftHoldHeading) pGain = pGain * compress(currentDraw, totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
         var delta = pGain + feedforward;
 
         SmartDashboard.putNumber("holdheading gain", delta);
