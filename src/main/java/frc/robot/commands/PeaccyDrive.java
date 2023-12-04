@@ -5,10 +5,13 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.swerve.PeaccyRequest;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
@@ -18,15 +21,17 @@ public class PeaccyDrive extends Command {
     private final BooleanSupplier isAutoAngleSup, isFieldRelativeSup, isOpenLoopSup, isLockInSup;
     private final DriveTrain driveTrain;
 
-    private final SwerveRequest.FieldCentric fieldCentricRequest = new SwerveRequest.FieldCentric();
-    private final SwerveRequest.RobotCentric robotCentricRequest = new SwerveRequest.RobotCentric();
-    private final SwerveRequest.FieldCentricFacingAngle autoHeadingRequest = new SwerveRequest.FieldCentricFacingAngle();
+    private final PeaccyRequest request;
     private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withIsOpenLoop(false);
 
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
+    private final SlewRateLimiter nearLinearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopNearLinearAngleLimit); //more extreme limit near zero 
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
     private BooleanSupplier isZeroOdometrySup;
+
+    private final Debouncer linearDeadbandDebouncer = new Debouncer(0.1, DebounceType.kBoth);
+    private final Debouncer angularDeadbandDebouncer = new Debouncer(0.1, DebounceType.kBoth);
 
 
     /**
@@ -68,9 +73,19 @@ public class PeaccyDrive extends Command {
         this.isZeroOdometrySup = isZeroOdometry;
         this.driveTrain = driveTrain;
 
-        autoHeadingRequest.HeadingController.setP(Constants.Swerve.autoHeadingKP);
-        autoHeadingRequest.HeadingController.setI(Constants.Swerve.autoHeadingKI);
-        autoHeadingRequest.HeadingController.setD(Constants.Swerve.autoHeadingKD);
+        request  = new PeaccyRequest(
+            50, 
+            70,
+            2600, 
+            0.0, 
+            0.0, 
+            driveTrain::getChassisSpeeds, 
+            driveTrain::getTotalDriveCurrent, 
+            30
+        ).withRotationalDeadband(Constants.Swerve.teleopAngularVelocityDeadband)
+        .withSoftHoldHeading(false)
+        .withPositionCorrectionIterations(4)
+        .withPositionCorrectionWeight(1);
 
         addRequirements(driveTrain);
     }
@@ -88,7 +103,10 @@ public class PeaccyDrive extends Command {
         boolean isLockIn = isLockInSup.getAsBoolean();
         boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean();
 
-        if(isZeroOdometry) driveTrain.resetOdometry();
+        if(isZeroOdometry) {
+            driveTrain.resetOdometry();
+            request.withHeading(driveTrain.getPose().getRotation().getRadians());
+        }
 
         // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
@@ -118,55 +136,34 @@ public class PeaccyDrive extends Command {
             }
         }
 
-        //handle auto angle
-        if (isAutoHeading) {
-            //convert angle to be -180 to 180
-            autoHeadingAngle = Math.IEEEremainder(autoHeadingAngle, 360);
-            if (autoHeadingAngle > 180) autoHeadingAngle -= 360;
-            if (autoHeadingAngle < -180) autoHeadingAngle += 360;
+       request.withVelocityX(linearVelocity.getX())
+            .withVelocityY(linearVelocity.getY())
+            .withRotationalRate(angularVelocity)
+            .withIsOpenLoop(true)
+            .withIsFieldCentric(isFieldRelative)
+            .withHoldHeading(true);
 
-            autoHeadingRequest.withIsOpenLoop(isOpenLoop)
-                            .withVelocityX(linearVelocity.getX())
-                            .withVelocityY(linearVelocity.getY())
-                            .withTargetDirection(Rotation2d.fromDegrees(autoHeadingAngle))
-                            .withRotationalDeadband(0.1); // todo do we need rotational deadband?
-
-            driveTrain.drive(autoHeadingRequest);
-            return;
+        if(isAutoHeading) {
+            request.withHeading(Rotation2d.fromDegrees(autoHeadingAngle).getRadians());
         }
 
-        //handle field relative
-        if (isFieldRelative) {
-            fieldCentricRequest.withIsOpenLoop(isOpenLoop)
-                                .withVelocityX(linearVelocity.getX())
-                                .withVelocityY(linearVelocity.getY())
-                                .withRotationalRate(angularVelocity);
-
-            driveTrain.drive(fieldCentricRequest);
-            return;
-        }
-
-        //handle robot relative
-        robotCentricRequest.withIsOpenLoop(isOpenLoop)
-                            .withVelocityX(linearVelocity.getX())
-                            .withVelocityY(linearVelocity.getY())
-                            .withRotationalRate(angularVelocity);
-
-        driveTrain.drive(robotCentricRequest);
+        driveTrain.drive(request);
     }
 
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
         //handle deadband and reset the rate limiter if we're in the deadband
-        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,linearVelocity.getNorm());
+        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,linearVelocity.getNorm(), linearDeadbandDebouncer);
         if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
         rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
         //limit the linear acceleration
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);
 
+        boolean useNearLimiter = Math.abs(rawLinearSpeed) < Constants.Swerve.teleopNearLimitThreshold;
+
         //limit the change in direction
         double rawLinearAngle = linearVelocity.getAngle().getRadians();
-        double linearAngle = linearAngleLimiter.calculate(rawLinearAngle);
+        double linearAngle = useNearLimiter ? nearLinearAngleLimiter.calculate(rawLinearAngle) : linearAngleLimiter.calculate(rawLinearAngle);
 
         // override the smoothing of the direction if it lags too far behind the raw value
         // (mainly after stopping and changing direction)
@@ -180,7 +177,7 @@ public class PeaccyDrive extends Command {
 
     private double smoothAndDeadband (double angularVelocity) {
         //apply deadband to angular velocity
-        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, angularVelocity);
+        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, angularVelocity, angularDeadbandDebouncer);
 
         angularVelocity = Constants.Swerve.teleopAngularVelocityCurve.apply(angularVelocity);
 
@@ -198,8 +195,8 @@ public class PeaccyDrive extends Command {
      * @param value the value to apply the deadband to
      * @return the value with the deadband applied (like magic)
      */
-    private double handleDeadbandFixSlope (double deadband, double value) {
-        if (Math.abs(value) < deadband) return 0;
+    private double handleDeadbandFixSlope (double deadband, double value, Debouncer debounce) {
+        if (debounce.calculate(Math.abs(value) < deadband)) return 0;
         return (value - (deadband * Math.signum(value)))/(1 - deadband);
     }
 }
