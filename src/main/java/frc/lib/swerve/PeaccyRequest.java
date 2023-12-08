@@ -57,6 +57,8 @@ public class PeaccyRequest implements SwerveRequest {
     private double holdHeadingAcceleration = 0;
 
     private Timer holdHeadingTrajectoryTimer = new Timer();
+    private final Timer robotMovingTimer = new Timer();
+    private final Timer robotNotMovingTimer = new Timer();
 
     //soft heading current limit parameters
     private DoubleSupplier totalDriveCurrent;
@@ -102,6 +104,8 @@ public class PeaccyRequest implements SwerveRequest {
         this.getChassisSpeeds = chassisSpeedsSupplier;
         this.totalDriveCurrent = totalDriveCurrentSupplier;
         this.totalDriveCurrentLimit = softHeadingCurrentLimit;
+        robotMovingTimer.start();
+        robotNotMovingTimer.start();
     }
 
     @Override
@@ -112,10 +116,20 @@ public class PeaccyRequest implements SwerveRequest {
         //position correction only works for field centric :|
         if(IsFieldCentric) toApplyTranslation = applyPositionCorrection(toApplyTranslation, parameters.currentPose, parameters.updatePeriod);
 
+        if(toApplyTranslation.getNorm() < 0.1){
+            robotMovingTimer.reset();
+            robotMovingTimer.start();
+        } else {
+            robotNotMovingTimer.reset();
+            robotNotMovingTimer.start();
+        }
+
         //we only do auto heading if there is no manually requested rotational rate
         if(Math.abs(toApplyRotation) <= RotationalDeadband) {
             toApplyRotation = 0;
-            if (HoldHeading || SoftHoldHeading) toApplyRotation = applyAutoHeading(parameters);
+            if ((HoldHeading || SoftHoldHeading)) {
+                toApplyRotation = applyAutoHeading(parameters);
+            } 
         } else {
             //Update the set heading to the current heading. This means that when there is no rotational rate requested,
             //the robot will hold its current heading if HoldHeading or SoftHoldHeading is true,
@@ -305,6 +319,10 @@ public class PeaccyRequest implements SwerveRequest {
         var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod);
         var error = target.position - currentHeading;
 
+        if(robotMovingTimer.get() < 0.3 && Math.abs(error) < 0.2){
+            return 0;
+        }
+
         SmartDashboard.putNumber("target heading",target.position);
         var feedforward = headingFeedforward.calculate(target.velocity);
         var pGain = error * holdHeadingkP * parameters.updatePeriod;
@@ -338,6 +356,8 @@ public class PeaccyRequest implements SwerveRequest {
         if (positionCorrectionRequestedVelocities.size() > PositionCorrectionIterations) {
             positionCorrectionRequestedVelocities.removeFirst();
         }
+
+        if(robotMovingTimer.get() < 0.05) return requestedTranslation;
 
         //integrate the requested velocities to get the requested position
         Translation2d requestedPositionDelta = new Translation2d(0, 0);

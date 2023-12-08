@@ -10,6 +10,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.swerve.PeaccyRequest;
 import frc.lib.telemetry.SwerveTelemetry;
@@ -30,8 +31,11 @@ public class PeaccyDrive extends Command {
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
     private BooleanSupplier isZeroOdometrySup;
 
-    private final Debouncer linearDeadbandDebouncer = new Debouncer(0.1, DebounceType.kBoth);
-    private final Debouncer angularDeadbandDebouncer = new Debouncer(0.1, DebounceType.kBoth);
+    private final Debouncer linearDeadbandDebouncer = new Debouncer(0.15, DebounceType.kBoth);
+    private final Debouncer angularDeadbandDebouncer = new Debouncer(0.15, DebounceType.kBoth);
+
+    private final Timer robotNotMovingTimer = new Timer();
+    private final Timer robotMovingTimer = new Timer();
 
 
     /**
@@ -87,7 +91,16 @@ public class PeaccyDrive extends Command {
         .withPositionCorrectionIterations(4)
         .withPositionCorrectionWeight(1);
 
+        robotMovingTimer.start();
+        robotNotMovingTimer.start();
+
         addRequirements(driveTrain);
+    }
+
+    @Override
+    public void initialize(){
+        driveTrain.resetOdometry();
+        request.withHeading(driveTrain.getPose().getRotation().getRadians());
     }
 
     @Override
@@ -112,6 +125,9 @@ public class PeaccyDrive extends Command {
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
         linearVelocity = smoothAndDeadband(linearVelocity).times(Constants.Swerve.teleopLinearMultiplier);
         angularVelocity = smoothAndDeadband(angularVelocity) * Constants.Swerve.teleopAngularMultiplier;
+
+        if(linearVelocity.getNorm() > 0.1) robotNotMovingTimer.reset();
+        else robotMovingTimer.reset();
 
         // log data
         SwerveTelemetry.updateSwerveCommand(
@@ -152,7 +168,7 @@ public class PeaccyDrive extends Command {
 
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
         //handle deadband and reset the rate limiter if we're in the deadband
-        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,linearVelocity.getNorm(), linearDeadbandDebouncer);
+        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,0.1,linearVelocity.getNorm(), linearDeadbandDebouncer);
         if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
         rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
@@ -177,7 +193,7 @@ public class PeaccyDrive extends Command {
 
     private double smoothAndDeadband (double angularVelocity) {
         //apply deadband to angular velocity
-        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, angularVelocity, angularDeadbandDebouncer);
+        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, 0.13, angularVelocity, angularDeadbandDebouncer);
 
         angularVelocity = Constants.Swerve.teleopAngularVelocityCurve.apply(angularVelocity);
 
@@ -195,8 +211,9 @@ public class PeaccyDrive extends Command {
      * @param value the value to apply the deadband to
      * @return the value with the deadband applied (like magic)
      */
-    private double handleDeadbandFixSlope (double deadband, double value, Debouncer debounce) {
+    private double handleDeadbandFixSlope (double modband, double deadband, double value, Debouncer debounce) {
         if (debounce.calculate(Math.abs(value) < deadband)) return 0;
-        return (value - (deadband * Math.signum(value)))/(1 - deadband);
+        var mod = (value - (deadband * Math.signum(value)))/(1 - deadband);
+        return Math.abs(mod) > deadband ? mod : 0;
     }
 }
