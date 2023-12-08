@@ -357,7 +357,7 @@ public class PeaccyRequest implements SwerveRequest {
             positionCorrectionRequestedVelocities.removeFirst();
         }
 
-        if(robotMovingTimer.get() < 0.3) return requestedTranslation;
+        if(robotMovingTimer.get() < 0.05) return requestedTranslation;
 
         //integrate the requested velocities to get the requested position
         Translation2d requestedPositionDelta = new Translation2d(0, 0);

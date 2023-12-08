@@ -98,6 +98,12 @@ public class PeaccyDrive extends Command {
     }
 
     @Override
+    public void initialize(){
+        driveTrain.resetOdometry();
+        request.withHeading(driveTrain.getPose().getRotation().getRadians());
+    }
+
+    @Override
     public void execute() {
         double xVelocity = xVelocitySup.getAsDouble();
         double yVelocity = yVelocitySup.getAsDouble();
@@ -162,7 +168,7 @@ public class PeaccyDrive extends Command {
 
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
         //handle deadband and reset the rate limiter if we're in the deadband
-        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,0.15,linearVelocity.getNorm(), linearDeadbandDebouncer);
+        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,0.1,linearVelocity.getNorm(), linearDeadbandDebouncer);
         if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
         rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
@@ -187,7 +193,7 @@ public class PeaccyDrive extends Command {
 
     private double smoothAndDeadband (double angularVelocity) {
         //apply deadband to angular velocity
-        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband - 0.05, 0.13, angularVelocity, angularDeadbandDebouncer);
+        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, 0.13, angularVelocity, angularDeadbandDebouncer);
 
         angularVelocity = Constants.Swerve.teleopAngularVelocityCurve.apply(angularVelocity);
 
