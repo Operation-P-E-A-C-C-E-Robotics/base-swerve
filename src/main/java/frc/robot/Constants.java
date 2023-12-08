@@ -61,7 +61,7 @@ public final class Constants {
 
     //inertia only used for simulation
     public static final Physics physics = new Physics(0.01,1, 50, 10);
-    public static final double steerMotorCurrentLimit = 20; //amps
+    public static final double steerMotorCurrentLimit = 40; //amps
     
     public static final PidGains driveGains = new PidGains(0.35, 0, 0, 0.11, 0.3); 
     public static final PidGains angleGains = new PidGains(90, 0, 0.001, 0, 0);
