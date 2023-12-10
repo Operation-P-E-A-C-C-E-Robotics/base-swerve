@@ -6,14 +6,16 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.sensors.LimelightHelper;
 import frc.robot.commands.PeaccyDrive;
-import frc.robot.commands.TestPeaccyRequest;
 import frc.robot.subsystems.DriveTrain;
 
 public class RobotContainer {
@@ -37,7 +39,7 @@ public class RobotContainer {
   private final JoystickButton closedLoopButton = new JoystickButton(driverController, 5);
 
   /* COMMANDS */
-  private final TestPeaccyRequest peaccyDrive = new TestPeaccyRequest(
+  private final PeaccyDrive peaccyDrive = new PeaccyDrive(
     () -> -driverController.getRawAxis(translationAxis),  //translation
     () -> -driverController.getRawAxis(strafeAxis),       //strafe
     () -> -driverController.getRawAxis(rotationAxis),     //rotation
@@ -59,6 +61,12 @@ public class RobotContainer {
 
   private void configureBindings() {
     driveTrain.setDefaultCommand(peaccyDrive);
+
+    // new JoystickButton(driverController,1).onTrue(new InstantCommand(
+    //   () -> {
+    //     Command test = driveTrain.driveToPose(new Pose2d());
+    //     test.schedule();
+    //   }, driveTrain));
   }
 
 
