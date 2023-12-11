@@ -37,6 +37,7 @@ public class PeaccyDrive extends Command {
     private final Timer robotNotMovingTimer = new Timer();
     private final Timer robotMovingTimer = new Timer();
 
+    private FallbackMode fallback = FallbackMode.Normal;
 
     /**
      * PeaccyDrive is a swerve drive command designed to handle all the different
@@ -157,10 +158,19 @@ public class PeaccyDrive extends Command {
             .withRotationalRate(angularVelocity)
             .withIsOpenLoop(true)
             .withIsFieldCentric(isFieldRelative)
-            .withHoldHeading(true);
+            .withHoldHeading(true)
+            .withPositionCorrectionIterations(4);
 
         if(isAutoHeading) {
             request.withHeading(Rotation2d.fromDegrees(autoHeadingAngle).getRadians());
+        }
+
+        if(fallback != FallbackMode.Normal){
+            request.withPositionCorrectionIterations(0);
+        }
+        if(fallback == FallbackMode.PigeonFailure){
+            request.withIsFieldCentric(false);
+            request.withHoldHeading(false);
         }
 
         driveTrain.drive(request);
@@ -215,5 +225,16 @@ public class PeaccyDrive extends Command {
         if (debounce.calculate(Math.abs(value) < deadband)) return 0;
         var mod = (value - (deadband * Math.signum(value)))/(1 - deadband);
         return Math.abs(mod) > deadband ? mod : 0;
+    }
+
+    public void fallback(){
+        if(fallback == FallbackMode.Normal) fallback = FallbackMode.OdmetryFailure;
+        if(fallback == FallbackMode.OdmetryFailure) fallback = FallbackMode.PigeonFailure;
+    }
+    
+    public enum FallbackMode{
+        Normal,
+        OdmetryFailure,
+        PigeonFailure
     }
 }

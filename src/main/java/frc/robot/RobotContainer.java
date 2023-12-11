@@ -35,7 +35,7 @@ public class RobotContainer {
   /* OI DEFINITIONS */
   private final Joystick driverController = new Joystick(0);
   
-  private final JoystickButton zeroButton = new JoystickButton(driverController, 7);
+  private final JoystickButton zeroButton = new JoystickButton(driverController, 7); //for debugging
   private final JoystickButton closedLoopButton = new JoystickButton(driverController, 5);
 
   /* COMMANDS */
