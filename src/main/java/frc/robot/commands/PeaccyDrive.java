@@ -231,6 +231,10 @@ public class PeaccyDrive extends Command {
         if(fallback == FallbackMode.Normal) fallback = FallbackMode.OdmetryFailure;
         if(fallback == FallbackMode.OdmetryFailure) fallback = FallbackMode.PigeonFailure;
     }
+
+    public void resetFallback(){
+        fallback = FallbackMode.Normal;
+    }
     
     public enum FallbackMode{
         Normal,
