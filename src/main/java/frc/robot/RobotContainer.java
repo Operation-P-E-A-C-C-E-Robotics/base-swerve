@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.sensors.LimelightHelper;
 import frc.robot.commands.PeaccyDrive;
@@ -35,8 +36,11 @@ public class RobotContainer {
   /* OI DEFINITIONS */
   private final Joystick driverController = new Joystick(0);
   
-  private final JoystickButton zeroButton = new JoystickButton(driverController, 7);
+  private final JoystickButton zeroButton = new JoystickButton(driverController, 7); //for debugging
   private final JoystickButton closedLoopButton = new JoystickButton(driverController, 5);
+  private final JoystickButton driveFallbackButton = new JoystickButton(driverController, 7);
+  private final JoystickButton driveFallbackResetButton = new JoystickButton(driverController, 8);
+
 
   /* COMMANDS */
   private final PeaccyDrive peaccyDrive = new PeaccyDrive(
@@ -61,7 +65,8 @@ public class RobotContainer {
 
   private void configureBindings() {
     driveTrain.setDefaultCommand(peaccyDrive);
-
+    driveFallbackButton.onTrue(new InstantCommand(peaccyDrive::fallback, driveTrain)); //TODO it's annoying that we have to state requiements, could cause problems, find better way
+    driveFallbackResetButton.onTrue(new InstantCommand(peaccyDrive::resetFallback, driveTrain));
     // new JoystickButton(driverController,1).onTrue(new InstantCommand(
     //   () -> {
     //     Command test = driveTrain.driveToPose(new Pose2d());
