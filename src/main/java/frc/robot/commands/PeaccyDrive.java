@@ -10,6 +10,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.swerve.PeaccyRequest;
@@ -26,6 +27,7 @@ public class PeaccyDrive extends Command {
     private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withIsOpenLoop(false);
 
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
+    private final SlewRateLimiter lowBatteryLinearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLowBatteryLinearSpeedLimit);
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
     private final SlewRateLimiter nearLinearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopNearLinearAngleLimit); //more extreme limit near zero 
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
@@ -172,14 +174,20 @@ public class PeaccyDrive extends Command {
         if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
         rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
+        boolean useLowBetteryLimiter = RobotController.getBatteryVoltage() < 10.5;
+
+        double lowBatSpeed = lowBatteryLinearSpeedLimiter.calculate(rawLinearSpeed);
         //limit the linear acceleration
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);
+        if(useLowBetteryLimiter) linearSpeed = lowBatSpeed;
 
         boolean useNearLimiter = Math.abs(rawLinearSpeed) < Constants.Swerve.teleopNearLimitThreshold;
 
         //limit the change in direction
         double rawLinearAngle = linearVelocity.getAngle().getRadians();
-        double linearAngle = useNearLimiter ? nearLinearAngleLimiter.calculate(rawLinearAngle) : linearAngleLimiter.calculate(rawLinearAngle);
+        double nearLinearAngle = nearLinearAngleLimiter.calculate(rawLinearAngle);
+        double linearAngle = linearAngleLimiter.calculate(rawLinearAngle);
+        if(useNearLimiter) linearAngle = nearLinearAngle;
 
         // override the smoothing of the direction if it lags too far behind the raw value
         // (mainly after stopping and changing direction)
