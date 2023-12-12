@@ -32,6 +32,7 @@ public final class Constants {
 
     //smoothing
     public static final double teleopLinearSpeedLimit = 5.0;
+	public static final double teleopLowBatteryLinearSpeedLimit = 2.0;
     public static final double teleopLinearAngleLimit = 2.0;
     public static final double teleopNearLinearAngleLimit = 0.5;
     public static final double teleopAngularRateLimit = 3.0;
