@@ -43,18 +43,7 @@ public class RobotContainer {
 
 
   /* COMMANDS */
-  private final PeaccyDrive peaccyDrive = new PeaccyDrive(
-    () -> -driverController.getRawAxis(translationAxis),  //translation
-    () -> -driverController.getRawAxis(strafeAxis),       //strafe
-    () -> -driverController.getRawAxis(rotationAxis),     //rotation
-    () -> (double) -driverController.getPOV(),            //auto heading angle
-    () -> driverController.getPOV() != -1,                //auto heading enabled
-    () -> driverController.getRawAxis(2) < 0.2,      //field oriented
-    () -> !closedLoopButton.getAsBoolean(),               //open loop
-    () -> driverController.getRawAxis(3) > 0.2,      //X lock wheels enabled
-    () -> zeroButton.getAsBoolean(),                      //zero odometry
-    driveTrain
-  );
+  private final PeaccyDrive peaccyDrive = new PeaccyDrive(driveTrain);
 
   private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -64,6 +53,14 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    peaccyDrive.withTranslation(() -> -driverController.getRawAxis(translationAxis))
+               .withStrafe     (() -> -driverController.getRawAxis(strafeAxis))
+               .withRotation   (() -> -driverController.getRawAxis(rotationAxis))
+               .withHeading    (() -> (double) -driverController.getPOV())
+               .useHeading     (() -> driverController.getPOV() != -1)
+               .isFieldRelative(() -> driverController.getRawAxis(2) < 0.2)
+               .isLockIn       (() -> driverController.getRawAxis(3) > 0.2)
+               .isZeroOdometry (() -> zeroButton.getAsBoolean());
     driveTrain.setDefaultCommand(peaccyDrive);
     driveFallbackButton.onTrue(new InstantCommand(peaccyDrive::fallback, driveTrain)); //TODO it's annoying that we have to state requiements, could cause problems, find better way
     driveFallbackResetButton.onTrue(new InstantCommand(peaccyDrive::resetFallback, driveTrain));

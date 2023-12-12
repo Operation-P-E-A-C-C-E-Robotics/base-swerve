@@ -42,9 +42,12 @@ public final class Constants {
     //deadband
     public static final double teleopLinearSpeedDeadband = 0.1;
     public static final double teleopAngularVelocityDeadband = 0.13;
+    public static final double teleopDeadbandDebounceTime = 0.15;
 
     public static final DoubleFunction <Double> teleopLinearSpeedCurve = (double linearSpeed) -> JoystickCurves.herraFCurve(linearSpeed, 6, 4.5); //a nice gentle curve which is Peaccy's (me!!) favorite :)
     public static final DoubleFunction <Double> teleopAngularVelocityCurve = (double angularVelocity) -> JoystickCurves.powerCurve(angularVelocity, 2); //TODO decide if the driver (me) wants a curve on this or not.
+
+    public static final int teleopPositionCorrectionIters = 4;
 
     /* CTRE SWERVE CONSTANTS */
     public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(24.75));
@@ -70,9 +73,15 @@ public final class Constants {
     public static final int pigeonCANId = 14;
     public static final boolean invertSteerMotors = Robot.isReal(); //cant invert in simulation which is dumb.
 
-    public static final double autoHeadingKP = 8.0;
+    public static final double autoHeadingKP = 2600;
     public static final double autoHeadingKI = 0.0;
     public static final double autoHeadingKD = 0.0;
+    public static final double autoHeadingKV = 0.0;
+    public static final double autoHeadingKA = 0.0;
+    public static final double autoHeadingMaxVelocity = 50;
+    public static final double autoHeadingMaxAcceleration = 70;
+    public static final boolean useSoftHoldHeading = false;
+    public static final double softHeadingCurrentLimit = 30;
 
     public static final double measuredMaxVelocity = 3,
                               measuredMaxAcceleration = 3,
