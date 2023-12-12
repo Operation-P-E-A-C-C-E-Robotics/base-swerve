@@ -32,8 +32,12 @@ public final class Constants {
 
     //smoothing
     public static final double teleopLinearSpeedLimit = 5.0;
+	public static final double teleopLowBatteryLinearSpeedLimit = 2.0;
     public static final double teleopLinearAngleLimit = 2.0;
+    public static final double teleopNearLinearAngleLimit = 0.5;
     public static final double teleopAngularRateLimit = 3.0;
+
+    public static final double teleopNearLimitThreshold = 0.2; //how close to zero to use more extreme linear angle smoothing.
 
     //deadband
     public static final double teleopLinearSpeedDeadband = 0.1;
@@ -51,14 +55,14 @@ public final class Constants {
     public static final CANIDs rearLeftIDs =    new CANIDs(11,  13,   12); //module (tuner) 4 / (robot) 3
     public static final CANIDs rearRightIDs =   new CANIDs(2,   4,    3); //module (tuner) 1 / (robot) 0
 
-    public static final Gearing gearing = new Gearing(DriveGearRatios.SDSMK4i_L2, ((150.0 / 7.0) / 1.0), 2.0, 0);
+    public static final Gearing gearing = new Gearing(DriveGearRatios.SDSMK4i_L2, ((150.0 / 7.0) / 1.0), (3.85/2), 0);
     public static final EncoderOffsets offsets = new EncoderOffsets(-0.488770, -0.225342, -0.224609, -0.906738); //todo these offsets are very wrong.
 
     public static final Inversion inversion = new Inversion(false, true, true, false); //herra 4.5, 6
 
     //inertia only used for simulation
     public static final Physics physics = new Physics(0.01,1, 50, 10);
-    public static final double steerMotorCurrentLimit = 20; //amps
+    public static final double steerMotorCurrentLimit = 40; //amps
     
     public static final PidGains driveGains = new PidGains(0.35, 0, 0, 0.11, 0.3); 
     public static final PidGains angleGains = new PidGains(90, 0, 0.001, 0, 0);
@@ -89,7 +93,7 @@ public final class Constants {
       new PIDConstants(5, 0, 0), 
       measuredMaxVelocity, 
       dimensions.frontLeft.getNorm(), 
-      new ReplanningConfig(false, false),
+      new ReplanningConfig(true, true),
       period
     );
   }
