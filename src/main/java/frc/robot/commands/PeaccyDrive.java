@@ -19,9 +19,15 @@ import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
 public class PeaccyDrive extends Command {
-    private final DoubleSupplier xVelocitySup, yVelocitySup, angularVelocitySup, autoHeadingAngleSup;
-    private final BooleanSupplier isAutoAngleSup, isFieldRelativeSup, isOpenLoopSup, isLockInSup;
-    private final DriveTrain driveTrain;
+    private DoubleSupplier xVelocitySup = () -> 0,
+                           yVelocitySup = () -> 0, 
+                           angularVelocitySup = () -> 0, 
+                           autoHeadingAngleSup = () -> 0;
+    private BooleanSupplier isAutoAngleSup = () -> false, 
+                            isFieldRelativeSup = () -> false, 
+                            isOpenLoopSup = () -> false, 
+                            isLockInSup = () -> false;
+    private DriveTrain driveTrain;
 
     private final PeaccyRequest request;
     private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withIsOpenLoop(false);
@@ -33,8 +39,8 @@ public class PeaccyDrive extends Command {
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
     private BooleanSupplier isZeroOdometrySup;
 
-    private final Debouncer linearDeadbandDebouncer = new Debouncer(0.15, DebounceType.kBoth);
-    private final Debouncer angularDeadbandDebouncer = new Debouncer(0.15, DebounceType.kBoth);
+    private final Debouncer linearDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
+    private final Debouncer angularDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
 
     private final Timer robotNotMovingTimer = new Timer();
     private final Timer robotMovingTimer = new Timer();
@@ -59,45 +65,69 @@ public class PeaccyDrive extends Command {
      * @param isZeroOdometry whether or not to zero the odometry
      * @param driveTrain the swerve subsystem
      */
-    public PeaccyDrive(DoubleSupplier xVelocitySup,
-                      DoubleSupplier yVelocitySup,
-                      DoubleSupplier angularVelocitySup,
-                      DoubleSupplier autoHeadingAngleSup,
-                      BooleanSupplier isAutoAngleSup,
-                      BooleanSupplier isFieldRelativeSup,
-                      BooleanSupplier isOpenLoopSup,
-                      BooleanSupplier isLockInSup,
-                      BooleanSupplier isZeroOdometry,
-                      DriveTrain driveTrain) {
-        this.xVelocitySup = xVelocitySup;
-        this.yVelocitySup = yVelocitySup;
-        this.angularVelocitySup = angularVelocitySup;
-        this.autoHeadingAngleSup = autoHeadingAngleSup;
-        this.isAutoAngleSup = isAutoAngleSup;
-        this.isFieldRelativeSup = isFieldRelativeSup;
-        this.isOpenLoopSup = isOpenLoopSup;
-        this.isLockInSup = isLockInSup;
-        this.isZeroOdometrySup = isZeroOdometry;
+    public PeaccyDrive(DriveTrain driveTrain) { 
         this.driveTrain = driveTrain;
 
         request  = new PeaccyRequest(
-            50, 
-            70,
-            2600, 
-            0.0, 
-            0.0, 
+            Constants.Swerve.autoHeadingMaxVelocity, 
+            Constants.Swerve.autoHeadingMaxAcceleration,
+            Constants.Swerve.autoHeadingKP, 
+            Constants.Swerve.autoHeadingKV, 
+            Constants.Swerve.autoHeadingKA, 
             driveTrain::getChassisSpeeds, 
             driveTrain::getTotalDriveCurrent, 
-            30
+            Constants.Swerve.softHeadingCurrentLimit
         ).withRotationalDeadband(Constants.Swerve.teleopAngularVelocityDeadband)
-        .withSoftHoldHeading(false)
-        .withPositionCorrectionIterations(4)
-        .withPositionCorrectionWeight(1);
+        .withSoftHoldHeading(Constants.Swerve.useSoftHoldHeading)
+        .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
 
         robotMovingTimer.start();
         robotNotMovingTimer.start();
 
         addRequirements(driveTrain);
+    }
+
+    public PeaccyDrive withTranslation(DoubleSupplier xVelocitySup){
+        this.xVelocitySup = xVelocitySup;
+        return this;
+    }
+
+    public PeaccyDrive withStrafe(DoubleSupplier yVelocitySup){
+        this.yVelocitySup = yVelocitySup;
+        return this;
+    }
+
+    public PeaccyDrive withRotation(DoubleSupplier angularVelocitySup){
+        this.angularVelocitySup = angularVelocitySup;
+        return this;
+    }
+    public PeaccyDrive withHeading(DoubleSupplier headingSup){
+        this.autoHeadingAngleSup = headingSup;
+        return this;
+    }
+    public PeaccyDrive isLockIn(BooleanSupplier isLockInSup){
+        this.isLockInSup = isLockInSup;
+        return this;
+    }
+
+    public PeaccyDrive isFieldRelative(BooleanSupplier isFieldRelativeSup){
+        this.isFieldRelativeSup = isFieldRelativeSup;
+        return this;
+    }
+
+    public PeaccyDrive isOpenLoop(BooleanSupplier isOpenLoopSup){
+        this.isOpenLoopSup = isOpenLoopSup;
+        return this;
+    }
+
+    public PeaccyDrive isZeroOdometry(BooleanSupplier isZeroOdometrySup){
+        this.isZeroOdometrySup = isZeroOdometrySup;
+        return this;
+    }
+
+    public PeaccyDrive useHeading(BooleanSupplier useHeadingSup){
+        this.isAutoAngleSup = useHeadingSup;
+        return this;
     }
 
     @Override
@@ -129,7 +159,7 @@ public class PeaccyDrive extends Command {
         linearVelocity = smoothAndDeadband(linearVelocity).times(Constants.Swerve.teleopLinearMultiplier);
         angularVelocity = smoothAndDeadband(angularVelocity) * Constants.Swerve.teleopAngularMultiplier;
 
-        if(linearVelocity.getNorm() > 0.1) robotNotMovingTimer.reset();
+        if(linearVelocity.getNorm() > Constants.Swerve.teleopLinearSpeedDeadband) robotNotMovingTimer.reset();
         else robotMovingTimer.reset();
 
         // log data
@@ -158,7 +188,7 @@ public class PeaccyDrive extends Command {
        request.withVelocityX(linearVelocity.getX())
             .withVelocityY(linearVelocity.getY())
             .withRotationalRate(angularVelocity)
-            .withIsOpenLoop(true)
+            .withIsOpenLoop(isOpenLoop)
             .withIsFieldCentric(isFieldRelative)
             .withHoldHeading(true)
             .withPositionCorrectionIterations(4);
@@ -173,6 +203,7 @@ public class PeaccyDrive extends Command {
         if(fallback == FallbackMode.PigeonFailure){
             request.withIsFieldCentric(false);
             request.withHoldHeading(false);
+            request.withSoftHoldHeading(false);
         }
 
         driveTrain.drive(request);
@@ -180,7 +211,7 @@ public class PeaccyDrive extends Command {
 
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
         //handle deadband and reset the rate limiter if we're in the deadband
-        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,0.1,linearVelocity.getNorm(), linearDeadbandDebouncer);
+        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,0.03,linearVelocity.getNorm(), linearDeadbandDebouncer);
         if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
         rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
@@ -211,7 +242,7 @@ public class PeaccyDrive extends Command {
 
     private double smoothAndDeadband (double angularVelocity) {
         //apply deadband to angular velocity
-        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, 0.13, angularVelocity, angularDeadbandDebouncer);
+        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, 0.3, angularVelocity, angularDeadbandDebouncer);
 
         angularVelocity = Constants.Swerve.teleopAngularVelocityCurve.apply(angularVelocity);
 
