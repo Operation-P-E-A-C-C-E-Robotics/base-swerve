@@ -15,13 +15,13 @@ import frc.lib.safety.Inspiration;
 import frc.robot.Constants.Core;
 
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
+  private Command autonomousCommand;
 
-  private RobotContainer m_robotContainer;
+  private RobotContainer robotContainer;
 
   private PowerDistribution pdp = new PowerDistribution(Core.PDPCanId, Core.PDPModuleType);
 
-  private boolean isInMatch = false;
+  private boolean isInMatch = false; //are we at comp
 
   public Robot() {
     super(Constants.period);
@@ -30,14 +30,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
 
+    //log data from network tables (SmartDashboard, etc.)
     DataLogManager.start();
     DataLogManager.logNetworkTables(true);
     DriverStation.startDataLog(DataLogManager.getLog());
 
+    //log current draw
     SmartDashboard.putData("PDP", pdp);
     
+    //BRING THE HYPE
     isInMatch = Inspiration.initializeInspirationOpt1();
     if(isInMatch){
       Inspiration.inspireDriversInit();
@@ -50,8 +53,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    //run the robot
     CommandScheduler.getInstance().run();
-    Inspiration.updateSlowPrinter();
+    Inspiration.updateSlowPrinter(); //KEEP THE HYPE MACHINE ROLLIN
   }
 
   @Override
@@ -66,11 +70,11 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     System.out.println("Robot Autonomous");
     Inspiration.inspireAutonomous(isInMatch);
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    // schedule the autonomous command
+    autonomousCommand = robotContainer.getAutonomousCommand();
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
     }
   }
 
@@ -81,8 +85,10 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     Inspiration.inspireTeleopInit(true);
     System.out.println("Robot Teleop");
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+
+    //stop autonomous
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
   }
 

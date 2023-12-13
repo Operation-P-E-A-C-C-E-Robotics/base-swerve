@@ -97,10 +97,10 @@ public class SwerveTelemetry {
         rearLeftLigament.setAngle(state.ModuleStates[2].angle.getDegrees());
         rearRightLigament.setAngle(state.ModuleStates[3].angle.getDegrees());
 
-        frontLeftLigament.setLength(state.ModuleStates[0].speedMetersPerSecond / Constants.Swerve.measuredMaxVelocity);
-        frontRightLigament.setLength(state.ModuleStates[1].speedMetersPerSecond / Constants.Swerve.measuredMaxVelocity);
-        rearLeftLigament.setLength(state.ModuleStates[2].speedMetersPerSecond / Constants.Swerve.measuredMaxVelocity);
-        rearRightLigament.setLength(state.ModuleStates[3].speedMetersPerSecond / Constants.Swerve.measuredMaxVelocity);
+        frontLeftLigament.setLength(state.ModuleStates[0].speedMetersPerSecond / Constants.Swerve.pathfollowingMaxVelocity);
+        frontRightLigament.setLength(state.ModuleStates[1].speedMetersPerSecond / Constants.Swerve.pathfollowingMaxVelocity);
+        rearLeftLigament.setLength(state.ModuleStates[2].speedMetersPerSecond / Constants.Swerve.pathfollowingMaxVelocity);
+        rearRightLigament.setLength(state.ModuleStates[3].speedMetersPerSecond / Constants.Swerve.pathfollowingMaxVelocity);
 
         /*
         format needed for advantagescope:
