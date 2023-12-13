@@ -1,6 +1,7 @@
 # base-swerve-2024 
 ## CTRE Phoenix 6 base swerve code
 This is FRC team 3461's base robot code for the 2024 season - currently (permanently) under development.
+See the [docs](docs/Outline.md) for more info.
 - Based on the new [CTRE swerve framework](https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/swerve/swerve-overview.html)
 - Field relative and robot relative control
 - Automatic heading control to keep robot facing cardinal directions and recover from bumps and drift
