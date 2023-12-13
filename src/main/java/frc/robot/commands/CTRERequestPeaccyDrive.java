@@ -9,17 +9,19 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.swerve.PeaccyRequest;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
-public class TestPeaccyRequest extends Command {
+@Deprecated
+public class CTRERequestPeaccyDrive extends Command {
     private final DoubleSupplier xVelocitySup, yVelocitySup, angularVelocitySup, autoHeadingAngleSup;
     private final BooleanSupplier isAutoAngleSup, isFieldRelativeSup, isOpenLoopSup, isLockInSup;
     private final DriveTrain driveTrain;
 
-    private final PeaccyRequest help;
+    private final SwerveRequest.FieldCentric fieldCentricRequest = new SwerveRequest.FieldCentric();
+    private final SwerveRequest.RobotCentric robotCentricRequest = new SwerveRequest.RobotCentric();
+    private final SwerveRequest.FieldCentricFacingAngle autoHeadingRequest = new SwerveRequest.FieldCentricFacingAngle();
     private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withIsOpenLoop(false);
 
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
@@ -29,8 +31,7 @@ public class TestPeaccyRequest extends Command {
 
 
     /**
-     * PeaccyDrive is a swerve drive command designed to handle all the different
-     * modes of driving that we want to use.
+     * DEPRICATED use peaccydrive instead. Has nice hold-heading and position correction.
      *
      * It has advanced input smoothing and deadbanding,
      * field centric and robot centric modes,
@@ -46,7 +47,7 @@ public class TestPeaccyRequest extends Command {
      * @param isZeroOdometry whether or not to zero the odometry
      * @param driveTrain the swerve subsystem
      */
-    public TestPeaccyRequest(DoubleSupplier xVelocitySup,
+    public CTRERequestPeaccyDrive(DoubleSupplier xVelocitySup,
                       DoubleSupplier yVelocitySup,
                       DoubleSupplier angularVelocitySup,
                       DoubleSupplier autoHeadingAngleSup,
@@ -67,19 +68,9 @@ public class TestPeaccyRequest extends Command {
         this.isZeroOdometrySup = isZeroOdometry;
         this.driveTrain = driveTrain;
 
-        help  = new PeaccyRequest(
-            50, 
-            70,
-            2600, 
-            0.0, 
-            0.0, 
-            driveTrain::getChassisSpeeds, 
-            driveTrain::getTotalDriveCurrent, 
-            30
-        ).withRotationalDeadband(Constants.Swerve.teleopAngularVelocityDeadband)
-        .withSoftHoldHeading(false)
-        .withPositionCorrectionIterations(4)
-        .withPositionCorrectionWeight(1);
+        autoHeadingRequest.HeadingController.setP(Constants.Swerve.autoHeadingKP);
+        autoHeadingRequest.HeadingController.setI(Constants.Swerve.autoHeadingKI);
+        autoHeadingRequest.HeadingController.setD(Constants.Swerve.autoHeadingKD);
 
         addRequirements(driveTrain);
     }
@@ -97,10 +88,7 @@ public class TestPeaccyRequest extends Command {
         boolean isLockIn = isLockInSup.getAsBoolean();
         boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean();
 
-        if(isZeroOdometry) {
-            driveTrain.resetOdometry();
-            help.withHeading(driveTrain.getPose().getRotation().getRadians());
-        }
+        if(isZeroOdometry) driveTrain.resetOdometry();
 
         // handle smoothing and deadbanding
         Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
@@ -130,18 +118,41 @@ public class TestPeaccyRequest extends Command {
             }
         }
 
-       help.withVelocityX(linearVelocity.getX())
-            .withVelocityY(linearVelocity.getY())
-            .withRotationalRate(angularVelocity)
-            .withIsOpenLoop(true)
-            .withIsFieldCentric(isFieldRelative)
-            .withHoldHeading(true);
+        //handle auto angle
+        if (isAutoHeading) {
+            //convert angle to be -180 to 180
+            autoHeadingAngle = Math.IEEEremainder(autoHeadingAngle, 360);
+            if (autoHeadingAngle > 180) autoHeadingAngle -= 360;
+            if (autoHeadingAngle < -180) autoHeadingAngle += 360;
 
-        if(isAutoHeading) {
-            help.withHeading(Rotation2d.fromDegrees(autoHeadingAngle).getRadians());
+            autoHeadingRequest.withIsOpenLoop(isOpenLoop)
+                            .withVelocityX(linearVelocity.getX())
+                            .withVelocityY(linearVelocity.getY())
+                            .withTargetDirection(Rotation2d.fromDegrees(autoHeadingAngle))
+                            .withRotationalDeadband(0.1); // todo do we need rotational deadband?
+
+            driveTrain.drive(autoHeadingRequest);
+            return;
         }
 
-        driveTrain.drive(help);
+        //handle field relative
+        if (isFieldRelative) {
+            fieldCentricRequest.withIsOpenLoop(isOpenLoop)
+                                .withVelocityX(linearVelocity.getX())
+                                .withVelocityY(linearVelocity.getY())
+                                .withRotationalRate(angularVelocity);
+
+            driveTrain.drive(fieldCentricRequest);
+            return;
+        }
+
+        //handle robot relative
+        robotCentricRequest.withIsOpenLoop(isOpenLoop)
+                            .withVelocityX(linearVelocity.getX())
+                            .withVelocityY(linearVelocity.getY())
+                            .withRotationalRate(angularVelocity);
+
+        driveTrain.drive(robotCentricRequest);
     }
 
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
