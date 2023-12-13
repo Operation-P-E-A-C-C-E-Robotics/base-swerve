@@ -5,7 +5,7 @@
 - Constants should be in per-subsystem subclassess
 - No joysticks or buttons should be owned by commands, they should be passed in through suppliers to make the OI easier to change.
 - Code should be split up in two ways: either into classes that reflect a real-world counterpart or classes that solve a specific problem (where no real-world system is applicable)
-- Variable names should be UNDERSTANDABLE, and concice but NOT ABBREVIATED. see [Code Style](Code_Style.md)
+- Variable names should be UNDERSTANDABLE, and concice but NOT ABBREVIATED. See [Code Style](Code_Style.md)
 
 ## Current Folder Structure
 - src/main/java/frc
