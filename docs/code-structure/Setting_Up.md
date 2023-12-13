@@ -43,4 +43,4 @@ There are a variety of other tunable parameters in the tuner described above. He
 
 The tuner also keeps track of peak robot acceleration and velocity.
 
-* All these values have counterparts in constants that must be edited. *
+*All these values have counterparts in constants that must be edited.*
