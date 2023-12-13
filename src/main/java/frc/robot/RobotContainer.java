@@ -32,7 +32,7 @@ public class RobotContainer {
   /* SUBSYSTEMS */
   //ONE OF THESE MUST BE COMMENTED OUT. ONLY USE THE TUNEABLE ONE FOR TUNING.
   private final DriveTrain driveTrain = new DriveTrain(limelight);
-  // private final DriveTrainTuneable_old driveTrainTuneable = new DriveTrainTuneable();
+  // private final DriveTrainTuner driveTrainTuneable = new DriveTrainTuner();
 
   /* OI DEFINITIONS */
   private final Joystick driverController = new Joystick(0);
@@ -60,7 +60,8 @@ public class RobotContainer {
                .useHeading     (() -> driverController.getPOV() != -1)
                .isFieldRelative(() -> driverController.getRawAxis(2) < 0.2) //left trigger
                .isLockIn       (() -> driverController.getRawAxis(3) > 0.2) //right trigger
-               .isZeroOdometry (() -> zeroButton.getAsBoolean());
+               .isZeroOdometry (() -> zeroButton.getAsBoolean())
+               .isOpenLoop(() -> false);
     driveTrain.setDefaultCommand(peaccyDrive);
     driveFallbackButton.onTrue(new InstantCommand(peaccyDrive::fallback, driveTrain)); 
     driveFallbackResetButton.onTrue(new InstantCommand(peaccyDrive::resetFallback, driveTrain));
