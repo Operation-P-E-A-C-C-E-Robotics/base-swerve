@@ -1,7 +1,7 @@
 # Outline
 
-1. Project Goals
-2. Code Structure
+1. [Project Goals](Project_Goals.md)
+2. [Code Structure](code-structure/Code_Structure.md)
    - Setting Up A New Robot
    - Organization Principles
    - Code Style
