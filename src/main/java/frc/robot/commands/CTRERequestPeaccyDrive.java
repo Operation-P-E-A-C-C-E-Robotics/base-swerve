@@ -13,6 +13,7 @@ import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
+@Deprecated
 public class CTRERequestPeaccyDrive extends Command {
     private final DoubleSupplier xVelocitySup, yVelocitySup, angularVelocitySup, autoHeadingAngleSup;
     private final BooleanSupplier isAutoAngleSup, isFieldRelativeSup, isOpenLoopSup, isLockInSup;
@@ -30,8 +31,7 @@ public class CTRERequestPeaccyDrive extends Command {
 
 
     /**
-     * PeaccyDrive is a swerve drive command designed to handle all the different
-     * modes of driving that we want to use.
+     * DEPRICATED use peaccydrive instead. Has nice hold-heading and position correction.
      *
      * It has advanced input smoothing and deadbanding,
      * field centric and robot centric modes,

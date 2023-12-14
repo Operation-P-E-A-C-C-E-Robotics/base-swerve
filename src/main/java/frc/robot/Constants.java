@@ -30,8 +30,9 @@ public final class Constants {
     public static final double teleopLinearMultiplier = 7.0;
     public static final double teleopAngularMultiplier = 7.0;
 
-    //smoothing
+    //acceleration limits
     public static final double teleopLinearSpeedLimit = 5.0;
+	  public static final double teleopLowBatteryLinearSpeedLimit = 2.0; //more acceleration limit when battery is low
     public static final double teleopLinearAngleLimit = 2.0;
     public static final double teleopNearLinearAngleLimit = 0.5;
     public static final double teleopAngularRateLimit = 3.0;
@@ -41,9 +42,16 @@ public final class Constants {
     //deadband
     public static final double teleopLinearSpeedDeadband = 0.1;
     public static final double teleopAngularVelocityDeadband = 0.13;
+    public static final double teleopDeadbandDebounceTime = 0.15;
 
     public static final DoubleFunction <Double> teleopLinearSpeedCurve = (double linearSpeed) -> JoystickCurves.herraFCurve(linearSpeed, 6, 4.5); //a nice gentle curve which is Peaccy's (me!!) favorite :)
     public static final DoubleFunction <Double> teleopAngularVelocityCurve = (double angularVelocity) -> JoystickCurves.powerCurve(angularVelocity, 2); //TODO decide if the driver (me) wants a curve on this or not.
+
+    //number of loops to keep track of position correction for (so multiply by 20ms to get the duration the correction is considering)
+    public static final int teleopPositionCorrectionIters = 4; 
+
+
+
 
     /* CTRE SWERVE CONSTANTS */
     public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(24.75));
@@ -69,29 +77,42 @@ public final class Constants {
     public static final int pigeonCANId = 14;
     public static final boolean invertSteerMotors = Robot.isReal(); //cant invert in simulation which is dumb.
 
-    public static final double autoHeadingKP = 8.0;
-    public static final double autoHeadingKI = 0.0;
-    public static final double autoHeadingKD = 0.0;
+    /* HEADING CONTROLLER CONSTANTS */
+    public static final double autoHeadingKP = 2600;
+    public static final double autoHeadingKI = 0.0; //DOES NOTHING LOL
+    public static final double autoHeadingKD = 0.0; //ALSO DOES NOTHING LOL
+    public static final double autoHeadingKV = 0.0;
+    public static final double autoHeadingKA = 0.0;
+    public static final double autoHeadingMaxVelocity = 50;
+    public static final double autoHeadingMaxAcceleration = 70;
+    public static final boolean useSoftHoldHeading = false;
+    public static final double softHeadingCurrentLimit = 30;
 
+    
+    /* PATH FOLLOWING CONSTANTS */
+    public static final double pathfollowingMaxVelocity = 3,
+                              pathfollowingMaxAcceleration = 3,
+                              pathfollowingMaxAngularVelocity = 360,
+                              pathfollowingMaxAngularAcceleration = 360;
+
+    //TODO
     public static final double measuredMaxVelocity = 3,
                               measuredMaxAcceleration = 3,
                               measuredMaxAngularVelocity = 360,
                               measuredMaxAngularAcceleration = 360;
-    
-    public static final double autoMaxSpeedSafetyScalar = 1;
 
     public static final PathConstraints autoMaxSpeed = new PathConstraints(
-      measuredMaxVelocity * autoMaxSpeedSafetyScalar, 
-      measuredMaxAcceleration * autoMaxSpeedSafetyScalar, 
-      measuredMaxAngularVelocity * autoMaxSpeedSafetyScalar, 
-      measuredMaxAngularAcceleration * autoMaxSpeedSafetyScalar
+      pathfollowingMaxVelocity,
+      pathfollowingMaxAcceleration,
+      pathfollowingMaxAngularVelocity,
+      pathfollowingMaxAngularAcceleration
     );
 
     public static final HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(
       new PIDConstants(10, 0, 0), 
       new PIDConstants(5, 0, 0), 
-      measuredMaxVelocity, 
-      dimensions.frontLeft.getNorm(), 
+      pathfollowingMaxVelocity, 
+      dimensions.frontLeft.getNorm(), //drive radius
       new ReplanningConfig(true, true),
       period
     );

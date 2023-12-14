@@ -200,9 +200,11 @@ public class Inspiration {
         slowPrintTimer.start();
         if(slowPrintTimer.get() > slowPrintDelay){
             if(!slowPrintQueue.isEmpty()){
-                System.out.print("[ROBOT]>");
+                System.out.print("[ROBOT] ");
                 System.out.println(slowPrintQueue.remove());
                 System.out.println();
+            } else {
+                System.out.println("[ROBOT] DOMINATE THIS SEASON!!!"); //just in case
             }
             slowPrintTimer.reset();
         }

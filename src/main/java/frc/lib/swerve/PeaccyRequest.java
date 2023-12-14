@@ -27,6 +27,8 @@ import frc.lib.util.Util;
  * I'll get a good one, but I don't know how to make it happen. I just keep putting coffee in my mouth and it keeps coming out.
  * Anyway. This is a swerve request that does all the things. It's got a heading controller, a position correction controller,
  * and a bunch of other stuff. It's pretty cool. I think. I don't know. I'm just a monkey with a keyboard.
+ * 
+ * UPDATE: it was a good one. :D
  */
 public class PeaccyRequest implements SwerveRequest {
 
