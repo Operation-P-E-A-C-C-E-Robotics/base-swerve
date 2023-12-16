@@ -88,8 +88,8 @@ public class SwerveTelemetry {
         });
     }
 
-    public static void updateSwerveState(SwerveDriveState state, ChassisSpeeds measuredSpeeds) {
-        swervePosePublisher.accept(new Pose3d(state.Pose));//TODO update once have 3d odometry stuff
+    public static void updateSwerveState(SwerveDriveState state, ChassisSpeeds measuredSpeeds, Pose3d pose) {
+        swervePosePublisher.accept(pose);//TODO update once have 3d odometry stuff
         field.setRobotPose(state.Pose);
 
         frontLeftLigament.setAngle(state.ModuleStates[0].angle.getDegrees());
