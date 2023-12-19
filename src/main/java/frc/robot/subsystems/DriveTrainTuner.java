@@ -86,7 +86,7 @@ public class DriveTrainTuner extends SubsystemBase {
 
         //log swerve state data as fast as it comes in
         swerve.registerTelemetry((SwerveDriveState state) -> {
-            SwerveTelemetry.updateSwerveState(state, swerve.getChassisSpeeds());
+            SwerveTelemetry.updateSwerveState(state, swerve.getChassisSpeeds(), swerve.getPose3d());
             SmartDashboard.putNumber("Front Left Module Angle", state.ModuleStates[0].angle.getRotations());
             SmartDashboard.putNumber("Front Right Module Angle", state.ModuleStates[1].angle.getRotations());
             SmartDashboard.putNumber("Rear Left Module Angle", state.ModuleStates[2].angle.getRotations());
