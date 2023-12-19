@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,7 +18,7 @@ import frc.robot.subsystems.DriveTrain;
 
 public class RobotContainer {
   /* OI CONSTANTS */
-  private final int translationAxis = 5;
+  private final int translationAxis = 5; //forward/backward
   private final int strafeAxis = 4;
   private final int rotationAxis = 0;
   private final int zeroButtonNo = 7;

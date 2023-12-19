@@ -61,7 +61,7 @@ public class DriveTrain extends SubsystemBase {
 
         //log swerve state data as fast as it comes in
         swerve.registerTelemetry((SwerveDriveState state) -> {
-            SwerveTelemetry.updateSwerveState(state, getChassisSpeeds(), swerve.getPose3d());
+            SwerveTelemetry.updateSwerveState(state, ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getPose().getRotation()), swerve.getPose3d());
         });
 
         System.out.println("DriveTrain Initialized");

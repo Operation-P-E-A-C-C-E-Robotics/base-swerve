@@ -31,10 +31,10 @@ public final class Constants {
     public static final double teleopAngularMultiplier = 7.0;
 
     //acceleration limits
-    public static final double teleopLinearSpeedLimit = 5.0;
-	  public static final double teleopLowBatteryLinearSpeedLimit = 2.0; //more acceleration limit when battery is low
+    public static final double teleopLinearSpeedLimit = 4.0;
+	  public static final double teleopLowBatteryLinearSpeedLimit = 1.5; //more acceleration limit when battery is low
     public static final double teleopLinearAngleLimit = 2.0;
-    public static final double teleopNearLinearAngleLimit = 0.5;
+    public static final double teleopNearLinearAngleLimit = 1.5;
     public static final double teleopAngularRateLimit = 3.0;
 
     public static final double teleopNearLimitThreshold = 0.2; //how close to zero to use more extreme linear angle smoothing.
@@ -78,7 +78,7 @@ public final class Constants {
     public static final boolean invertSteerMotors = Robot.isReal(); //cant invert in simulation which is dumb.
 
     /* HEADING CONTROLLER CONSTANTS */
-    public static final double autoHeadingKP = 2600;
+    public static final double autoHeadingKP = 1500;
     public static final double autoHeadingKI = 0.0; //DOES NOTHING LOL
     public static final double autoHeadingKD = 0.0; //ALSO DOES NOTHING LOL
     public static final double autoHeadingKV = 0.0;
