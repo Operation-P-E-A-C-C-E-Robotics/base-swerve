@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.safety.Inspiration;
+import frc.lib.telemetry.ControlSystemTelemetry;
 import frc.robot.Constants.Core;
 
 public class Robot extends TimedRobot {
@@ -55,6 +56,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     //run the robot
     CommandScheduler.getInstance().run();
+    ControlSystemTelemetry.update(null);
     Inspiration.updateSlowPrinter(); //KEEP THE HYPE MACHINE ROLLIN
   }
 
