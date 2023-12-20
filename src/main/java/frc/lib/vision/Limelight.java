@@ -1,4 +1,4 @@
-package frc.lib.sensors;
+package frc.lib.vision;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
@@ -18,7 +18,7 @@ import frc.lib.swerve.PeaccefulSwerve;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-public class LimelightHelper {
+public class Limelight {
     private static final double FOCAL_LENGTH = (1*83)/0.32;//(1 * 240) / 0.32; //183 px = 0.21 meters // (distance * pixels) / size
     NetworkTableInstance networkTables = NetworkTableInstance.getDefault();
     NetworkTable limelight;
@@ -31,6 +31,7 @@ public class LimelightHelper {
     private MedianFilter xFilter = new MedianFilter(10);
     private boolean visionAgreesWithOdometry = false;
 
+    /* MAKE SUBSCRIBING MORE CONCISE (since we do it a bunch) */
     private DoubleSubscriber dSub(String name){
         return limelight.getDoubleTopic(name).subscribe(0);
     }
@@ -53,17 +54,16 @@ public class LimelightHelper {
 
 
     /**
-     * a nice limelight helper for color object and
-     * apriltags
+     * a nice limelight utility
      * @param networktablesName the limelight's table in networktables
      */
-    public LimelightHelper(String networktablesName){
+    public Limelight(String networktablesName){
         limelight = networkTables.getTable(networktablesName);
         botpose = daSub("botpose");
         campose = daSub("campose");
     }
 
-    //NETWORKTABLES API:
+    /* NETWORKTABLES API: */
     public boolean hasTarget(){
         if(tv == null) tv = dSub("tv");
         return tv.get() == 1;
@@ -141,6 +141,21 @@ public class LimelightHelper {
         return new Value<>(val);
     }
 
+    public Value<Pose3d> getTagPoseFromRobot(){
+        var val = getTagFromRobot().get(new double[0]);
+        if(val.length != 6) return Value.notAvailable();
+        return new Value<>(new Pose3d(
+                val[0],
+                val[1],
+                val[2],
+                new Rotation3d(
+                        val[3],
+                        val[4],
+                        val[5]
+                )
+        ));
+    }
+
     public double getApriltagID(){
         if(tid == null) tid = iSub("tid");
         return tid.get();
@@ -193,8 +208,7 @@ public class LimelightHelper {
         return Value.of(xFilter.calculate(targetX.get(0.0)));
     }
 
-    //GAMEPIECES:
-
+    /* GAMEPIECE DETECTION: */
     /**
      * get the distance to an irregular object (e.g. cone or cube)
      * uses the closer approximation of both the width and the height.
@@ -234,8 +248,7 @@ public class LimelightHelper {
     }
 
 
-    //APRILTAGS:
-
+    /* APRILTAGS: */
     double halfFieldWidth = 16.48/2;
     double halfFieldHeight = 8.1/2;
 

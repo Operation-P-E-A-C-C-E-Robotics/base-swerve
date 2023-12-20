@@ -16,8 +16,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.motion.Trajectory;
+import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.Util;
 
 /**
@@ -287,8 +287,6 @@ public class PeaccyRequest implements SwerveRequest {
         return this;
     }
 
-    boolean autoHeadingDeadbandEnabled = true;
-
     /**
      * Get the rotation rate to apply to the robot to go to the target heading
      */
@@ -305,7 +303,7 @@ public class PeaccyRequest implements SwerveRequest {
         }
 
         //regenerate the trajectory if the target heading has changed
-        if(Heading != headingTrajectory.getTarget().position) {
+        if(Math.abs(Heading - headingTrajectory.getTarget().position) > 0.4) {
             headingTrajectory = Trajectory.trapezoidTrajectory(
                 new State(currentHeading, getChassisSpeeds.get().omegaRadiansPerSecond), 
                 new State(Heading, 0), 
@@ -321,19 +319,28 @@ public class PeaccyRequest implements SwerveRequest {
         var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod);
         var error = target.position - currentHeading;
 
+        var acceleration = (target.velocity - getChassisSpeeds.get().omegaRadiansPerSecond);
+
         if(robotMovingTimer.get() < 0.3 && Math.abs(error) < 0.2){
             return 0;
         }
 
-        SmartDashboard.putNumber("target heading",target.position);
-        var feedforward = headingFeedforward.calculate(target.velocity);
+        var feedforward = headingFeedforward.calculate(target.velocity, acceleration);
         var pGain = error * holdHeadingkP * parameters.updatePeriod;
-        SmartDashboard.putNumber("heading error", target.position - currentHeading);
         var currentDraw = currentLimitSmoother.calculate(totalDriveCurrent.getAsDouble());
         if(SoftHoldHeading) pGain = pGain * compress(currentDraw, totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
         var delta = pGain + feedforward;
 
-        SmartDashboard.putNumber("holdheading gain", delta);
+        SwerveTelemetry.updateAutoHeading(
+            Heading,
+            error,
+            pGain,
+            feedforward,
+            target.velocity,
+            acceleration,
+            target.position,
+            SoftHoldHeading
+        );
 
         return delta;
     }
