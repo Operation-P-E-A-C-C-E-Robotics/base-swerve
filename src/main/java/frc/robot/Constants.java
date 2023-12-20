@@ -31,8 +31,8 @@ public final class Constants {
     public static final double teleopAngularMultiplier = 7.0;
 
     //acceleration limits
-    public static final double teleopLinearSpeedLimit = 4.0;
-	  public static final double teleopLowBatteryLinearSpeedLimit = 1.5; //more acceleration limit when battery is low
+    public static final double teleopLinearSpeedLimit = 5.0;
+	  public static final double teleopLowBatteryLinearSpeedLimit = 2; //more acceleration limit when battery is low
     public static final double teleopLinearAngleLimit = 2.0;
     public static final double teleopNearLinearAngleLimit = 1.5;
     public static final double teleopAngularRateLimit = 3.0;
@@ -83,8 +83,8 @@ public final class Constants {
     public static final double autoHeadingKD = 0.0; //ALSO DOES NOTHING LOL
     public static final double autoHeadingKV = 0.0;
     public static final double autoHeadingKA = 0.0;
-    public static final double autoHeadingMaxVelocity = 50;
-    public static final double autoHeadingMaxAcceleration = 70;
+    public static final double autoHeadingMaxVelocity = 50; //deg/s
+    public static final double autoHeadingMaxAcceleration = 70; //deg/s^2
     public static final boolean useSoftHoldHeading = false;
     public static final double softHeadingCurrentLimit = 30;
 
