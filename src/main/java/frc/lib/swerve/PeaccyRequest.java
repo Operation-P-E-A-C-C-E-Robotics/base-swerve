@@ -305,7 +305,7 @@ public class PeaccyRequest implements SwerveRequest {
         }
 
         //regenerate the trajectory if the target heading has changed
-        if(Heading != headingTrajectory.getTarget().position) {
+        if(Math.abs(Heading - headingTrajectory.getTarget().position) > 0.4) {
             headingTrajectory = Trajectory.trapezoidTrajectory(
                 new State(currentHeading, getChassisSpeeds.get().omegaRadiansPerSecond), 
                 new State(Heading, 0), 
