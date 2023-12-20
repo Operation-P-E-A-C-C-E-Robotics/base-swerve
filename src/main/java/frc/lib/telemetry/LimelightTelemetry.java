@@ -8,7 +8,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import frc.lib.safety.Value;
-import frc.lib.sensors.LimelightHelper;
+import frc.lib.vision.Limelight;
 
 /**
  * Telemetry for a limelight camera, intended for use with apriltag tracking.
@@ -31,7 +31,7 @@ public class LimelightTelemetry {
     private static final StructPublisher<Pose3d> primaryTagPoseFromFieldPublisher = limelightTable.getStructTopic("Primary Tag From Field", Pose3d.struct).publish();
     private static final StructPublisher<Pose3d> rawBotPosePublisher = limelightTable.getStructTopic("Raw BotPose", Pose3d.struct).publish();
 
-    public static final void update(LimelightHelper limelight, Pose3d robotPose){
+    public static final void update(Limelight limelight, Pose3d robotPose){
         Value<double[]> tcornxy = limelight.getCorners();
         if(tcornxy.isNormal()) {
             double[] corners = tcornxy.get(new double[]{});
