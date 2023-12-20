@@ -25,7 +25,7 @@ public class PeaccyDrive extends Command {
                            autoHeadingAngleSup = () -> 0;
     private BooleanSupplier isAutoAngleSup = () -> false, 
                             isFieldRelativeSup = () -> false, 
-                            isOpenLoopSup = () -> false, 
+                            isOpenLoopSup = () -> true, 
                             isLockInSup = () -> false,
                             isZeroOdometrySup = () -> false;
 

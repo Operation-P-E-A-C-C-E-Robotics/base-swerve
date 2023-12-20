@@ -68,7 +68,7 @@ public final class Constants {
     public static final Inversion inversion = new Inversion(false, true, true, false); //herra 4.5, 6
 
     //inertia only used for simulation
-    public static final Physics physics = new Physics(0.01,1, 50, 10);
+    public static final Physics physics = new Physics(1,1, 50, 10);
     public static final double steerMotorCurrentLimit = 40; //amps
     
     public static final PidGains driveGains = new PidGains(0.35, 0, 0, 0.11, 0.3); 
