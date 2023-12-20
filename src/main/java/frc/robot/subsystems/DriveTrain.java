@@ -5,6 +5,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.PIDConstants;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.sensors.LimelightHelper;
 import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
+import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
 
@@ -146,6 +148,14 @@ public class DriveTrain extends SubsystemBase {
 
     public double getTotalDriveCurrent(){
         return swerve.getTotalDriveCurrent();
+    }
+
+    public void updateDriveGains(PidGains gains){
+        swerve.applyDriveConfigs(gains);
+    }
+
+    public void updateAngleGains(PidGains gains){
+        swerve.applySteerConfigs(gains);
     }
 
     @Override

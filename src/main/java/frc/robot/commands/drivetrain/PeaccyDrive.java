@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.drivetrain;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -55,15 +55,6 @@ public class PeaccyDrive extends Command {
      * It has advanced input smoothing and deadbanding,
      * field centric and robot centric modes,
      * and auto angle (automatic heading adjustment) modes.
-     * @param xVelocitySup the requested x velocity
-     * @param yVelocitySup the requested y velocity
-     * @param angularVelocitySup the requested angular velocity
-     * @param autoHeadingAngleSup the requested auto heading angle
-     * @param isAutoAngleSup whether or not to use automatic heading adjustment
-     * @param isFieldRelativeSup whether or not to use field centric mode
-     * @param isOpenLoopSup whether or not to use open loop controls
-     * @param isLockInSup whether or not to X-lock the wheels when stopped
-     * @param isZeroOdometry whether or not to zero the odometry
      * @param driveTrain the swerve subsystem
      */
     public PeaccyDrive(DriveTrain driveTrain) { 
