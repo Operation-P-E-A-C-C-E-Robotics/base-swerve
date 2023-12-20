@@ -52,6 +52,15 @@ public class SwerveTelemetry {
     private static final BooleanPublisher requestLockInPublisher = swerveCommandTable.getBooleanTopic("Request Lock In").publish();
     private static final BooleanPublisher requestZeroOdometryPublisher = swerveCommandTable.getBooleanTopic("Request Zero Odometry").publish();
 
+    private static final NetworkTable autoHeadingTable = swerveTable.getSubTable("Auto Heading");
+    private static final DoublePublisher autoHeadingAngle = autoHeadingTable.getDoubleTopic("Target").publish();
+    private static final DoublePublisher autoHeadingError = autoHeadingTable.getDoubleTopic("Error").publish();
+    private static final DoublePublisher autoHeadingPComponent = autoHeadingTable.getDoubleTopic("P Component").publish();
+    private static final DoublePublisher autoHeadingFeedForward = autoHeadingTable.getDoubleTopic("Feed Forward").publish();
+    private static final DoublePublisher autoHeadingTrajectoryVelocity = autoHeadingTable.getDoubleTopic("Trajectory Velocity").publish();
+    private static final DoublePublisher autoHeadingTrajectoryAcceleration = autoHeadingTable.getDoubleTopic("Trajectory Acceleration").publish();
+    private static final DoublePublisher autoHeadingTrajectoryPosition = autoHeadingTable.getDoubleTopic("Trajectory Position").publish();
+    private static final BooleanPublisher autoHeadingCurrentLimited = autoHeadingTable.getBooleanTopic("Current Limited").publish();
 
     
     private static final Mechanism2d swerve = new Mechanism2d(5, 5);
@@ -143,6 +152,24 @@ public class SwerveTelemetry {
         requestOpenLoopPublisher.accept(isOpenLoop);
         requestLockInPublisher.accept(isLockIn);
         requestZeroOdometryPublisher.accept(isZeroOdometry);
+    }
+
+    public static void updateAutoHeading(double targetAngle, 
+                                        double error, 
+                                        double pComponent, 
+                                        double feedForward, 
+                                        double trajectoryVelocity, 
+                                        double trajectoryAcceleration, 
+                                        double trajectoryPosition, 
+                                        boolean isCurrentLimited) {
+        autoHeadingAngle.accept(targetAngle);
+        autoHeadingError.accept(error);
+        autoHeadingPComponent.accept(pComponent);
+        autoHeadingFeedForward.accept(feedForward);
+        autoHeadingTrajectoryVelocity.accept(trajectoryVelocity);
+        autoHeadingTrajectoryAcceleration.accept(trajectoryAcceleration);
+        autoHeadingTrajectoryPosition.accept(trajectoryPosition);
+        autoHeadingCurrentLimited.accept(isCurrentLimited);
     }
 
 }
