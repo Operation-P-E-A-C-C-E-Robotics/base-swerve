@@ -44,7 +44,9 @@ public class SwerveTelemetry {
     
     private static final DoublePublisher swerveRequestedXVelocity = swerveCommandTable.getDoubleTopic("Requested X Velocity").publish();
     private static final DoublePublisher swerveRequestedYVelocity = swerveCommandTable.getDoubleTopic("Requested Y Velocity").publish();
-    
+    private static final DoublePublisher swerveRequestedRawXVelocity = swerveCommandTable.getDoubleTopic("Requested Raw X Velocity").publish();
+    private static final DoublePublisher swerveRequestedRawYVelocity = swerveCommandTable.getDoubleTopic("Requested Raw Y Velocity").publish();
+
     private static final DoublePublisher swerveRequestedAngularVelocity = swerveCommandTable.getDoubleTopic("Requested Angular Velocity").publish();
     private static final DoublePublisher swerveRequestedAutoHeadingAngle = swerveCommandTable.getDoubleTopic("Requested Auto Heading Angle").publish();
     private static final BooleanPublisher requestFieldCentricPublisher = swerveCommandTable.getBooleanTopic("Request Field Centric").publish();
@@ -137,6 +139,8 @@ public class SwerveTelemetry {
 
     public static void updateSwerveCommand(double requestedXVelocity, 
                                             double requestedYVelocity, 
+                                            double rawXVelocity,
+                                            double rawYVelocity,
                                             double requestedAngularVelocity, 
                                             double requestedAutoHeading, 
                                             boolean isAutoHeading, 
@@ -146,6 +150,8 @@ public class SwerveTelemetry {
                                             boolean isZeroOdometry) {
         swerveRequestedXVelocity.accept(requestedXVelocity);
         swerveRequestedYVelocity.accept(requestedYVelocity);
+        swerveRequestedRawXVelocity.accept(rawXVelocity);
+        swerveRequestedRawYVelocity.accept(rawYVelocity);
         swerveRequestedAngularVelocity.accept(requestedAngularVelocity);
         swerveRequestedAutoHeadingAngle.accept(requestedAutoHeading);
         requestFieldCentricPublisher.accept(isFieldRelative);

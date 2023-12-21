@@ -192,14 +192,16 @@ public class PeaccyDrive extends Command {
         }
 
         // handle smoothing and deadbanding
-        Translation2d linearVelocity = new Translation2d(xVelocity, yVelocity);
-        linearVelocity = smoothAndDeadband(linearVelocity).times(Constants.Swerve.teleopLinearMultiplier);
+        Translation2d rawLinearVelocity = new Translation2d(xVelocity, yVelocity);
+        Translation2d linearVelocity = smoothAndDeadband(rawLinearVelocity).times(Constants.Swerve.teleopLinearMultiplier);
         angularVelocity = smoothAndDeadband(angularVelocity) * Constants.Swerve.teleopAngularMultiplier;
 
         // log data
         SwerveTelemetry.updateSwerveCommand(
             linearVelocity.getX(), 
             linearVelocity.getY(), 
+            rawLinearVelocity.getX(),
+            rawLinearVelocity.getY(),
             angularVelocity, 
             autoHeadingAngle, 
             isAutoHeading, 
