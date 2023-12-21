@@ -508,6 +508,8 @@ public class DriveTrainTuner extends Command {
         Translation2d linearVelocity = smoothAndDeadband(rawLinearVelocity).times(Constants.Swerve.teleopLinearMultiplier);
         angularVelocity = smoothAndDeadband(angularVelocity) * Constants.Swerve.teleopAngularMultiplier;
 
+        rawLinearVelocity = rawLinearVelocity.times(Constants.Swerve.teleopLinearMultiplier); //apples to apples comparison for logging
+
         // log data
         SwerveTelemetry.updateSwerveCommand(
             linearVelocity.getX(), 
