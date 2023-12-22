@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -77,6 +78,7 @@ public class PeaccyRequest implements SwerveRequest {
 
     private final double CURRENT_LIMIT_THRESHOLD = 0.01; //percent of the current limit to start throttling at.
     private final SlewRateLimiter currentLimitSmoother = new SlewRateLimiter(10); //limit the amps per second for the current to change, to help find equilibrium.
+    private double maxLinearVelocity;
 
 
     /**
@@ -84,6 +86,7 @@ public class PeaccyRequest implements SwerveRequest {
      * Made by the one and only Peaccy.
      * @param maxAngularVelocity the maximum angular velocity to use when turning to the set trajectory
      * @param maxAngularAcceleration the maximum angular acceleration to use when turning to the set trajectory
+     * @param maxLinearVelocity the maximum linear velocity (for scaling between open loop and closed loop)
      * @param holdHeadingkP the proportional gain to use when turning to the set trajectory
      * @param holdHeadingkV the velocity feedforward to use when turning to the set trajectory
      * @param holdHeadingkA the acceleration feedforward to use when turning to the set trajectory
@@ -93,6 +96,7 @@ public class PeaccyRequest implements SwerveRequest {
      */
     public PeaccyRequest(double maxAngularVelocity, 
                     double maxAngularAcceleration, 
+                    double maxLinearVelocity,
                     double holdHeadingkP, 
                     double holdHeadingkV, 
                     double holdHeadingkA, 
@@ -103,6 +107,8 @@ public class PeaccyRequest implements SwerveRequest {
         holdHeadingVelocity = maxAngularVelocity;
         headingFeedforward = new SimpleMotorFeedforward(0, holdHeadingkV, holdHeadingkA);
         this.holdHeadingkP = holdHeadingkP;
+
+        this.maxLinearVelocity = maxLinearVelocity;
         
         this.getChassisSpeeds = chassisSpeedsSupplier;
         this.totalDriveCurrent = totalDriveCurrentSupplier;
@@ -117,6 +123,10 @@ public class PeaccyRequest implements SwerveRequest {
     public StatusCode apply(SwerveControlRequestParameters parameters, SwerveModule... modulesToApply) {
         Translation2d toApplyTranslation = new Translation2d(VelocityX, VelocityY);
         double toApplyRotation = RotationalRate;
+
+        if(IsOpenLoop) {
+            toApplyTranslation = toApplyTranslation.times(12/maxLinearVelocity);
+        }
 
         //position correction only works for field centric :|
         if(IsFieldCentric) toApplyTranslation = applyPositionCorrection(toApplyTranslation, parameters.currentPose, parameters.updatePeriod);
@@ -161,7 +171,7 @@ public class PeaccyRequest implements SwerveRequest {
         var states = parameters.kinematics.toSwerveModuleStates(speeds, new Translation2d());
 
         for (int i = 0; i < modulesToApply.length; ++i) {
-            modulesToApply[i].apply(states[i], IsOpenLoop);
+            modulesToApply[i].apply(states[i], IsOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity);
         }
 
         return StatusCode.OK;

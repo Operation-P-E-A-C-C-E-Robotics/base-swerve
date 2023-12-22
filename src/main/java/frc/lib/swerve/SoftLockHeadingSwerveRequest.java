@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 
@@ -108,7 +109,7 @@ public class SoftLockHeadingSwerveRequest implements SwerveRequest{
         var states = parameters.kinematics.toSwerveModuleStates(speeds, new Translation2d());
 
         for (int i = 0; i < modulesToApply.length; ++i) {
-            modulesToApply[i].apply(states[i], IsOpenLoop);
+            modulesToApply[i].apply(states[i],  IsOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity);
         }
 
         return StatusCode.OK;

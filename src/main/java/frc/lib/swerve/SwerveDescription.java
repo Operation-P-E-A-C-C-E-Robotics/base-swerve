@@ -4,8 +4,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SwerveModuleSteerFeedbackType;
-
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
 import edu.wpi.first.math.geometry.Translation2d;
 
 /**
@@ -46,7 +45,6 @@ public class SwerveDescription {
                                 boolean invertSteerMotors){
         SwerveDrivetrainConstants swerveConstants = new SwerveDrivetrainConstants()
                                                     .withPigeon2Id(pigeonCANId)
-                                                    .withSupportsPro(false)
                                                     .withCANbusName("rio");
         SwerveModuleConstantsFactory globalModuleConstants = new SwerveModuleConstantsFactory()
                                     .withDriveMotorGearRatio(gearing.driveRatio)
@@ -58,7 +56,7 @@ public class SwerveDescription {
                                     .withSpeedAt12VoltsMps(physics.freeSpeed)
                                     .withSteerInertia(physics.angularInertia)
                                     .withDriveInertia(physics.linearInertia)
-                                    .withFeedbackSource(SwerveModuleSteerFeedbackType.FusedCANcoder)
+                                    .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
                                     .withCouplingGearRatio(gearing.steerCouplingRatio)
                                     .withSteerMotorInverted(invertSteerMotors);
 
