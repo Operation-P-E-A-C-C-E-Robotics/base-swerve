@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,7 +31,7 @@ public class DriveTrainTuner extends SubsystemBase {
     private final SwerveRequest.FieldCentric fieldCentricRequest = new SwerveRequest.FieldCentric();
     private final SwerveRequest.RobotCentric robotCentricRequest = new SwerveRequest.RobotCentric();
     private final SwerveRequest.FieldCentricFacingAngle autoHeadingRequest = new SwerveRequest.FieldCentricFacingAngle();
-    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withDriveRequestType(DriveRequestType.Velocity);
 
     private double newAutoHeadingKP = autoHeadingKP;
     private double newAutoHeadingKI = autoHeadingKI;
@@ -300,14 +301,14 @@ public class DriveTrainTuner extends SubsystemBase {
         //handle lock in
         if (isLockIn) {
             if (linearVelocity.equals(new Translation2d(0,0)) && angularVelocity == 0) {
-                swerve.setControl(lockInRequest.withIsOpenLoop(isOpenLoop));
+                swerve.setControl(lockInRequest.withDriveRequestType(DriveRequestType.Velocity));
                 return;
             }
         }
 
         //handle auto angle
         if (isAutoHeading) {
-            autoHeadingRequest.withIsOpenLoop(isOpenLoop)
+            autoHeadingRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity)
                             .withVelocityX(linearVelocity.getX())
                             .withVelocityY(linearVelocity.getY())
                             .withTargetDirection(Rotation2d.fromDegrees(autoHeadingAngle))
@@ -319,7 +320,7 @@ public class DriveTrainTuner extends SubsystemBase {
 
         //handle field relative
         if (isFieldRelative) {
-            fieldCentricRequest.withIsOpenLoop(isOpenLoop)
+            fieldCentricRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity)
                                 .withVelocityX(linearVelocity.getX())
                                 .withVelocityY(linearVelocity.getY())
                                 .withRotationalRate(angularVelocity);
@@ -329,7 +330,7 @@ public class DriveTrainTuner extends SubsystemBase {
         }
 
         //handle robot relative
-        robotCentricRequest.withIsOpenLoop(isOpenLoop)
+        robotCentricRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity)
                             .withVelocityX(linearVelocity.getX())
                             .withVelocityY(linearVelocity.getY())
                             .withRotationalRate(angularVelocity);

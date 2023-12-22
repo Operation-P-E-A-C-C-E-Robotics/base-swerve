@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -26,7 +27,7 @@ public class DriveTrain extends SubsystemBase {
     protected final PeaccefulSwerve swerve;
 
     private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds()
-                                                                                        .withIsOpenLoop(false);
+                                                                                        .withDriveRequestType(DriveRequestType.Velocity);
 
     // private LimelightHelper limelight;
 

@@ -4,6 +4,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,7 +23,7 @@ public class CTRERequestPeaccyDrive extends Command {
     private final SwerveRequest.FieldCentric fieldCentricRequest = new SwerveRequest.FieldCentric();
     private final SwerveRequest.RobotCentric robotCentricRequest = new SwerveRequest.RobotCentric();
     private final SwerveRequest.FieldCentricFacingAngle autoHeadingRequest = new SwerveRequest.FieldCentricFacingAngle();
-    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withIsOpenLoop(false);
+    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withDriveRequestType(DriveRequestType.Velocity);
 
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
@@ -117,7 +118,7 @@ public class CTRERequestPeaccyDrive extends Command {
         //handle lock in
         if (isLockIn) {
             if (linearVelocity.equals(new Translation2d(0,0)) && angularVelocity == 0) {
-                driveTrain.drive(lockInRequest.withIsOpenLoop(isOpenLoop));
+                driveTrain.drive(lockInRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
                 return;
             }
         }
@@ -129,7 +130,7 @@ public class CTRERequestPeaccyDrive extends Command {
             if (autoHeadingAngle > 180) autoHeadingAngle -= 360;
             if (autoHeadingAngle < -180) autoHeadingAngle += 360;
 
-            autoHeadingRequest.withIsOpenLoop(isOpenLoop)
+            autoHeadingRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity)
                             .withVelocityX(linearVelocity.getX())
                             .withVelocityY(linearVelocity.getY())
                             .withTargetDirection(Rotation2d.fromDegrees(autoHeadingAngle))
@@ -141,7 +142,7 @@ public class CTRERequestPeaccyDrive extends Command {
 
         //handle field relative
         if (isFieldRelative) {
-            fieldCentricRequest.withIsOpenLoop(isOpenLoop)
+            fieldCentricRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity)
                                 .withVelocityX(linearVelocity.getX())
                                 .withVelocityY(linearVelocity.getY())
                                 .withRotationalRate(angularVelocity);
@@ -151,7 +152,7 @@ public class CTRERequestPeaccyDrive extends Command {
         }
 
         //handle robot relative
-        robotCentricRequest.withIsOpenLoop(isOpenLoop)
+        robotCentricRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity)
                             .withVelocityX(linearVelocity.getX())
                             .withVelocityY(linearVelocity.getY())
                             .withRotationalRate(angularVelocity);

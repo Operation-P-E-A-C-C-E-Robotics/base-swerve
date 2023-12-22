@@ -3,6 +3,8 @@ package frc.robot.commands.drivetrain;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -82,7 +84,7 @@ public class DriveTrainTuner extends Command {
 
     /* "Swerve Requests" are what the drivetrain subsystem accepts. They figure out how to orient and drive the wheels. */
     private PeaccyRequest request; //custom fancy request than handles everything
-    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withIsOpenLoop(false); //for X-locking the wheels
+    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withDriveRequestType(DriveRequestType.Velocity); //for X-locking the wheels
 
     /* Acceleration limiters for a consistent feel and to reduce power draw. */
     private SlewRateLimiter linearSpeedLimiter;
@@ -242,6 +244,7 @@ public class DriveTrainTuner extends Command {
         request  = new PeaccyRequest(
             autoHeadingMaxVelocity, 
             autoHeadingMaxAcceleration,
+            Constants.Swerve.teleopLinearMultiplier,
             autoHeadingKP, 
             autoHeadingKV, 
             autoHeadingKA, 
@@ -532,7 +535,7 @@ public class DriveTrainTuner extends Command {
             //only lock in if we're stopped
             if (linearVelocity.equals(new Translation2d(0,0)) && angularVelocity == 0) {
                 //use CTRE lock in, then return so it's not overridden by the normal request :)
-                driveTrain.drive(lockInRequest.withIsOpenLoop(isOpenLoop));
+                driveTrain.drive(lockInRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
                 return;
             }
         }
