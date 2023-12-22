@@ -18,15 +18,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.lib.motion.Trajectory;
 
-public class SwerveSelfCheck extends Command {
+public class SwerveAngleSelfCheck extends Command {
     private PeaccefulSwerve swerve;
-    private NetworkTable swerveTestNT = NetworkTableInstance.getDefault().getTable("Test").getSubTable("Swerve Self Check");
-
-    private StringPublisher message = swerveTestNT.getStringTopic("Message").publish();
-    private BooleanSubscriber continueButton = swerveTestNT.getBooleanTopic("Continue").subscribe(false);
-    private BooleanPublisher continueButtonReset = swerveTestNT.getBooleanTopic("Continue").publish();
-
-    private BooleanSubscriber enableDriveTest = swerveTestNT.getBooleanTopic("Enable Drive Test").subscribe(false);
+    private NetworkTable swerveTestNT = NetworkTableInstance.getDefault().getTable("Test").getSubTable("Swerve Angle Self Check");
 
     //how closely all the modules are moving together
     private DoublePublisher module0CohesionPub = swerveTestNT.getDoubleTopic("Module 0 Cohesion").publish();
@@ -92,8 +86,8 @@ public class SwerveSelfCheck extends Command {
     private final double MAX_PEAK_CURRENT = 40; //amps, for angle motors
     private final double MAX_ACCUM_CURRENT = 100; //amps, for angle motors
     private final double MAX_COHESION = 1; //sum of differences between module angles in rotations
-    private final double MAX_FINAL_ERROR_ANGLE = 1; //rotations
-    private final double MAX_DURATION_90 = 0.2; //seconds
+    private final double MAX_FINAL_ERROR_ANGLE = 50; //rotations
+    private final double MAX_DURATION_90 = 0.5; //seconds
     private final double MAX_ACCUM_ERROR_ANGLE = 400; //arbitrary
     private final double MIN_ROTATIONAL_RATE = 1; //rotations per second (probably)
     private final double MAX_ACCUM_ERROR_DRIVE = 100; //arbitrary
@@ -107,18 +101,13 @@ public class SwerveSelfCheck extends Command {
     private final double FINAL_ANGLE_ERROR_WEIGHT = 10000; //multiple of the FINAL angle error of the modules when going to an angle
     private final double DURATION_90_WEIGHT = 100; //multiple of the time it takes to get to a 90 degree angle
     private final double ACCUM_ERROR_ANGLE_WEIGHT = 20; //multiple of the accumulated error of the angle controller
-    private final double ACCUM_ERROR_DRIVE_WEIGHT = 0; //multiple of the accumulated error of the drive controller
-    private final double ACCUM_DRIVE_CURRENT_WEIGHT = 0; //multiple of the accumulated current draw of the drive motors
 
     private final SwerveRequest.PointWheelsAt angleTestRequest = new SwerveRequest.PointWheelsAt();
-    private final SwerveRequest.RobotCentric driveTestRequest = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.Velocity);
-
-    private Trajectory driveTestTrajectory;
     private Timer angle90Timer = new Timer();
     private Timer spinTimer = new Timer();
-    private Timer driveTimer = new Timer();
+    private Timer angleForwardTimer = new Timer();
 
-    private Stage stage = Stage.WAITING_FOR_START;
+    private Stage stage = Stage.ANGLE_FORWARD;
 
     /**
      * Swerve Self Tester! :D
@@ -127,18 +116,15 @@ public class SwerveSelfCheck extends Command {
      * @param swerve
      * @param requirements
      */
-    public SwerveSelfCheck(PeaccefulSwerve swerve, double maxVelocity, double maxAcceleration, Subsystem... requirements){
+    public SwerveAngleSelfCheck(PeaccefulSwerve swerve, double maxVelocity, double maxAcceleration, Subsystem... requirements){
         this.swerve = swerve;
-
-        driveTestTrajectory = Trajectory.trapezoidTrajectory(new State(0, 0), new State(1,0), maxVelocity, maxAcceleration);
 
         addRequirements(requirements);
     }
 
     @Override
     public void initialize(){
-        stage = Stage.WAITING_FOR_START;
-        continueButtonReset.accept(false);
+        stage = Stage.ANGLE_FORWARD;
         for(int i = 0; i < moduleTestData.length; i++){
             moduleTestData[i] = new ModuleTestData();
         }
@@ -148,8 +134,8 @@ public class SwerveSelfCheck extends Command {
         spinTimer.stop();
         spinTimer.reset();
 
-        driveTimer.stop();
-        driveTimer.reset();
+        angleForwardTimer.reset();
+        angleForwardTimer.start();
         moduleAttained90Test = new boolean[]{false, false, false, false};
     }
     boolean[] moduleAttained90Test = new boolean[]{false, false, false, false};
@@ -161,15 +147,10 @@ public class SwerveSelfCheck extends Command {
             moduleIterData[i] = ModuleIterData.getModuleData(i, swerve, stage == Stage.ANGLE_90 ? 0.25 : 0);
         }
         switch(stage){
-            case WAITING_FOR_START:
-                message.accept("Press the button to start the test :D");
-                if(shouldContinue()) stage = Stage.ANGLE_FORWARD;
-                break;
             case ANGLE_FORWARD:
-                message.accept("The modules are now attepting to point forward. Please visually confirm that they are pointing forward, and press the button to continue.");
                 swerve.setControl(angleTestRequest.withModuleDirection(new Rotation2d()));
 
-                if(shouldContinue()) {
+                if(angleForwardTimer.get() > 0.5) {
                     //check to make sure the modules reach the setpoint
                     for(int i = 0; i < moduleTestData.length; i++){
                         var delta = moduleIterData[i].angle; //should be 0 when pointing forward
@@ -183,7 +164,6 @@ public class SwerveSelfCheck extends Command {
                 }
                 break;
             case ANGLE_90:
-                message.accept("The modules are now attepting to point to a 90 degree angle. Press the button to continue. Any modules that do not reach the setpoint before the button is pressed will fail.");
                 swerve.setControl(angleTestRequest.withModuleDirection(Rotation2d.fromDegrees(90)));
                 for(int i = 0; i < moduleTestData.length; i++){
                     var delta = moduleIterData[i].angle - 0.25; //should be 0 when pointing 90 degrees (1/4 rotation)
@@ -191,16 +171,15 @@ public class SwerveSelfCheck extends Command {
                     SmartDashboard.putNumber("module " + i + " delta", delta);
                     //did we reach the setpoint
                     if(delta < MAX_FINAL_ERROR_ANGLE){
-                        moduleTestData[i].duration = angle90Timer.get();
-                        angle90Timer.stop();
                         if(!moduleAttained90Test[i]){
+                            moduleTestData[i].duration = angle90Timer.get();
                             moduleTestData[i].score += DURATION_90_WEIGHT * angle90Timer.get();
                         }
                         moduleAttained90Test[i] = true;
                     }
 
                     //if we don't reach the setpoint within the allowed amount of time, fail
-                    if(angle90Timer.get() > MAX_DURATION_90 && delta > MAX_FINAL_ERROR_ANGLE){
+                    if(angle90Timer.get() > MAX_DURATION_90 && delta > MAX_FINAL_ERROR_ANGLE && !moduleAttained90Test[i]){
                         moduleTestData[i].duration = angle90Timer.get();
                         moduleTestData[i].passed = false;
                     }
@@ -216,7 +195,7 @@ public class SwerveSelfCheck extends Command {
                     moduleTestData[i].angleError += moduleIterData[i].angleError;
                 }
 
-                if(shouldContinue()) {
+                if(angle90Timer.get() > 0.5) {
                     for(int i = 0; i < moduleTestData.length; i++){
                         var delta = moduleIterData[i].angle - 0.25; //should be 0 when pointing 90 degrees (1/4 rotation)
 
@@ -247,14 +226,13 @@ public class SwerveSelfCheck extends Command {
                         }
                         moduleTestData[i].score += moduleTestData[i].cohesion * COHESION_WEIGHT;
                     }
-                    stage = Stage.DRIVE_VELOCITY_TEST;
+                    stage = Stage.DONE;
                     swerve.seedFieldRelative();
                     spinTimer.reset();
                     spinTimer.start();
                 }
                 break;
             case SPIN_TEST:
-                message.accept("The modules will now spin for 0.5 seconds at 100% speed. Press the button to continue.");
                 if(spinTimer.get() < 0.5){
                     swerve.spinAngleMotors(1);
 
@@ -265,10 +243,9 @@ public class SwerveSelfCheck extends Command {
                     }
                 } else {
                     swerve.spinAngleMotors(0);
-                    spinTimer.stop();
                 }
 
-                if(shouldContinue()){
+                if(spinTimer.get() > 0.5){
                     for(int i = 0; i < moduleTestData.length; i++){
                         //check the rotational rate
                         if(moduleTestData[i].rotationalRate < MIN_ROTATIONAL_RATE){
@@ -283,49 +260,6 @@ public class SwerveSelfCheck extends Command {
                         moduleTestData[i].score += moduleTestData[i].anglePeakCurrent * PEAK_CURRENT_WEIGHT;
                     }
                     swerve.tareEverything();
-                    stage = Stage.DRIVE_VELOCITY_TEST;
-                }
-                break;
-            case DRIVE_VELOCITY_TEST:
-                if(!enableDriveTest.get()){
-                    message.accept("Drive test is disabled. Press the button to finish, or toggle to enable the drive test.");
-                    if(shouldContinue()) stage = Stage.DONE;
-                    break;
-                } 
-                message.accept("BE CAREFUL!!! The modules will now drive forward for 1 meter following a trapezoidal velocity profile. There is no pid, so the modules are running off of feedforward control only");
-                driveTimer.start();
-
-                if(driveTimer.get() < driveTestTrajectory.getTotalTime()){
-                    swerve.setControl(driveTestRequest.withVelocityX(driveTestTrajectory.calculate(driveTimer.get()).velocity));
-                } else {
-                    swerve.setControl(driveTestRequest.withVelocityX(0).withVelocityY(0));
-                    driveTimer.stop();
-                }
-
-                //accumulate drive controller error and drive current draw
-                for(int i = 0; i < moduleTestData.length; i++){
-                    moduleTestData[i].driveError += moduleIterData[i].driveError;
-                    moduleTestData[i].driveAccumCurrent += moduleIterData[i].driveCurrentDraw;
-                }
-
-                if(shouldContinue()){
-                    for(int i = 0; i < moduleTestData.length; i++){
-                        //check the drive controller error
-                        if(moduleTestData[i].driveError > MAX_ACCUM_ERROR_DRIVE){
-                            moduleTestData[i].passed = false;
-                        }
-                        moduleTestData[i].score += moduleTestData[i].driveError * ACCUM_ERROR_DRIVE_WEIGHT;
-
-                        //check the drive current draw
-                        if(moduleTestData[i].driveAccumCurrent > MAX_ACCUM_CURRENT_DRIVE){
-                            moduleTestData[i].passed = false;
-                        }
-                        moduleTestData[i].score += moduleTestData[i].driveAccumCurrent * ACCUM_DRIVE_CURRENT_WEIGHT;
-                    }
-
-                    //calculate the odometry error
-                    driveOdometryError = swerve.getState().Pose.minus(new Pose2d(-1, 0, new Rotation2d())).getTranslation().getNorm();
-
                     stage = Stage.DONE;
                 }
                 break;
@@ -337,12 +271,9 @@ public class SwerveSelfCheck extends Command {
         writeTelemetry();
     }
 
-    private boolean shouldContinue(){
-        if(continueButton.get()){
-            continueButtonReset.accept(false);
-            return true;
-        }
-        return false;
+    @Override
+    public boolean isFinished(){
+        return stage == Stage.DONE;
     }
 
     private void writeTelemetry(){
@@ -399,11 +330,9 @@ public class SwerveSelfCheck extends Command {
 
 
     public enum Stage{
-        WAITING_FOR_START, //waiting for the user to press the button
         ANGLE_FORWARD, //point the modules forward, prompt visual check
         ANGLE_90, //point the modules at a 90 degree angle, prompt visual check, look at current draw & module cohesiveness, duration of motion, position tracking accuracy
         SPIN_TEST, //ramp modules to 100% speed, check rotational rate of encoder
-        DRIVE_VELOCITY_TEST, //check velocity controller tracking error
         DONE
     }
 

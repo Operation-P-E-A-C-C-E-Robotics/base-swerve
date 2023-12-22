@@ -29,6 +29,9 @@ public class DriveTrain extends SubsystemBase {
     private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds()
                                                                                         .withDriveRequestType(DriveRequestType.Velocity);
 
+    public PeaccefulSwerve getSwerve() {
+        return swerve;
+    }
     // private LimelightHelper limelight;
 
     public DriveTrain(Limelight limelight) {
