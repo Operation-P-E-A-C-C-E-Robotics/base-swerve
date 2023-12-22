@@ -17,6 +17,7 @@ public class ControlSystemTelemetry {
     
     //rio
     private static final DoublePublisher loopTimePublisher = roboRIOTable.getDoubleTopic("RIO Loop Time").publish();
+    private static final DoublePublisher commandsOverheadPublisher = roboRIOTable.getDoubleTopic("CommandScheduler Run Duration").publish();
     private static final BooleanPublisher brownoutPublisher = roboRIOTable.getBooleanTopic("Brownout").publish();
     private static final DoublePublisher batteryVoltagePublisher = roboRIOTable.getDoubleTopic("Battery Voltage").publish();
     private static final DoublePublisher brownoutVoltagePublisher = roboRIOTable.getDoubleTopic("Brownout Voltage").publish();  
@@ -46,8 +47,9 @@ public class ControlSystemTelemetry {
 
     private static Timer time = new Timer();
 
-    public static void update(PneumaticsBase pcm) {
+    public static void update(PneumaticsBase pcm, double schedulerTime) {
         loopTimePublisher.accept(time.get());
+        commandsOverheadPublisher.accept(schedulerTime);
         time.reset();
         time.start();
 

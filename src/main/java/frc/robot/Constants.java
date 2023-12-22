@@ -23,7 +23,7 @@ import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.util.JoystickCurves;
 
 public final class Constants {
-  public static final double period = 0.02;
+  public static final double period = 0.01;
   public static final class Swerve {
     /* TELEOP */
     //speeds in m/s (probably)

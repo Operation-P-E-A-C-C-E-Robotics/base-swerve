@@ -8,10 +8,10 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.lib.safety.Inspiration;
 import frc.lib.telemetry.ControlSystemTelemetry;
 import frc.robot.Constants.Core;
 
@@ -21,12 +21,12 @@ public class Robot extends TimedRobot {
   private RobotContainer robotContainer;
 
   private PowerDistribution pdp = new PowerDistribution(Core.PDPCanId, Core.PDPModuleType);
-
-  private boolean isInMatch = false; //are we at comp
+  private Timer scheduleTimer = new Timer();
 
   public Robot() {
     super(Constants.period);
     CommandScheduler.getInstance().setPeriod(Constants.period);
+    SmartDashboard.updateValues();
   }
 
   @Override
@@ -40,24 +40,16 @@ public class Robot extends TimedRobot {
 
     //log current draw
     SmartDashboard.putData("PDP", pdp);
-    
-    //BRING THE HYPE
-    isInMatch = Inspiration.initializeInspirationOpt1();
-    if(isInMatch){
-      Inspiration.inspireDriversInit();
-    } else {
-      Inspiration.inspireProgrammersInit();
-    }
-    
     System.out.println("Robot Initialized");
   }
 
   @Override
   public void robotPeriodic() {
     //run the robot
+    scheduleTimer.reset();
+    scheduleTimer.start();
     CommandScheduler.getInstance().run();
-    ControlSystemTelemetry.update(null);
-    Inspiration.updateSlowPrinter(); //KEEP THE HYPE MACHINE ROLLIN
+    ControlSystemTelemetry.update(null, scheduleTimer.get());
   }
 
   @Override
@@ -71,7 +63,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     System.out.println("Robot Autonomous");
-    Inspiration.inspireAutonomous(isInMatch);
 
     // schedule the autonomous command
     autonomousCommand = robotContainer.getAutonomousCommand();
@@ -85,7 +76,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    Inspiration.inspireTeleopInit(true);
     System.out.println("Robot Teleop");
 
     //stop autonomous

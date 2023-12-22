@@ -106,7 +106,7 @@ public class DriveTrain extends SubsystemBase {
      * sometimes, the missile forgets where it is, and it's not even where it's been.
      */
     public void resetOdometry() {
-        swerve.tareEverything();
+        swerve.seedFieldRelative();
     }
 
     /**

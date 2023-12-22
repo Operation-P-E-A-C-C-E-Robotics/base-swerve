@@ -57,7 +57,7 @@ public class PeaccyDrive extends Command {
      * and auto angle (automatic heading adjustment) modes.
      * @param driveTrain the swerve subsystem
      */
-    public PeaccyDrive(DriveTrain driveTrain) { 
+    public PeaccyDrive(DriveTrain driveTrain) {
         this.driveTrain = driveTrain;
 
         request  = new PeaccyRequest(
@@ -74,6 +74,7 @@ public class PeaccyDrive extends Command {
         .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
 
         addRequirements(driveTrain);
+        System.out.println("PeacyDrive initialized");
     }
 
     /**
@@ -169,7 +170,7 @@ public class PeaccyDrive extends Command {
 
     @Override
     public void initialize(){
-        driveTrain.resetOdometry();
+        // driveTrain.resetOdometry();
         request.withHeading(driveTrain.getPose().getRotation().getRadians());
     }
 
