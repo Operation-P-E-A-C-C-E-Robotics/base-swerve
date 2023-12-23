@@ -13,14 +13,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.telemetry.ControlSystemTelemetry;
-import frc.robot.Constants.Core;
+import frc.robot.Constants.ControlSystem;
 
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
 
   private RobotContainer robotContainer;
 
-  private PowerDistribution pdp = new PowerDistribution(Core.PDPCanId, Core.PDPModuleType);
+  private PowerDistribution pdp = new PowerDistribution(ControlSystem.PDPCanId, ControlSystem.PDPModuleType);
   private Timer scheduleTimer = new Timer();
 
   public Robot() {

@@ -29,18 +29,30 @@ import frc.lib.util.JoystickCurves.CurveType;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
-public class DriveTrainTuner extends Command {
+/**
+ * The organization / lack thereof of this file is a sin 
+ * and i am sorry for writing it. To atone here is a fun poem about $h!tty code:
+ * Messy code like poops on a shingle,
+ * I'm sorry for writing it, it makes me tingle.
+ * This file cannot be understood,
+ * I'm sorry for writing it, it's not good.
+ * - Peaccy
+ * 
+ * Updated helper to tune the drivetrain constants & drive mode.
+ * Functionally similar to PeaccyDrive but with:
+ * - mutable limiters and constants
+ * - ability to write new pid gains to modules
+ * - tons and tons of dashboard controls
+ */
+public class PeaccyTuner extends Command {
     /* CONSTANTS BUT MUTABLE */
-        private double teleopLinearMultiplier  = Constants.Swerve.teleopLinearMultiplier;
+    private double teleopLinearMultiplier  = Constants.Swerve.teleopLinearMultiplier;
     private double teleopAngularMultiplier = Constants.Swerve.teleopAngularMultiplier;
 
     private double teleopLinearSpeedLimit = Constants.Swerve.teleopLinearSpeedLimit;
     private double teleopLowBatteryLinearSpeedLimit = Constants.Swerve.teleopLowBatteryLinearSpeedLimit;
     private double teleopLinearAngleLimit = Constants.Swerve.teleopLinearAngleLimit;
-    private double teleopNearLinearAngleLimit = Constants.Swerve.teleopNearLinearAngleLimit;
     private double teleopAngularRateLimit = Constants.Swerve.teleopAngularRateLimit;
-
-    private double teleopNearLimitThreshold = Constants.Swerve.teleopNearLimitThreshold;
 
     private double teleopLinearSpeedDeadband = Constants.Swerve.teleopLinearSpeedDeadband;
     private double teleopAngularVelocityDeadband = Constants.Swerve.teleopAngularVelocityDeadband;
@@ -69,6 +81,7 @@ public class DriveTrainTuner extends Command {
     
     
     /* NORMAL VARIABLES */
+    //(i copy/pasted this :D) - peaccy
     /* Initialize the suppliers to default values */
     private DoubleSupplier xVelocitySup = () -> 0,
                         yVelocitySup = () -> 0, 
@@ -90,7 +103,6 @@ public class DriveTrainTuner extends Command {
     private SlewRateLimiter linearSpeedLimiter;
     private SlewRateLimiter lowBatteryLinearSpeedLimiter;
     private SlewRateLimiter linearAngleLimiter;
-    private SlewRateLimiter nearLinearAngleLimiter;
     private SlewRateLimiter angularVelocityLimiter;
 
     /* Debounce the deadband to prevent jitter when the joystick is near the edge of the deadband */
@@ -109,13 +121,14 @@ public class DriveTrainTuner extends Command {
     private SendableChooser<CurveType> angularCurveChooser = new SendableChooser<>();
 
     /* NETWORKTABLES */
+    //i decided to split the networktables into different tables for different catagoies of constants
     NetworkTable tunerTable = NetworkTableInstance.getDefault().getTable("Drivetrain Tuner");
-    NetworkTable gains = tunerTable.getSubTable("Gains");
-    NetworkTable limits = tunerTable.getSubTable("Limits");
-    NetworkTable deadbands = tunerTable.getSubTable("Deadbands");
-    NetworkTable curves = tunerTable.getSubTable("Curves");
-    NetworkTable data = tunerTable.getSubTable("Data");
-    NetworkTable control = tunerTable.getSubTable("Control");
+    NetworkTable gains = tunerTable.getSubTable("Gains"); //pid gains & trajectory whatevers
+    NetworkTable limits = tunerTable.getSubTable("Limits"); //max speeds, rate limiters, multipliers, etc.
+    NetworkTable deadbands = tunerTable.getSubTable("Deadbands"); //deadbands & debounce time for said deadbands
+    NetworkTable curves = tunerTable.getSubTable("Curves"); //joystick curves (no $h!t sherlock)
+    NetworkTable data = tunerTable.getSubTable("Data"); //data to be displayed on the dashboard (why am i writing this comment)
+    NetworkTable control = tunerTable.getSubTable("Control"); //just whatever to control the robot or whatever (zeroing odometry, updating gains, etc.)
 
     //gains
     DoubleEntry drivekPEntry = gains.getDoubleTopic("Drive kP").getEntry(driveGains.kP);
@@ -146,10 +159,7 @@ public class DriveTrainTuner extends Command {
     DoubleEntry teleopLinearSpeedLimitEntry = limits.getDoubleTopic("Teleop Linear Speed Limit").getEntry(teleopLinearSpeedLimit);
     DoubleEntry teleopLowBatteryLinearSpeedLimitEntry = limits.getDoubleTopic("Teleop Low Battery Linear Speed Limit").getEntry(teleopLowBatteryLinearSpeedLimit);
     DoubleEntry teleopLinearAngleLimitEntry = limits.getDoubleTopic("Teleop Linear Angle Limit").getEntry(teleopLinearAngleLimit);
-    DoubleEntry teleopNearLinearAngleLimitEntry = limits.getDoubleTopic("Teleop Near Linear Angle Limit").getEntry(teleopNearLinearAngleLimit);
     DoubleEntry teleopAngularRateLimitEntry = limits.getDoubleTopic("Teleop Angular Rate Limit").getEntry(teleopAngularRateLimit);
-
-    DoubleEntry teleopNearLimitThresholdEntry = limits.getDoubleTopic("Teleop Near Limit Threshold").getEntry(teleopNearLimitThreshold);
 
     //deadbands
     DoubleEntry teleopLinearSpeedDeadbandEntry = deadbands.getDoubleTopic("Teleop Linear Speed Deadband").getEntry(teleopLinearSpeedDeadband);
@@ -211,10 +221,8 @@ public class DriveTrainTuner extends Command {
         teleopLinearSpeedLimit = teleopLinearSpeedLimitEntry.get(teleopLinearSpeedLimit);
         teleopLowBatteryLinearSpeedLimit = teleopLowBatteryLinearSpeedLimitEntry.get(teleopLowBatteryLinearSpeedLimit);
         teleopLinearAngleLimit = teleopLinearAngleLimitEntry.get(teleopLinearAngleLimit);
-        teleopNearLinearAngleLimit = teleopNearLinearAngleLimitEntry.get(teleopNearLinearAngleLimit);
         teleopAngularRateLimit = teleopAngularRateLimitEntry.get(teleopAngularRateLimit);
 
-        teleopNearLimitThreshold = teleopNearLimitThresholdEntry.get(teleopNearLimitThreshold);
 
         //deadbands
         teleopLinearSpeedDeadband = teleopLinearSpeedDeadbandEntry.get(teleopLinearSpeedDeadband);
@@ -236,7 +244,6 @@ public class DriveTrainTuner extends Command {
         linearSpeedLimiter = new SlewRateLimiter(teleopLinearSpeedLimit);
         lowBatteryLinearSpeedLimiter = new SlewRateLimiter(teleopLowBatteryLinearSpeedLimit);
         linearAngleLimiter = new SlewRateLimiter(teleopLinearAngleLimit);
-        nearLinearAngleLimiter = new SlewRateLimiter(teleopNearLinearAngleLimit);
         angularVelocityLimiter = new SlewRateLimiter(teleopAngularRateLimit);
 
         linearDeadbandDebouncer = new Debouncer(teleopDeadbandDebounceTime, DebounceType.kBoth);
@@ -276,7 +283,7 @@ public class DriveTrainTuner extends Command {
      * - tons and tons of dashboard controls
      * @param driveTrain the swerve subsystem
      */
-    public DriveTrainTuner(DriveTrain driveTrain) { 
+    public PeaccyTuner(DriveTrain driveTrain) { 
         this.driveTrain = driveTrain;
         updateLimiters();
         updatePeaccyRequest();
@@ -289,7 +296,7 @@ public class DriveTrainTuner extends Command {
      * @param xVelocitySup supplier that gives desired x velocity as a percentage of max velocity
      * @return this (so u can chain em)
      */
-    public DriveTrainTuner withTranslation(DoubleSupplier xVelocitySup){
+    public PeaccyTuner withTranslation(DoubleSupplier xVelocitySup){
         this.xVelocitySup = xVelocitySup;
         return this;
     }
@@ -299,7 +306,7 @@ public class DriveTrainTuner extends Command {
      * @param yVelocitySup supplier that gives desired y velocity as a percentage of max velocity
      * @return this (so u can chain em)
      */
-    public DriveTrainTuner withStrafe(DoubleSupplier yVelocitySup){
+    public PeaccyTuner withStrafe(DoubleSupplier yVelocitySup){
         this.yVelocitySup = yVelocitySup;
         return this;
     }
@@ -309,7 +316,7 @@ public class DriveTrainTuner extends Command {
      * @param angularVelocitySup supplier that gives desired angular velocity as a percentage of max velocity
      * @return this (so u can chain em)
      */
-    public DriveTrainTuner withRotation(DoubleSupplier angularVelocitySup){
+    public PeaccyTuner withRotation(DoubleSupplier angularVelocitySup){
         this.angularVelocitySup = angularVelocitySup;
         return this;
     }
@@ -319,7 +326,7 @@ public class DriveTrainTuner extends Command {
      * @param headingSup supplier that gives desired heading in field-centric degrees
      * @return this (so u can chain em)
      */
-    public DriveTrainTuner withHeading(DoubleSupplier headingSup){
+    public PeaccyTuner withHeading(DoubleSupplier headingSup){
         this.autoHeadingAngleSup = headingSup;
         return this;
     }
@@ -329,7 +336,7 @@ public class DriveTrainTuner extends Command {
      * @param isLockInSup supplier that gives whether to X-lock the wheels when stopped
      * @return this (so u can chain em)
      */
-    public DriveTrainTuner isLockIn(BooleanSupplier isLockInSup){
+    public PeaccyTuner isLockIn(BooleanSupplier isLockInSup){
         this.isLockInSup = isLockInSup;
         return this;
     }
@@ -339,7 +346,7 @@ public class DriveTrainTuner extends Command {
      * @param isFieldRelativeSup supplier that gives whether to use field centric controls
      * @return this (so u can chain em)
      */
-    public DriveTrainTuner isFieldRelative(BooleanSupplier isFieldRelativeSup){
+    public PeaccyTuner isFieldRelative(BooleanSupplier isFieldRelativeSup){
         this.isFieldRelativeSup = isFieldRelativeSup;
         return this;
     }
@@ -349,7 +356,7 @@ public class DriveTrainTuner extends Command {
      * @param isOpenLoopSup supplier that gives whether to use open loop controls
      * @return this (so u can chain em)
      */
-    public DriveTrainTuner isOpenLoop(BooleanSupplier isOpenLoopSup){
+    public PeaccyTuner isOpenLoop(BooleanSupplier isOpenLoopSup){
         this.isOpenLoopSup = isOpenLoopSup;
         return this;
     }
@@ -359,7 +366,7 @@ public class DriveTrainTuner extends Command {
      * @param isZeroOdometrySup supplier that gives whether to zero the odometry
      * @return this (so u can chain em)
      */
-    public DriveTrainTuner isZeroOdometry(BooleanSupplier isZeroOdometrySup){
+    public PeaccyTuner isZeroOdometry(BooleanSupplier isZeroOdometrySup){
         this.isZeroOdometrySup = isZeroOdometrySup;
         return this;
     }
@@ -370,7 +377,7 @@ public class DriveTrainTuner extends Command {
      * @param useHeadingSup supplier that gives whether to use the heading
      * @return this (so u can chain em)
      */
-    public DriveTrainTuner useHeading(BooleanSupplier useHeadingSup){
+    public PeaccyTuner useHeading(BooleanSupplier useHeadingSup){
         this.isAutoAngleSup = useHeadingSup;
         return this;
     }
@@ -411,10 +418,8 @@ public class DriveTrainTuner extends Command {
         teleopLinearSpeedLimitEntry.set(teleopLinearSpeedLimit);
         teleopLowBatteryLinearSpeedLimitEntry.set(teleopLowBatteryLinearSpeedLimit);
         teleopLinearAngleLimitEntry.set(teleopLinearAngleLimit);
-        teleopNearLinearAngleLimitEntry.set(teleopNearLinearAngleLimit);
         teleopAngularRateLimitEntry.set(teleopAngularRateLimit);
 
-        teleopNearLimitThresholdEntry.set(teleopNearLimitThreshold);
 
         //deadbands
         teleopLinearSpeedDeadbandEntry.set(teleopLinearSpeedDeadband);
@@ -469,7 +474,7 @@ public class DriveTrainTuner extends Command {
 
     @Override
     public void execute() {
-        updateConstants();
+        updateConstants(); 
 
         boolean updateDriveGains = updateDriveGainsEntry.get(false);
         boolean updateAngleGains = updateAngleGainsEntry.get(false);
@@ -601,13 +606,10 @@ public class DriveTrainTuner extends Command {
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);
         if(useLowBetteryLimiter) linearSpeed = lowBatSpeed;
 
-        boolean useNearLimiter = Math.abs(rawLinearSpeed) < teleopNearLimitThreshold;
 
         //limit the change in direction
         double rawLinearAngle = linearVelocity.getAngle().getRadians();
-        double nearLinearAngle = nearLinearAngleLimiter.calculate(rawLinearAngle);
         double linearAngle = linearAngleLimiter.calculate(rawLinearAngle);
-        if(useNearLimiter) linearAngle = nearLinearAngle;
 
         // override the smoothing of the direction if it lags too far behind the raw value
         // (mainly after stopping and changing direction)

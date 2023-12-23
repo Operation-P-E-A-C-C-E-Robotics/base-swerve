@@ -1,22 +1,15 @@
 package frc.lib.swerve;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.lib.motion.Trajectory;
 
 public class SwerveAngleSelfCheck extends Command {
     private PeaccefulSwerve swerve;
@@ -90,8 +83,6 @@ public class SwerveAngleSelfCheck extends Command {
     private final double MAX_DURATION_90 = 0.5; //seconds
     private final double MAX_ACCUM_ERROR_ANGLE = 400; //arbitrary
     private final double MIN_ROTATIONAL_RATE = 1; //rotations per second (probably)
-    private final double MAX_ACCUM_ERROR_DRIVE = 100; //arbitrary
-    private final double MAX_ACCUM_CURRENT_DRIVE = 400;
 
     //Weights of each parameter in module scores. Higher score = worse. 0 is "perfect".
     //TODO arbitrary selections
@@ -153,7 +144,7 @@ public class SwerveAngleSelfCheck extends Command {
                 if(angleForwardTimer.get() > 0.5) {
                     //check to make sure the modules reach the setpoint
                     for(int i = 0; i < moduleTestData.length; i++){
-                        var delta = moduleIterData[i].angle; //should be 0 when pointing forward
+                        var delta = Math.abs(moduleIterData[i].angle); //should be 0 when pointing forward
                         if(delta > MAX_FINAL_ERROR_ANGLE){
                             moduleTestData[i].passed = false;
                         }
@@ -166,7 +157,7 @@ public class SwerveAngleSelfCheck extends Command {
             case ANGLE_90:
                 swerve.setControl(angleTestRequest.withModuleDirection(Rotation2d.fromDegrees(90)));
                 for(int i = 0; i < moduleTestData.length; i++){
-                    var delta = moduleIterData[i].angle - 0.25; //should be 0 when pointing 90 degrees (1/4 rotation)
+                    var delta = Math.abs(moduleIterData[i].angle - 0.25); //should be 0 when pointing 90 degrees (1/4 rotation)
                     SmartDashboard.putNumber("module " + i + " angle", moduleIterData[i].angle);
                     SmartDashboard.putNumber("module " + i + " delta", delta);
                     //did we reach the setpoint

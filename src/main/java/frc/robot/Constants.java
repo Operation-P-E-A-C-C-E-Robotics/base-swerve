@@ -34,15 +34,13 @@ public final class Constants {
     public static final double teleopLinearSpeedLimit = 5.0;
 	  public static final double teleopLowBatteryLinearSpeedLimit = 2; //more acceleration limit when battery is low
     public static final double teleopLinearAngleLimit = 2.0;
-    public static final double teleopNearLinearAngleLimit = 1.5;
     public static final double teleopAngularRateLimit = 3.0;
 
-    public static final double teleopNearLimitThreshold = 0.2; //how close to zero to use more extreme linear angle smoothing.
 
     //deadband
     public static final double teleopLinearSpeedDeadband = 0.1;
     public static final double teleopAngularVelocityDeadband = 0.13;
-    public static final double teleopDeadbandDebounceTime = 0.15;
+    public static final double teleopDeadbandDebounceTime = 0.1;
 
     public static final DoubleFunction <Double> teleopLinearSpeedCurve = (double linearSpeed) -> JoystickCurves.herraFCurve(linearSpeed, 6, 4.5); //a nice gentle curve which is Peaccy's (me!!) favorite :)
     public static final DoubleFunction <Double> teleopAngularVelocityCurve = (double angularVelocity) -> JoystickCurves.powerCurve(angularVelocity, 2); //TODO decide if the driver (me) wants a curve on this or not.
@@ -83,7 +81,7 @@ public final class Constants {
     public static final double autoHeadingKD = 0.0; //ALSO DOES NOTHING LOL
     public static final double autoHeadingKV = 0.0;
     public static final double autoHeadingKA = 0.0;
-    public static final double autoHeadingMaxVelocity = 50; //deg/s
+    public static final double autoHeadingMaxVelocity = 50; //deg/s (i think)
     public static final double autoHeadingMaxAcceleration = 70; //deg/s^2
     public static final boolean useSoftHoldHeading = false;
     public static final double softHeadingCurrentLimit = 30;
@@ -118,7 +116,7 @@ public final class Constants {
     );
   }
 
-  public static final class Core {
+  public static final class ControlSystem {
     public static final int PDPCanId = 0;
     public static final ModuleType PDPModuleType = ModuleType.kCTRE;
   }

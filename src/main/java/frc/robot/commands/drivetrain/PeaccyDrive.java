@@ -36,11 +36,10 @@ public class PeaccyDrive extends Command {
     private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withDriveRequestType(DriveRequestType.Velocity); //for X-locking the wheels
 
     /* Acceleration limiters for a consistent feel and to reduce power draw. */
-    private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit);
-    private final SlewRateLimiter lowBatteryLinearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLowBatteryLinearSpeedLimit);
-    private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit);
-    private final SlewRateLimiter nearLinearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopNearLinearAngleLimit); //more extreme limit near zero 
-    private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit);
+    private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit); //limit the change in speed
+    private final SlewRateLimiter lowBatteryLinearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLowBatteryLinearSpeedLimit); //more aggresive to prevent brownouts
+    private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit); //limit the change in direction
+    private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit); //limit the change in angular velocity
 
     /* Debounce the deadband to prevent jitter when the joystick is near the edge of the deadband */
     private final Debouncer linearDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
@@ -171,12 +170,13 @@ public class PeaccyDrive extends Command {
 
     @Override
     public void initialize(){
-        // driveTrain.resetOdometry();
+        //seed with initial heading to stop the robot turning to 0
         request.withHeading(driveTrain.getPose().getRotation().getRadians());
     }
 
     @Override
     public void execute() {
+        //get the values from the suppliers
         double xVelocity = xVelocitySup.getAsDouble();
         double yVelocity = yVelocitySup.getAsDouble();
         double angularVelocity = angularVelocitySup.getAsDouble();
@@ -217,7 +217,7 @@ public class PeaccyDrive extends Command {
 
 
 
-        //handle lock in
+        //X-lock the wheels if we're stopped and the driver wants to
         if (isLockIn) {
             //only lock in if we're stopped
             if (linearVelocity.equals(new Translation2d(0,0)) && angularVelocity == 0) {
@@ -227,13 +227,16 @@ public class PeaccyDrive extends Command {
             }
         }
 
-       request.withVelocityX(linearVelocity.getX())
-            .withVelocityY(linearVelocity.getY())
-            .withRotationalRate(angularVelocity)
-            .withIsOpenLoop(isOpenLoop)
-            .withIsFieldCentric(isFieldRelative)
-            .withHoldHeading(true) //always hold our current heading.
-            .withPositionCorrectionIterations(4);
+        //update my very nice swerve request with the values we've calculated
+        request.withVelocityX(linearVelocity.getX())
+               .withVelocityY(linearVelocity.getY())
+               .withRotationalRate(angularVelocity)
+               .withIsOpenLoop(isOpenLoop)
+               .withIsFieldCentric(isFieldRelative)
+               //true will use pid control to maintain heading, or set to "isAutoHeading" if you want to only turn to specified headings 
+               //rather than holding whatever direction you're facing :)
+               .withHoldHeading(true)
+               .withPositionCorrectionIterations(4);
 
         //update the robot's target heading if we're using auto heading
         if(isAutoHeading) {
@@ -251,10 +254,30 @@ public class PeaccyDrive extends Command {
             request.withSoftHoldHeading(false);
         }
 
-        //yay peaccyrequest will handle the rest :D
+        //yay peaccyrequest,
+        //(my beautiful swerve request),
+        //will handle the rest :D,
+        //and make the robot go vroom vroom,
+        //and do the thing,
+        //and be very nice,
+        //and make me happy,
+        //for the rest of my life.
+        // -peaccy
         driveTrain.drive(request);
     }
 
+    /**
+     * Handle deadbanding and smoothing of the linear velocity.
+     * Does a nice deadband to get rid of joystick drift while minimizing loss of precise control.
+     * Also does a nice rate limiter to make the robot feel nice to drive.
+     * Rate limits are on the speed and angle of the velocity rather than X and Y components to prevent
+     * the angle of the velocity feeling inconsistent, 
+     * and help you (me) pretend to be a good driver who can make the robot go straight.
+     * Oh yeah it also does a nice curve to make the robot feel nice to drive,
+     * and hopefully stop me from driving thru any more large metal workbenches
+     * @param linearVelocity the raw linear velocity as a Translation2d
+     * @return the much more gooder linear velocity
+     */
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
         //handle deadband and reset the rate limiter if we're in the deadband
         double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,0.03,linearVelocity.getNorm(), linearDeadbandDebouncer);
@@ -268,13 +291,9 @@ public class PeaccyDrive extends Command {
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);
         if(useLowBetteryLimiter) linearSpeed = lowBatSpeed;
 
-        boolean useNearLimiter = Math.abs(rawLinearSpeed) < Constants.Swerve.teleopNearLimitThreshold;
-
         //limit the change in direction
         double rawLinearAngle = linearVelocity.getAngle().getRadians();
-        double nearLinearAngle = nearLinearAngleLimiter.calculate(rawLinearAngle);
         double linearAngle = linearAngleLimiter.calculate(rawLinearAngle);
-        if(useNearLimiter) linearAngle = nearLinearAngle;
 
         // override the smoothing of the direction if it lags too far behind the raw value
         // (mainly after stopping and changing direction)
@@ -286,6 +305,12 @@ public class PeaccyDrive extends Command {
         return new Translation2d(linearSpeed, new Rotation2d(linearAngle));
     }
 
+    /**
+     * super simple lil deadbander and smoother for the spinny part.
+     * just a deadband, curve and rate limiter.
+     * @param angularVelocity the raw angular velocity
+     * @return the vastly superior angular velocity
+     */
     private double smoothAndDeadband (double angularVelocity) {
         //apply deadband to angular velocity
         angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, 0.3, angularVelocity, angularDeadbandDebouncer);
@@ -302,7 +327,9 @@ public class PeaccyDrive extends Command {
      * This function handles deadband by increases the slope of the output after
      * the deadband, so the output is 0 at the end of the deadband but still 100% for 100% input. 
      * This preserves fine control while still eliminating unnecessary current draw and preventing joystick drift.
-     * @param deadband the deadband to use
+     * (all the benefits of a deadband lol)
+     * @param modband I gave up on naming things. This is the deadband with a slope increase afterward
+     * @param deadband normal deadband that is applied after the """"modband"""" [rolleyes emoji]. Use if you wanna overcome the static friction of the motors right after the deadband.
      * @param value the value to apply the deadband to
      * @return the value with the deadband applied (like magic)
      */
