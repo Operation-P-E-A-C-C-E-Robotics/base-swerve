@@ -89,14 +89,14 @@ import frc.robot.subsystems.DriveTrain;
  * Then, it never worked again. I was so shortsighted and had so much build-up cognitive bias (as did
  * the team as a whole) that i couln't see how the automation was killing our change of success.
  * We needed more driver practice, not more automation. (swerve would have helped too).
- *    All this wouldn't have been so bad if it weren't for the real problem: lack of appreciation.
+ *    All this wouldn't have been so frustrating if it weren't for the worst part: lack of appreciation.
  * It was just like the minibot. Hundreds of hours and thousands of lines in. Carefully refined,
  * documented. I obsessively organized the code to refute the claims of "your code is hard to read",
  * but it did nothing. I considered for hours, all the possible control schemes, different position
  * controllers, anything I could do to control this monstrosity of an arm in a cohesive manner.
  * I spent hours wrestling with these position controllers in the simulation. I did things no other
- * teams have done; I made my own motion profiles that could be generated in real time - NO OTHER
- * TEAM HAS DONE THIS! We could generate trajectories for any setpoint from any position, and somehow, miraculously,
+ * teams have done; I made my own motion profiles that could be generated in real time.
+ * We could generate trajectories for any setpoint from any position, and somehow, miraculously,
  * manipulate all 5 degrees of freedom in unison to get there, with extreme precision, and speed.
  * And the only thing the team could see was that the apriltags on the field were an inch off so
  * we missed. The only feedback I got was "it doesn't work", and "it's too complicated".
@@ -122,7 +122,7 @@ import frc.robot.subsystems.DriveTrain;
  * write code that's too hard to read. Maybe I'm still an asshole. And maybe, just maybe, we're all just
  * assholes who don't know anything about anything.
  *    But we're going to worlds this year.
- * - Peaccy, a.k.a. Sean Benham, a.k.a. "the programmer" (i'm not bitter i swear) - 00:00 12/23/23
+ * - Peaccy, a.k.a. Sean Benham, a.k.a. "the programmer" - 00:00 12/23/23
  * 
  */
 public class RobotContainer {
