@@ -34,11 +34,11 @@ public class ControlSystemTelemetry {
     private static final BooleanPublisher outputsEnabled = roboRIOTable.getBooleanTopic("Outputs Enabled").publish();
 
     //can
-    private static final DoublePublisher canBusUtilization = canTable.getDoubleTopic("CAN Bus Utilization").publish();
-    private static final DoublePublisher canBusOffCount = canTable.getDoubleTopic("CAN Bus Off Count").publish();
-    private static final DoublePublisher canRxErrorCount = canTable.getDoubleTopic("CAN Rx Error Count").publish();
-    private static final DoublePublisher canTxErrorCount = canTable.getDoubleTopic("CAN Tx Error Count").publish();
-    private static final DoublePublisher canTxFullCount = canTable.getDoubleTopic("CAN Tx Full Count").publish();
+    private static final DoublePublisher canBusUtilization = canTable.getDoubleTopic("Bus Utilization").publish();
+    private static final DoublePublisher canBusOffCount = canTable.getDoubleTopic("Bus Off Count").publish();
+    private static final DoublePublisher canRxErrorCount = canTable.getDoubleTopic("Rx Error Count").publish();
+    private static final DoublePublisher canTxErrorCount = canTable.getDoubleTopic("Tx Error Count").publish();
+    private static final DoublePublisher canTxFullCount = canTable.getDoubleTopic("Tx Full Count").publish();
 
     //pneumatics
     private static final BooleanPublisher compressorEnabled = pneumaticsTable.getBooleanTopic("Compressor Enabled").publish();
@@ -81,6 +81,10 @@ public class ControlSystemTelemetry {
             compressorEnabled.accept(pcm.getCompressor());
             pneumaticPressure.accept(pcm.getPressure(0));
             pneumaticSolenoidStates.accept(Integer.toBinaryString(pcm.getSolenoids()));
+        } else {
+            compressorEnabled.accept(false);
+            pneumaticPressure.accept(0.0);
+            pneumaticSolenoidStates.accept("Pneumatics-free robot :)");
         }
 
         RobotController.getBatteryVoltage();

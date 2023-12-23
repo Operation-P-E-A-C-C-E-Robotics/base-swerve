@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerve.PeaccefulSwerve;
@@ -28,6 +30,8 @@ public class DriveTrain extends SubsystemBase {
 
     private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds()
                                                                                         .withDriveRequestType(DriveRequestType.Velocity);
+    private final SendableChooser<Pose2d> poseSeedChooser = new SendableChooser<>();
+
 
     public PeaccefulSwerve getSwerve() {
         return swerve;
@@ -67,6 +71,11 @@ public class DriveTrain extends SubsystemBase {
         swerve.registerTelemetry((SwerveDriveState state) -> {
             SwerveTelemetry.updateSwerveState(state, ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getPose().getRotation()), swerve.getPose3d());
         });
+
+        poseSeedChooser.setDefaultOption("zero", new Pose2d());
+        poseSeedChooser.addOption("test", new Pose2d(1, 1, new Rotation2d()));
+        SmartDashboard.putData("POSE SEED", poseSeedChooser);
+        SmartDashboard.putBoolean("seed pose", false);
 
         System.out.println("DriveTrain Initialized");
 
@@ -162,6 +171,11 @@ public class DriveTrain extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if(SmartDashboard.getBoolean("seed pose", false)) {
+            // swerve.tareEverything();
+            resetOdometry(poseSeedChooser.getSelected());
+            SmartDashboard.putBoolean("seed pose", false);
+        }
         // limelight.updateCTRESwerveOdometry(swerve, getPose(), getChassisSpeeds()); causes errer for some reason
     }
 
