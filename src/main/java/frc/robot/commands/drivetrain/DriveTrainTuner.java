@@ -165,6 +165,7 @@ public class DriveTrainTuner extends Command {
     DoublePublisher maxLinearAccelerationPublisher = data.getDoubleTopic("Max Linear Acceleration").publish();
     DoublePublisher maxAngularVelocityPublisher = data.getDoubleTopic("Max Angular Velocity").publish();
     DoublePublisher maxAngularAccelerationPublisher = data.getDoubleTopic("Max Angular Acceleration").publish();
+    DoublePublisher wheelRadiusPublisher = data.getDoubleTopic("Wheel Radius").publish();
     DoubleArrayPublisher driveMotorErrors = data.getDoubleArrayTopic("Drive Motor Errors").publish();
     DoubleArrayPublisher angleMotorErrors = data.getDoubleArrayTopic("Angle Motor Errors").publish();
 
@@ -173,6 +174,8 @@ public class DriveTrainTuner extends Command {
     BooleanEntry updateAngleGainsEntry = control.getBooleanTopic("Update Angle Gains").getEntry(false);
     BooleanEntry updatePeaccyRequestEntry = control.getBooleanTopic("Update Peaccy Request").getEntry(false);
     BooleanEntry updateLimitsDeadbandsCurvesEntry = control.getBooleanTopic("Update Limits, Deadbands, Curves").getEntry(false);
+    BooleanEntry zeroOdometry = control.getBooleanTopic("Zero Odometry").getEntry(false);
+    DoubleEntry wheelRadiusCalculatorDistance = control.getDoubleTopic("Wheel Radius Calculator Distance (m)").getEntry(2);
     
     BooleanEntry resetMaxVelocitiesEntry = control.getBooleanTopic("Reset Max Velocities").getEntry(false);
     BooleanEntry useSoftHoldHeadingEntry = control.getBooleanTopic("Use Soft Hold Heading").getEntry(useSoftHoldHeading);
@@ -433,9 +436,14 @@ public class DriveTrainTuner extends Command {
         updateAngleGainsEntry.set(false);
         updatePeaccyRequestEntry.set(false);
         updateLimitsDeadbandsCurvesEntry.set(false);
+        zeroOdometry.set(false);
+
+        wheelRadiusCalculatorDistance.set(2);
 
         resetMaxVelocitiesEntry.set(false);
         useSoftHoldHeadingEntry.set(useSoftHoldHeading);
+
+        
 
         //curve choosers
         linearCurveChooser.addOption("Linear", CurveType.LINEAR);
@@ -489,6 +497,17 @@ public class DriveTrainTuner extends Command {
             updateLimitsDeadbandsCurvesEntry.set(false);
         }
 
+        //calculate the wheel radius from encoder distance and wheel rotations
+        //start by going from odometry x distance to wheel rotations with the current radius:
+        double wheelRotations = driveTrain.getPose().getTranslation().getX() / (2 * Math.PI * Constants.Swerve.gearing.wheelRadius);
+        if(wheelRotations != 0){
+            //then calculate the wheel radius to get to the specified distance with the wheel rotations:
+            double wheelRadius = wheelRadiusCalculatorDistance.get(2) / (2 * Math.PI * wheelRotations);
+            wheelRadiusPublisher.set(wheelRadius);
+        } else {
+            wheelRadiusPublisher.set(0);
+        }
+
 
         double xVelocity = xVelocitySup.getAsDouble();
         double yVelocity = yVelocitySup.getAsDouble();
@@ -499,11 +518,12 @@ public class DriveTrainTuner extends Command {
         boolean isFieldRelative = isFieldRelativeSup.getAsBoolean();
         boolean isOpenLoop = isOpenLoopSup.getAsBoolean();
         boolean isLockIn = isLockInSup.getAsBoolean();
-        boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean();
+        boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean() || zeroOdometry.get(false);
 
         if(isZeroOdometry) {
             driveTrain.resetOdometry();
             request.withHeading(driveTrain.getPose().getRotation().getRadians());
+            zeroOdometry.set(false);
         }
 
         // handle smoothing and deadbanding

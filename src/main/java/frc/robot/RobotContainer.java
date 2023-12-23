@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.vision.Limelight;
+import frc.robot.commands.drivetrain.DriveTrainTuner;
 import frc.robot.commands.drivetrain.PeaccyDrive;
 import frc.robot.subsystems.DriveTrain;
 
@@ -42,7 +43,7 @@ public class RobotContainer {
 
 
   /* COMMANDS */
-  private final PeaccyDrive peaccyDrive = new PeaccyDrive(driveTrain);
+  private final DriveTrainTuner peaccyDrive = new DriveTrainTuner(driveTrain);
 
   private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 

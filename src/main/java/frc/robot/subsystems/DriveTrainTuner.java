@@ -17,9 +17,9 @@ import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.JoystickCurves;
 import frc.robot.Constants;
-
 import static frc.robot.Constants.Swerve.*;
 
+@Deprecated
 public class DriveTrainTuner extends SubsystemBase {
     private PeaccefulSwerve swerve;
 
