@@ -376,7 +376,9 @@
               "_showGlyph": false,
               "Game/Game": "A2023_Charged_Up",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false
+              "Visuals/Show Outside Circles": false,
+              "Colors/Path": "#FFFFFFFF",
+              "Colors/Target Pose": "#FFFFFFFF"
             }
           },
           "12,2": {
@@ -525,7 +527,9 @@
               "_showGlyph": false,
               "Game/Game": "A2023_Charged_Up",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false
+              "Visuals/Show Outside Circles": false,
+              "Colors/Path": "#FFFFFFFF",
+              "Colors/Target Pose": "#FFFFFFFF"
             }
           },
           "6,5": {
@@ -678,7 +682,9 @@
               "_showGlyph": false,
               "Game/Game": "A2023_Charged_Up",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false
+              "Visuals/Show Outside Circles": false,
+              "Colors/Path": "#FFFFFFFF",
+              "Colors/Target Pose": "#FFFFFFFF"
             }
           },
           "0,0": {

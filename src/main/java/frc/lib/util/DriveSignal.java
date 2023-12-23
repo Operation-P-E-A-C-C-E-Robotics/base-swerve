@@ -2,6 +2,7 @@ package frc.lib.util;
 
 /**
  * A drivetrain command consisting of the left, right motor settings and whether the brake mode is enabled.
+ * #authentic2023experience
  */
 public class DriveSignal {
     protected double mLeftMotor;

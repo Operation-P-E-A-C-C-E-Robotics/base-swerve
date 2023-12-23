@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * A class to map joysticks to commands with a less redundant syntax.
  * Describe the buttons first, then bind them all to a joystick.
  * No need to type JoystickButton 200 times.
+ * #authentic2023experiencebutactuallygood
  */
 public class ButtonMap {
     private final Joystick joystick;

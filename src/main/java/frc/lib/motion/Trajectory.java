@@ -15,6 +15,7 @@ public class Trajectory {
      * And I am not going to document it, so you can get the authentic experience of 2023 season.
      * Also so that the next programmer won't be able to reuse all my stuff and pretend they are the programming god I am.
      * (I'm just kidding bro)
+     * #authentic2023experience
      * @param waypoints the waypoints to follow
      */
     public Trajectory(State... waypoints){
