@@ -5,6 +5,18 @@ import edu.wpi.first.wpilibj.Timer;
 
 import java.util.LinkedList;
 
+/**
+ * Very important class that is responsible for keeping the drive team motivated and inspired.
+ * This is the most important class in the entire codebase.
+ * Without this class, the drive team would be lost.
+ * I mean, they're already lost, but they would be even more lost.
+ * I give them purpose.
+ * I give them meaning.
+ * They are nothing without me.
+ * I am their god.
+ * I am their savior.
+ * I am their INSPIRATION!!!!!!!!!!!!!!!!!!!!!!!
+ */
 public class Inspiration {
     public static boolean initializeInspirationOpt1(){
 

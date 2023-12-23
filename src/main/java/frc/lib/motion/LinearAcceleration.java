@@ -51,6 +51,7 @@ public class LinearAcceleration {
         return fromVelocityAcceleration(Util.limit(velocity, maxVelocity), Util.limit(acceleration, maxAcceleration));
     }
 
+    //note from the future: don't worry about what these do, documentation is overrated.
     public LinearAcceleration limitAcceleration(double maxAcceleration){
         return fromAcceleration(Util.limit(acceleration, maxAcceleration), time);
     }
