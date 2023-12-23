@@ -32,10 +32,6 @@ public class DriveTrain extends SubsystemBase {
                                                                                         .withDriveRequestType(DriveRequestType.Velocity);
     private final SendableChooser<Pose2d> poseSeedChooser = new SendableChooser<>();
 
-
-    public PeaccefulSwerve getSwerve() {
-        return swerve;
-    }
     // private LimelightHelper limelight;
 
     public DriveTrain(Limelight limelight) {
@@ -133,7 +129,8 @@ public class DriveTrain extends SubsystemBase {
     }
 
     /**
-     * drive in a straight line to a target pose.
+     * drive in a straight line to a target pose. THIS IS DUMB BECAUSE
+     * THE RETURNED COMMAND ALWAYS FOLLOWS THE SAME PATH AND DOESN'T REGENERATE.
      * @param target the goal pose
      * @return the command to follow the path
      */

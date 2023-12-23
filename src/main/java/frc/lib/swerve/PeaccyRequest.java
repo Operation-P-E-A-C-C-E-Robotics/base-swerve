@@ -31,6 +31,27 @@ import frc.lib.util.Util;
  * and a bunch of other stuff. It's pretty cool. I think. I don't know. I'm just a monkey with a keyboard.
  * 
  * UPDATE: it was a good one. :D
+ * 
+ * here's a poem about actually thinking you wrote good code (and probably being delusional):
+ * Yeah bro my code legit so works,
+ * It always works, it never quirks,
+ * I'm sure it's fine,
+ * cause I tested it a million goddamn times
+ * So I can believe my code legit so works.
+ * Please don't tell me it doesn't work.
+ * I legit am getting pissed off with computer daily
+ * These poems are gettings worse and worse
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I hate programming.
+ * -Peaccy
  */
 public class PeaccyRequest implements SwerveRequest {
 

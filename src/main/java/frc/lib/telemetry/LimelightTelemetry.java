@@ -22,6 +22,7 @@ import frc.lib.vision.Limelight;
  * </ul>
  * 
  * A HOT MESS COURTESY OF PEACCY
+ * I LEGINTIMATELY HAVE NO IDEA WHAT I'M DOING
  */
 public class LimelightTelemetry {
     private static final NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("Limelight");

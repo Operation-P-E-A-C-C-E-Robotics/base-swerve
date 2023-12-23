@@ -9,6 +9,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * CTRE's way of writing out swerve constants is messy, hard to read, and documented like a wet fart, so I made this.
+ * 
+ * Here's a fun poem about improving other people's trash code:
+ * It is indeed quite a feat,
+ * writing code so impossibly neat,
+ * that's why you didn't do it, bro,
+ * so now you have to read my code,
+ * and wish you had written it so.
+ * Seriously, why couldn't you have written it so?
+ * Then I could have slept or fished or whatever, but no.
+ * -Peaccy
  */
 public class SwerveDescription {
 

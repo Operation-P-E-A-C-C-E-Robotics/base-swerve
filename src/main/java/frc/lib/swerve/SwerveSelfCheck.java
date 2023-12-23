@@ -124,6 +124,21 @@ public class SwerveSelfCheck extends Command {
      * Swerve Self Tester! :D
      * First, it will orient the wheels forward, then at 90 degrees, then spin them, then drive 1 meter forward
      * It checks for module current draw, how similar the module's motion is ("cohesion"), and how well the module tracks it's angle.
+     * Quite possibly the worst software to ever disgrace the earth.
+     * Plus, it doesn't work :D
+     * 
+     * Here is a fun poem about code that don't work:
+     * My goddam code dont work,
+     * It's making me go berserk,
+     * The game is in 2 weeks,
+     * Yet I'm feeling pretty bleak.
+     * A few more all nighters,
+     * Maybe I'll get it righter,
+     * However I must admit that i believe it to be the case that this is not likely to occur.
+     * My good sir, I do believe that this code is not functional, and i must say,
+     * My goddam code dont work.
+     * - peaccy
+     * 
      * @param swerve
      * @param requirements
      */

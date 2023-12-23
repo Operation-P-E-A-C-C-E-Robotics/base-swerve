@@ -37,12 +37,6 @@ import frc.robot.subsystems.DriveTrain;
  * This file cannot be understood,
  * I'm sorry for writing it, it's not good.
  * - Peaccy
- * 
- * Updated helper to tune the drivetrain constants & drive mode.
- * Functionally similar to PeaccyDrive but with:
- * - mutable limiters and constants
- * - ability to write new pid gains to modules
- * - tons and tons of dashboard controls
  */
 public class PeaccyTuner extends Command {
     /* CONSTANTS BUT MUTABLE */
