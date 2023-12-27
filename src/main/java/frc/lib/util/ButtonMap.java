@@ -1,6 +1,7 @@
 package frc.lib.util;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -415,6 +416,42 @@ public class ButtonMap {
         public static JoystickTrigger toggle(Joystick joystick, Command command, int axis, double threshold){
             return new JoystickTrigger(joystick, command, axis, threshold, TriggerType.TOGGLE);
         }
+    }
+
+    public static class Password implements OIEntry {
+        private final int[] password;
+        private final Command command;
+        private final Timer timer = new Timer();
+        private int i = 0;
+
+        public Password(Command command, int... password) {
+            this.command = command;
+            this.password = password;
+        }
+
+        @Override
+        public void bindTo(Trigger trigger) {
+            trigger.onTrue(command);
+        }
+
+        @Override
+        public Trigger getTrigger(Joystick joystick) {
+            return new Trigger(() -> {
+                timer.start();
+                if(joystick.getRawButton(password[i])) {
+                    i++;
+                    timer.reset();
+                } else if(timer.get() > 0.7) {
+                    i = 0;
+                }
+                if (i == password.length){
+                    i = 0;
+                    return true;
+                };
+                return false;
+            });
+        }
+
     }
 
     public static enum TriggerType {

@@ -12,9 +12,70 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.lib.safety.Inspiration;
+import frc.lib.util.ButtonMap;
+import frc.lib.util.ButtonMap.Password;
 import frc.lib.vision.Limelight;
 import frc.robot.commands.drivetrain.PeaccyDrive;
 import frc.robot.subsystems.DriveTrain;
+
+
+public class RobotContainer {
+  /* OI CONSTANTS */
+  private final int translationAxis = 5; //forward/backward
+  private final int strafeAxis = 4;
+  private final int rotationAxis = 0;
+  private final int zeroButtonNo = 7;
+  private final int fallbackButtonNo = 7;
+  private final int fallbackResetButtonNo = 8;
+
+  /* SENSORS */
+  Limelight limelight = new Limelight("limelight");
+
+  /* SUBSYSTEMS */
+  //ONE OF THESE MUST BE COMMENTED OUT. ONLY USE THE TUNEABLE ONE FOR TUNING.
+  private final DriveTrain driveTrain = new DriveTrain(limelight);
+  // private final DriveTrainTuner driveTrainTuneable = new DriveTrainTuner();
+
+  /* OI DEFINITIONS */
+  private final Joystick driverController = new Joystick(0);
+  
+  private final JoystickButton zeroButton = new JoystickButton(driverController, zeroButtonNo); //for debugging
+  private final JoystickButton driveFallbackButton = new JoystickButton(driverController, fallbackButtonNo);
+  private final JoystickButton driveFallbackResetButton = new JoystickButton(driverController, fallbackResetButtonNo);
+
+
+  /* COMMANDS */
+  private final PeaccyDrive peaccyDrive = new PeaccyDrive(driveTrain);
+
+  private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
+
+  public RobotContainer() {
+    configureBindings();
+    SmartDashboard.putData("AUTO MODE", autoChooser);
+  }
+
+  private void configureBindings() {
+    peaccyDrive.withTranslation(() -> -driverController.getRawAxis(translationAxis))
+               .withStrafe     (() -> -driverController.getRawAxis(strafeAxis))
+               .withRotation   (() -> -driverController.getRawAxis(rotationAxis))
+               .withHeading    (() -> (double) -driverController.getPOV())
+               .useHeading     (() -> driverController.getPOV() != -1)
+               .isFieldRelative(() -> driverController.getRawAxis(2) < 0.2) //left trigger
+               .isLockIn       (() -> driverController.getRawAxis(3) > 0.2) //right trigger
+               .isZeroOdometry (() -> zeroButton.getAsBoolean())
+               .isOpenLoop     (() -> true);
+    driveTrain.setDefaultCommand(peaccyDrive);
+    driveFallbackButton.onTrue(new InstantCommand(peaccyDrive::fallback, driveTrain)); 
+    driveFallbackResetButton.onTrue(new InstantCommand(peaccyDrive::resetFallback, driveTrain));
+    driveTrain.register(driverController);
+  }
+
+
+  public Command getAutonomousCommand() {
+    return AutoBuilder.followPathWithEvents(PathPlannerPath.fromPathFile("Example Path"));
+  }
+}
 
 /**
  * Welcome to the last robot code I'm ever writing.
@@ -71,8 +132,8 @@ import frc.robot.subsystems.DriveTrain;
  * It was quite the experience. I wrote the entire codebase long, long before the robot was built. I
  * debugged the entire thing using a simulation. It was a 10,000 line work of art. I was very uncertain
  * that it would work. When the robot was finally built, I looked at my watch, and realized that it was about
- * 2 hours before our first competition. Until this point, i had run various parts of the code on subsystems
- * in the breif intervals that they were free from the furious clutches of mechanical team's frantic assmebling.
+ * 2 hours before our first competition. Until this point, i had only been able to run various parts of the code on
+ * individual subsytems in the breif intervals that they were free from the furious clutches of mechanical team's frantic assmebling.
  * In that 2 hours, all the decisions I had made in the code really shined, as I tuned all the state-space controllers
  * in about 15 minutes, and spent the rest tuning some setpoints.
  *    We did solidly mediocre at the first competition, very middle-ranked. Our robot suffered from butterfingers,
@@ -125,58 +186,3 @@ import frc.robot.subsystems.DriveTrain;
  * - Peaccy, a.k.a. Sean Benham, a.k.a. "the programmer" - 00:00 12/23/23
  * 
  */
-public class RobotContainer {
-  /* OI CONSTANTS */
-  private final int translationAxis = 5; //forward/backward
-  private final int strafeAxis = 4;
-  private final int rotationAxis = 0;
-  private final int zeroButtonNo = 7;
-  private final int fallbackButtonNo = 7;
-  private final int fallbackResetButtonNo = 8;
-
-  /* SENSORS */
-  Limelight limelight = new Limelight("limelight");
-
-  /* SUBSYSTEMS */
-  //ONE OF THESE MUST BE COMMENTED OUT. ONLY USE THE TUNEABLE ONE FOR TUNING.
-  private final DriveTrain driveTrain = new DriveTrain(limelight);
-  // private final DriveTrainTuner driveTrainTuneable = new DriveTrainTuner();
-
-  /* OI DEFINITIONS */
-  private final Joystick driverController = new Joystick(0);
-  
-  private final JoystickButton zeroButton = new JoystickButton(driverController, zeroButtonNo); //for debugging
-  private final JoystickButton driveFallbackButton = new JoystickButton(driverController, fallbackButtonNo);
-  private final JoystickButton driveFallbackResetButton = new JoystickButton(driverController, fallbackResetButtonNo);
-
-
-  /* COMMANDS */
-  private final PeaccyDrive peaccyDrive = new PeaccyDrive(driveTrain);
-
-  private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
-
-  public RobotContainer() {
-    configureBindings();
-    SmartDashboard.putData("AUTO MODE", autoChooser);
-  }
-
-  private void configureBindings() {
-    peaccyDrive.withTranslation(() -> -driverController.getRawAxis(translationAxis))
-               .withStrafe     (() -> -driverController.getRawAxis(strafeAxis))
-               .withRotation   (() -> -driverController.getRawAxis(rotationAxis))
-               .withHeading    (() -> (double) -driverController.getPOV())
-               .useHeading     (() -> driverController.getPOV() != -1)
-               .isFieldRelative(() -> driverController.getRawAxis(2) < 0.2) //left trigger
-               .isLockIn       (() -> driverController.getRawAxis(3) > 0.2) //right trigger
-               .isZeroOdometry (() -> zeroButton.getAsBoolean())
-               .isOpenLoop(() -> true);
-    driveTrain.setDefaultCommand(peaccyDrive);
-    driveFallbackButton.onTrue(new InstantCommand(peaccyDrive::fallback, driveTrain)); 
-    driveFallbackResetButton.onTrue(new InstantCommand(peaccyDrive::resetFallback, driveTrain));
-  }
-
-
-  public Command getAutonomousCommand() {
-    return AutoBuilder.followPathWithEvents(PathPlannerPath.fromPathFile("Example Path"));
-  }
-}

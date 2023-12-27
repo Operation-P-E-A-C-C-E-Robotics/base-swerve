@@ -36,7 +36,6 @@ public final class Constants {
     public static final double teleopLinearAngleLimit = 2.0;
     public static final double teleopAngularRateLimit = 3.0;
 
-
     //deadband
     public static final double teleopLinearSpeedDeadband = 0.1;
     public static final double teleopAngularVelocityDeadband = 0.13;
@@ -93,7 +92,6 @@ public final class Constants {
                               pathfollowingMaxAngularVelocity = 360,
                               pathfollowingMaxAngularAcceleration = 360;
 
-    //TODO
     public static final double measuredMaxVelocity = 3,
                               measuredMaxAcceleration = 3,
                               measuredMaxAngularVelocity = 360,
@@ -121,6 +119,7 @@ public final class Constants {
     public static final ModuleType PDPModuleType = ModuleType.kCTRE;
   }
 
+  //stolen from 364 :D
   public class DriveGearRatios{
     /** SDS MK3 - 8.16 : 1 */
     public static final double SDSMK3_Standard = (8.16 / 1.0);
