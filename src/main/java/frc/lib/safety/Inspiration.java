@@ -2,10 +2,12 @@ package frc.lib.safety;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.lib.util.ButtonMap;
-import frc.lib.util.ButtonMap.Password;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+// import frc.lib.util.ButtonMap;
+// import frc.lib.util.ButtonMap.Password;
 
 import java.util.LinkedList;
 
@@ -227,8 +229,7 @@ public class Inspiration {
     }
 
     public static void fullPeacce(Joystick j){
-        var wow = new ButtonMap(j);
-        wow.map(new Password(new InstantCommand(() -> {
+        var command = new InstantCommand(() -> {
 System.out.println("             _____                    _____                    _____                    _____                    _____                _____           ");
 System.out.println("            /\\    \\                  /\\    \\                  /\\    \\                  /\\    \\                  /\\    \\              |\\    \\         ");              
 System.out.println("           /::\\    \\                /::\\    \\                /::\\    \\                /::\\    \\                /::\\    \\             |:\\____\\        ");              
@@ -320,6 +321,10 @@ System.out.println("              |     |  |     |");
 System.out.println("              |/~~~\\|  |/~~~\\|");
 System.out.println("              /|___|\\  /|___|\\");
 System.out.println("             <_______><_______>");
-        }),9,10,5,6,5,6,5,5,6,6,1));
+        });
+
+        // var wow = new ButtonMap(j);
+        // wow.map(new Password(command,9,10,5,6,5,6,5,5,6,6,1));
+        new Trigger(RobotController::getUserButton).onTrue(command);
     }
 }

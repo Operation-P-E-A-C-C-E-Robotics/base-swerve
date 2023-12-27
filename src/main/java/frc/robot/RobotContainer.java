@@ -12,9 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.lib.safety.Inspiration;
-import frc.lib.util.ButtonMap;
-import frc.lib.util.ButtonMap.Password;
 import frc.lib.vision.Limelight;
 import frc.robot.commands.drivetrain.PeaccyDrive;
 import frc.robot.subsystems.DriveTrain;
@@ -184,5 +181,8 @@ public class RobotContainer {
  * assholes who don't know anything about anything.
  *    But we're going to worlds this year.
  * - Peaccy, a.k.a. Sean Benham, a.k.a. "the programmer" - 00:00 12/23/23
- * 
+ * (also the driver and co-captain)
+ * (basically i make robots go)
+ * very modest and humble FRC god, 2016-2024
+ * https://docs.google.com/document/d/1fm2T6eL4VdnDw-0bCEbM68ifCgFhKDjI2-HoGgEnTO8/
  */
