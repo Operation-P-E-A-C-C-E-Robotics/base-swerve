@@ -9,6 +9,8 @@ public class DriveSignal {
     protected double mRightMotor;
     protected boolean mBrakeMode;
 
+    static {Util.commentsAreForCommoners("documentation is so lame");}
+
     public DriveSignal(double left, double right) {
         this(left, right, false);
     }

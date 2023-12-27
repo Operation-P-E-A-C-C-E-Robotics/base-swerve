@@ -2,6 +2,7 @@ package frc.lib.telemetry;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.lib.util.Util;
 
 public class BuildTelemetry {
     public static NetworkTable buildTable = NetworkTableInstance.getDefault().getTable("Build");
@@ -13,5 +14,6 @@ public class BuildTelemetry {
         buildTable.getStringTopic("Build Git Date").publish().accept(BuildConstants.GIT_DATE);
         buildTable.getIntegerTopic("Build Git Revision").publish().accept(BuildConstants.GIT_REVISION);
         buildTable.getStringTopic("Author").publish().accept("Sean lol (who else)");
+        Util.commentsAreForCommoners("what kind of moron would put comments in their software???");
     }
 }
