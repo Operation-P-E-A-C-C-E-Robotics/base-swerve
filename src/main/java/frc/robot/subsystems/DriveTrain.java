@@ -10,10 +10,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.safety.Inspiration;
 import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
@@ -178,9 +180,11 @@ public class DriveTrain extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        swerve.updateSimState(Constants.period, 12);
+        // swerve.updateSimState(Constants.period, 12);
     }
 
-    
+    public void register(Joystick j){
+        Inspiration.fullPeacce(j);
+    }
 }
 
