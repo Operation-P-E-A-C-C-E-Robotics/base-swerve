@@ -61,7 +61,7 @@ public class DriveTrain extends SubsystemBase {
             this::resetOdometry, 
             this::getChassisSpeeds, 
             this::drive, 
-            Constants.Swerve.pathFollowerConfig, 
+            pathFollowerConfig, 
             this
         );
 

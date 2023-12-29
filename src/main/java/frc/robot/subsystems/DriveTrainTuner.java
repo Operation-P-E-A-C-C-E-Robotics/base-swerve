@@ -60,6 +60,7 @@ public class DriveTrainTuner extends SubsystemBase {
 
     /**
      * DO NOT USE THIS INSTEAD OF DriveTrain.java
+     * Repalced by PeaccyTuner
      * HAS BUILT IN DRIVE MODE SO DOESNT WORK WITH COMMANDS
      * This is a copy of DriveTrain.java that is used for tuning the drivetrain.
      * It is not used in the actual robot code.
