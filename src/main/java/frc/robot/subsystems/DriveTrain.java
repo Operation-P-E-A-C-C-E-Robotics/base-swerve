@@ -19,6 +19,7 @@ import frc.lib.safety.Inspiration;
 import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
+import frc.lib.telemetry.LimelightTelemetry;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
@@ -180,6 +181,8 @@ public class DriveTrain extends SubsystemBase {
             Pose2d pose = results.getBotPose2d_wpiBlue();
             swerve.addVisionMeasurement(pose, results.timestamp_RIOFPGA_capture); //todo right timestamp?
         }
+
+        LimelightTelemetry.update(primaryLLName, swerve.getPose3d());
     }
 
     @Override
