@@ -8,7 +8,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import frc.lib.safety.Value;
-import frc.lib.vision.Limelight;
+import frc.lib.vision.depricated.Limelight;
 
 /**
  * Telemetry for a limelight camera, intended for use with apriltag tracking.

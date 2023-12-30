@@ -20,7 +20,7 @@ import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.telemetry.SwerveTelemetry;
-import frc.lib.vision.Limelight;
+import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
@@ -36,7 +36,7 @@ public class DriveTrain extends SubsystemBase {
 
     // private LimelightHelper limelight;
 
-    public DriveTrain(Limelight limelight) {
+    public DriveTrain() {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
             frontLeftIDs, 
@@ -76,8 +76,6 @@ public class DriveTrain extends SubsystemBase {
         SmartDashboard.putBoolean("seed pose", false);
 
         System.out.println("DriveTrain Initialized");
-
-        // this.limelight = limelight;
     }
 
     /**
@@ -175,7 +173,13 @@ public class DriveTrain extends SubsystemBase {
             resetOdometry(poseSeedChooser.getSelected());
             SmartDashboard.putBoolean("seed pose", false);
         }
-        // limelight.updateCTRESwerveOdometry(swerve, getPose(), getChassisSpeeds()); causes errer for some reason
+
+        //update odometry from limelight
+        var results = LimelightHelpers.getLatestResults(Constants.Swerve.primaryLLName).targetingResults;
+        if(results.botpose.length == 6) {
+            Pose2d pose = results.getBotPose2d_wpiBlue();
+            swerve.addVisionMeasurement(pose, results.timestamp_RIOFPGA_capture); //todo right timestamp?
+        }
     }
 
     @Override

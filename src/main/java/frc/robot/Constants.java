@@ -113,6 +113,8 @@ public final class Constants {
       new ReplanningConfig(true, true),
       period
     );
+
+    public static final String primaryLLName = "limelight";
   }
 
   public static final class ControlSystem {

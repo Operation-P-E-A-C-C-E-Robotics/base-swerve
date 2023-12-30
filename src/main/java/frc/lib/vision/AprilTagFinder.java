@@ -8,7 +8,7 @@ import frc.lib.util.Median;
 
 public class AprilTagFinder {
     private final int observations = 50;
-    private Limelight limelight;
+    private String limelight;
     private Median medianX = new Median(observations);
     private Median medianY = new Median(observations);
     private Median medianZ = new Median(observations);
@@ -18,13 +18,14 @@ public class AprilTagFinder {
     private Median medianZQ = new Median(observations);
 
 
-    public AprilTagFinder(Limelight limelight){
+    public AprilTagFinder(String limelight){
         this.limelight = limelight;
     }
 
     public void update(Pose3d robotPose) {
-        if(!limelight.hasTarget()) return;
-        Pose3d tagFromBot = limelight.getTagPoseFromRobot().get(new Pose3d());
+        var results = LimelightHelpers.getLatestResults(limelight).targetingResults;
+        if(results.targets_Fiducials.length == 0) return;
+        Pose3d tagFromBot = results.targets_Fiducials[0].getTargetPose_RobotSpace();
         Pose3d tagFromField = robotPose.plus(new Transform3d(tagFromBot.getTranslation(), tagFromBot.getRotation()));
         medianX.add(tagFromField.getTranslation().getX());
         medianY.add(tagFromField.getTranslation().getY());
