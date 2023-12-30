@@ -45,7 +45,8 @@ public final class Constants {
     public static final DoubleFunction <Double> teleopAngularVelocityCurve = (double angularVelocity) -> JoystickCurves.powerCurve(angularVelocity, 2); //TODO decide if the driver (me) wants a curve on this or not.
 
     //number of loops to keep track of position correction for (so multiply by 20ms to get the duration the correction is considering)
-    public static final int teleopPositionCorrectionIters = 4; 
+    //todo too slow?
+    public static final int teleopPositionCorrectionIters = 0; 
 
 
 

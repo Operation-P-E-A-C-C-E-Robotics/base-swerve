@@ -191,6 +191,8 @@ public class PeaccyRequest implements SwerveRequest {
         //wowie make it go.
         var states = parameters.kinematics.toSwerveModuleStates(speeds, new Translation2d());
 
+        SwerveTelemetry.updateRequestedState(states);
+
         for (int i = 0; i < modulesToApply.length; ++i) {
             modulesToApply[i].apply(states[i], IsOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity);
         }
@@ -345,6 +347,7 @@ public class PeaccyRequest implements SwerveRequest {
                 holdHeadingVelocity,
                 holdHeadingAcceleration 
             );
+            
             holdHeadingTrajectoryTimer.reset();
             holdHeadingTrajectoryTimer.start();
         }
@@ -362,8 +365,10 @@ public class PeaccyRequest implements SwerveRequest {
 
         var feedforward = headingFeedforward.calculate(target.velocity, acceleration);
         var pGain = error * holdHeadingkP * parameters.updatePeriod;
-        var currentDraw = currentLimitSmoother.calculate(totalDriveCurrent.getAsDouble());
-        if(SoftHoldHeading) pGain = pGain * compress(currentDraw, totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
+        if(SoftHoldHeading) {
+            var currentDraw = currentLimitSmoother.calculate(totalDriveCurrent.getAsDouble());
+            pGain = pGain * compress(currentDraw, totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
+        }
         var delta = pGain + feedforward;
 
         SwerveTelemetry.updateAutoHeading(
@@ -411,6 +416,11 @@ public class PeaccyRequest implements SwerveRequest {
 
         Translation2d realPositionDelta = currentPose.getTranslation().minus(positionCorrectionRealPositions.getFirst());
         Translation2d positionError = requestedPositionDelta.minus(realPositionDelta);
+
+        SwerveTelemetry.updatePositionCorrection(
+            requestedPositionDelta,
+            realPositionDelta
+        );
 
         Translation2d newRequestedVelocity = requestedTranslation.plus(positionError.times(PositionCorrectionWeight));
         return newRequestedVelocity;

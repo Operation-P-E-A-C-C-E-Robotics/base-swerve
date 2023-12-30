@@ -87,7 +87,14 @@
             "open": true
           },
           "open": true
-        }
+        },
+        "Translation2d##v_/Swerve/Position Correction Measured Delta": {
+          "open": true
+        },
+        "Translation2d##v_/Swerve/Position Correction Requested Delta": {
+          "open": true
+        },
+        "open": true
       }
     }
   }

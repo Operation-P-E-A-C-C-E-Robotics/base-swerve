@@ -61,7 +61,7 @@ public class RobotContainer {
                .isFieldRelative(() -> driverController.getRawAxis(2) < 0.2) //left trigger
                .isLockIn       (() -> driverController.getRawAxis(3) > 0.2) //right trigger
                .isZeroOdometry (() -> zeroButton.getAsBoolean())
-               .isOpenLoop     (() -> true);
+               .isOpenLoop     (() -> false);
     driveTrain.setDefaultCommand(peaccyDrive);
     driveFallbackButton.onTrue(new InstantCommand(peaccyDrive::fallback, driveTrain)); 
     driveFallbackResetButton.onTrue(new InstantCommand(peaccyDrive::resetFallback, driveTrain));

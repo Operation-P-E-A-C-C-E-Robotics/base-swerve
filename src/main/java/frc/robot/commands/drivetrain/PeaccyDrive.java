@@ -236,7 +236,7 @@ public class PeaccyDrive extends Command {
                //true will use pid control to maintain heading, or set to "isAutoHeading" if you want to only turn to specified headings 
                //rather than holding whatever direction you're facing :)
                .withHoldHeading(true)
-               .withPositionCorrectionIterations(4);
+               .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
 
         //update the robot's target heading if we're using auto heading
         if(isAutoHeading) {

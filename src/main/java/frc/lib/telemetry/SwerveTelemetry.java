@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -31,7 +32,9 @@ public class SwerveTelemetry {
     private static final StructPublisher<Pose3d> pathplannerTargetPosePublisher = swerveTable.getStructTopic("Target Pose", Pose3d.struct).publish();
     private static final StructArrayPublisher <Pose2d> pathplannerTrajectoryPublisher = swerveTable.getStructArrayTopic("Path", Pose2d.struct).publish();
     
-    private static final DoubleArrayPublisher swerveDataPublisher = swerveTable.getDoubleArrayTopic("Swerve Data").publish();
+    private static final DoubleArrayPublisher swerveDataPublisher = swerveTable.getDoubleArrayTopic("Swerve Measured Data").publish();
+    private static final DoubleArrayPublisher swerveRequestedData = swerveTable.getDoubleArrayTopic("Swerve Requested Data").publish();
+
     private static final DoublePublisher measuredXVelocity = swerveTable.getDoubleTopic("Measured X Velocity").publish();
     private static final DoublePublisher measuredYVelocity = swerveTable.getDoubleTopic("Measured Y Velocity").publish();
     private static final DoublePublisher measuredAngularVelocity = swerveTable.getDoubleTopic("Measured Angular Velocity").publish();
@@ -64,6 +67,9 @@ public class SwerveTelemetry {
     private static final DoublePublisher autoHeadingTrajectoryAcceleration = autoHeadingTable.getDoubleTopic("Trajectory Acceleration").publish();
     private static final DoublePublisher autoHeadingTrajectoryPosition = autoHeadingTable.getDoubleTopic("Trajectory Position").publish();
     private static final BooleanPublisher autoHeadingCurrentLimited = autoHeadingTable.getBooleanTopic("Current Limited").publish();
+
+    private static final StructPublisher <Translation2d> positionCorrectionDeltaPublisher = swerveTable.getStructTopic("Position Correction Requested Delta", Translation2d.struct).publish();
+    private static final StructPublisher <Translation2d> positionCorrectionMeasuredPublisher = swerveTable.getStructTopic("Position Correction Measured Delta", Translation2d.struct).publish();
 
     
     private static final Mechanism2d swerve = new Mechanism2d(5, 5);
@@ -179,49 +185,26 @@ public class SwerveTelemetry {
         autoHeadingCurrentLimited.accept(isCurrentLimited);
     }
 
+    public static void updateRequestedState(SwerveModuleState... states){
+        //required for advantagescope:
+        // [
+        //     rotation_1, velocity_1,
+        //     rotation_2, velocity_2,
+        //     rotation_3, velocity_3,
+        //     rotation_4, velocity_4
+        // ]
 
+        double[] swerveRequestedData = new double[]{
+            states[0].angle.getDegrees(), states[0].speedMetersPerSecond,
+            states[1].angle.getDegrees(), states[1].speedMetersPerSecond,
+            states[2].angle.getDegrees(), states[2].speedMetersPerSecond,
+            states[3].angle.getDegrees(), states[3].speedMetersPerSecond
+        };
+        SwerveTelemetry.swerveRequestedData.accept(swerveRequestedData);
+    }
 
-    //Peaccy Request Data
-    private static final NetworkTable peaccyRequestTable = swerveTable.getSubTable("Peaccy Request");
-    private static final DoublePublisher peaccyRequestedXVelocity = peaccyRequestTable.getDoubleTopic("VelocityX").publish();
-    private static final DoublePublisher peaccyRequestedYVelocity = peaccyRequestTable.getDoubleTopic("VelocityY").publish();
-    private static final DoublePublisher peaccyRequestedAngularVelocity = peaccyRequestTable.getDoubleTopic("RotationalRate").publish();
-    private static final BooleanPublisher peaccyRequestedHeading = peaccyRequestTable.getBooleanTopic("Heading").publish();
-    private static final BooleanPublisher peaccyRequestedHoldHeading = peaccyRequestTable.getBooleanTopic("HoldHeading").publish();
-    private static final BooleanPublisher peaccyRequestedSoftHoldHeading = peaccyRequestTable.getBooleanTopic("SoftHoldHeading").publish();
-    private static final BooleanPublisher peaccyRequestedOpenLoop = peaccyRequestTable.getBooleanTopic("IsOpenLoop").publish();
-    private static final BooleanPublisher peaccyRequestFieldCentric = peaccyRequestTable.getBooleanTopic("IsFieldCentric").publish();
-    private static final DoublePublisher peaccyPositionCorrectionIterations = peaccyRequestTable.getDoubleTopic("PositionCorrectionIterations").publish();
-    private static final DoublePublisher peaccyHeadingError = peaccyRequestTable.getDoubleTopic("Heading Error").publish();
-    private static final StructPublisher<Translation2d> preCorrectionTranslation = peaccyRequestTable.getStructTopic("Pre-Correction Translation", Translation2d.struct).publish();
-    private static final StructPublisher<Translation2d> postCorrectionTranslation = peaccyRequestTable.getStructTopic("Post-Correction Translation", Translation2d.struct).publish();
-    private static final StructPublisher<Pose2d> correctionTargetPose = peaccyRequestTable.getStructTopic("Correction Target Pose", Pose2d.struct).publish();
-
-    public static void updatePeaccyRequestData(double requestedXVelocity, 
-                                                double requestedYVelocity, 
-                                                double requestedAngularVelocity, 
-                                                boolean isFieldRelative, 
-                                                boolean isOpenLoop, 
-                                                boolean isHeading, 
-                                                boolean isHoldHeading, 
-                                                boolean isSoftHoldHeading, 
-                                                double positionCorrectionIterations, 
-                                                double headingError, 
-                                                Translation2d preCorrectionTranslation2d, 
-                                                Translation2d postCorrectionTranslation2d, 
-                                                Pose2d correctionTargetPose2d) {
-        peaccyRequestedXVelocity.accept(requestedXVelocity);
-        peaccyRequestedYVelocity.accept(requestedYVelocity);
-        peaccyRequestedAngularVelocity.accept(requestedAngularVelocity);
-        peaccyRequestFieldCentric.accept(isFieldRelative);
-        peaccyRequestedOpenLoop.accept(isOpenLoop);
-        peaccyRequestedHeading.accept(isHeading);
-        peaccyRequestedHoldHeading.accept(isHoldHeading);
-        peaccyRequestedSoftHoldHeading.accept(isSoftHoldHeading);
-        peaccyPositionCorrectionIterations.accept(positionCorrectionIterations);
-        peaccyHeadingError.accept(headingError);
-        preCorrectionTranslation.accept(preCorrectionTranslation2d);
-        postCorrectionTranslation.accept(postCorrectionTranslation2d);
-        correctionTargetPose.accept(correctionTargetPose2d);
+    public static void updatePositionCorrection(Translation2d delta, Translation2d measured){
+        positionCorrectionDeltaPublisher.accept(delta);
+        positionCorrectionMeasuredPublisher.accept(measured);
     }
 }

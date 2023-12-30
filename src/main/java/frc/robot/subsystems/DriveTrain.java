@@ -180,7 +180,7 @@ public class DriveTrain extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        // swerve.updateSimState(Constants.period, 12);
+        swerve.updateSimState(Constants.period, 12);
     }
 
     public void register(Joystick j){
