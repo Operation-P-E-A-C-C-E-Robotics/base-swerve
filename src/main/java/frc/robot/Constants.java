@@ -37,8 +37,8 @@ public final class Constants {
     public static final double teleopAngularRateLimit = 3.0;
 
     //deadband
-    public static final double teleopLinearSpeedDeadband = 0.1;
-    public static final double teleopAngularVelocityDeadband = 0.13;
+    public static final double teleopLinearSpeedDeadband = 0.15;
+    public static final double teleopAngularVelocityDeadband = 0.2;
     public static final double teleopDeadbandDebounceTime = 0.1;
 
     public static final DoubleFunction <Double> teleopLinearSpeedCurve = (double linearSpeed) -> JoystickCurves.herraFCurve(linearSpeed, 6, 4.5); //a nice gentle curve which is Peaccy's (me!!) favorite :)
@@ -76,13 +76,13 @@ public final class Constants {
     public static final boolean invertSteerMotors = Robot.isReal(); //cant invert in simulation which is dumb.
 
     /* HEADING CONTROLLER CONSTANTS */
-    public static final double autoHeadingKP = 1500;
+    public static final double autoHeadingKP = 500;
     public static final double autoHeadingKI = 0.0; //DOES NOTHING LOL
     public static final double autoHeadingKD = 0.0; //ALSO DOES NOTHING LOL
-    public static final double autoHeadingKV = 0.0;
-    public static final double autoHeadingKA = 0.0;
-    public static final double autoHeadingMaxVelocity = 50; //deg/s (i think)
-    public static final double autoHeadingMaxAcceleration = 70; //deg/s^2
+    public static final double autoHeadingKV = 0.7;
+    public static final double autoHeadingKA = 0.02;
+    public static final double autoHeadingMaxVelocity = 3; //deg/s (i think)
+    public static final double autoHeadingMaxAcceleration = 10; //deg/s^2
     public static final boolean useSoftHoldHeading = false;
     public static final double softHeadingCurrentLimit = 30;
 

@@ -4,16 +4,12 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.safety.Inspiration;
 import frc.lib.swerve.PeaccefulSwerve;
@@ -25,8 +21,6 @@ import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
-
-import java.util.List;
 
 public class DriveTrain extends SubsystemBase {
     protected final PeaccefulSwerve swerve;
@@ -57,14 +51,7 @@ public class DriveTrain extends SubsystemBase {
         swerve.setSteerCurrentLimit(steerMotorCurrentLimit);
 
         //pathplanner config
-        AutoBuilder.configureHolonomic(
-            this::getPose, 
-            this::resetOdometry, 
-            this::getChassisSpeeds, 
-            this::drive, 
-            pathFollowerConfig, 
-            this
-        );
+        AutoBuilder.configureHolonomic(this::getPose, this::resetOdometry, this::getChassisSpeeds, this::drive, pathFollowerConfig, () -> false, this);
 
         //log swerve state data as fast as it comes in
         swerve.registerTelemetry((SwerveDriveState state) -> {
@@ -135,25 +122,25 @@ public class DriveTrain extends SubsystemBase {
      * @param target the goal pose
      * @return the command to follow the path
      */
-    public Command driveToPose(Pose2d target){
-        //the target rotation is the angle of the curve, and we want to go in a straight line, so it
-        //needs to be the angle between the robot and the target
-        Rotation2d targetRotation = target.minus(getPose()).getRotation();
+    // public Command driveToPose(Pose2d target){
+    //     //the target rotation is the angle of the curve, and we want to go in a straight line, so it
+    //     //needs to be the angle between the robot and the target
+    //     Rotation2d targetRotation = target.minus(getPose()).getRotation();
 
-        //bezier curve from the current pose to the target pose
-        List<Translation2d> waypoints = PathPlannerPath.bezierFromPoses(
-            getPose(), 
-            new Pose2d(target.getTranslation(), targetRotation)
-        );
+    //     //bezier curve from the current pose to the target pose
+    //     List<Translation2d> waypoints = PathPlannerPath.bezierFromPoses(
+    //         getPose(), 
+    //         new Pose2d(target.getTranslation(), targetRotation)
+    //     );
 
-        PathPlannerPath path = new PathPlannerPath(
-            waypoints,
-            Constants.Swerve.autoMaxSpeed,
-            new GoalEndState(0.0, target.getRotation())
-        );
+    //     PathPlannerPath path = new PathPlannerPath(
+    //         waypoints,
+    //         Constants.Swerve.autoMaxSpeed,
+    //         new GoalEndState(0.0, target.getRotation())
+    //     );
 
-        return AutoBuilder.followPathWithEvents(path);
-    }
+    //     return AutoBuilder.followPathWithEvents(path);
+    // }
 
     public double getTotalDriveCurrent(){
         return swerve.getTotalDriveCurrent();

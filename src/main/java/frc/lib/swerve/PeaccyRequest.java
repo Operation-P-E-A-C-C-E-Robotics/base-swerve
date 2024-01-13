@@ -321,7 +321,9 @@ public class PeaccyRequest implements SwerveRequest {
         this.PositionCorrectionWeight = Util.limit(positionCorrectionWeight,0,1);
         return this;
     }
+    
 
+    double prevHeading = 0;
     /**
      * Get the rotation rate to apply to the robot to go to the target heading
      */
@@ -329,7 +331,7 @@ public class PeaccyRequest implements SwerveRequest {
         var currentHeading = parameters.currentPose.getRotation().getRadians();
         SmartDashboard.putNumber("current heading", currentHeading);
 
-        //make sure our odometry heading is within 180 degrees of the target heading to prevent it from wrapping LIKE CTRE DOES >:(
+        //make sure our odometry heading is within +/- 180 degrees of the target heading to prevent it from wrapping LIKE CTRE DOES >:(
         while (Math.abs(currentHeading - Heading) > Math.PI) {
             if (currentHeading > Heading) {
                 currentHeading -= 2 * Math.PI;
@@ -340,9 +342,9 @@ public class PeaccyRequest implements SwerveRequest {
         SmartDashboard.putNumber("current heading fixed", currentHeading);
 
         //regenerate the trajectory if the target heading has changed
-        if(Heading != headingTrajectory.getTarget().position) {
+        if(Heading != headingTrajectory.getTarget().position || Math.abs(currentHeading - prevHeading) > (Math.PI/4)) {
             headingTrajectory = Trajectory.trapezoidTrajectory(
-                new State(currentHeading, getChassisSpeeds.get().omegaRadiansPerSecond), 
+                new State(currentHeading, 0), 
                 new State(Heading, 0), 
                 holdHeadingVelocity,
                 holdHeadingAcceleration 
@@ -352,6 +354,8 @@ public class PeaccyRequest implements SwerveRequest {
             holdHeadingTrajectoryTimer.start();
         }
 
+        prevHeading = currentHeading;
+
         
         //calculate the correction
         var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod);
@@ -359,7 +363,7 @@ public class PeaccyRequest implements SwerveRequest {
 
         var acceleration = (target.velocity - getChassisSpeeds.get().omegaRadiansPerSecond);
 
-        if(robotMovingTimer.get() < 0.3 && Math.abs(error) < 0.2){
+        if(robotMovingTimer.get() < 0.3 && Math.abs(error) < 0.002){
             return 0;
         }
 

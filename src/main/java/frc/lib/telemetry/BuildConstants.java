@@ -5,15 +5,15 @@ package frc.lib.telemetry;
  */
 public final class BuildConstants {
     public static final String MAVEN_GROUP = "";
-    public static final String MAVEN_NAME = "base-swerve-2024";
+    public static final String MAVEN_NAME = "base-swerve-2024-Imported";
     public static final String VERSION = "unspecified";
-    public static final int GIT_REVISION = 159;
-    public static final String GIT_SHA = "0fd2cdcd0731a56904cd066c453e270cf3e813e5";
-    public static final String GIT_DATE = "2023-12-30 18:09:34 EST";
-    public static final String GIT_BRANCH = "needs-testing";
-    public static final String BUILD_DATE = "2023-12-30 18:16:51 EST";
-    public static final long BUILD_UNIX_TIME = 1703978211816L;
-    public static final int DIRTY = 1;
+    public static final int GIT_REVISION = -1;
+    public static final String GIT_SHA = "UNKNOWN";
+    public static final String GIT_DATE = "UNKNOWN";
+    public static final String GIT_BRANCH = "UNKNOWN";
+    public static final String BUILD_DATE = "2024-01-13 10:26:48 EST";
+    public static final long BUILD_UNIX_TIME = 1705159608093L;
+    public static final int DIRTY = 129;
 
     private BuildConstants(){}
 }

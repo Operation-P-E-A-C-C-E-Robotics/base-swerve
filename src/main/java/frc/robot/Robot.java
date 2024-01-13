@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
 
     //log data from network tables (SmartDashboard, etc.)
     DataLogManager.start();
-    DataLogManager.logNetworkTables(true);
+    DataLogManager.logNetworkTables(false);
     DriverStation.startDataLog(DataLogManager.getLog());
 
     //log current draw
@@ -55,6 +55,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    DataLogManager.logNetworkTables(false);
     System.out.println("Robot Disabled");
     System.out.println("let's hope it doesn't move lol");
   }
@@ -64,6 +65,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    DataLogManager.logNetworkTables(true);
     System.out.println("Robot Autonomous");
     System.out.println("EVERYBODY PANIC PEACCY IS RUNNING AUTONOMOUS AND HE DOESN'T KNOW WHAT HE'S DOING");
 
@@ -79,6 +81,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    DataLogManager.logNetworkTables(true);
     System.out.println("Robot Teleop");
     System.out.println("EVERYBODY RUN PEACCY IS DRIVING THE ROBOT AND HE WILL CRASH IT VERY SOON");
 
@@ -93,6 +96,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    DataLogManager.logNetworkTables(true);
     System.out.println("Robot Test");
     System.out.println("ok but what are yall doing i don't even know why you'd be running in test mode");
     CommandScheduler.getInstance().cancelAll();
