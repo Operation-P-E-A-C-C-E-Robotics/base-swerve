@@ -1,9 +1,9 @@
-package frc.robot.commands;
+package frc.robot.statemachines;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class TriggerIntakeStatemachine extends Command {
-    private TriggerIntakeState state = TriggerIntakeState.RETRACT;
+public class FlywheelIntakeStatemachine extends Command {
+    private FlywheelIntakeState state = FlywheelIntakeState.RETRACT;
 
     private void updateState(){
         switch (state) {
@@ -20,7 +20,7 @@ public class TriggerIntakeStatemachine extends Command {
         }
     }
 
-    public void requestState(TriggerIntakeState state){
+    public void requestState(FlywheelIntakeState state){
 
     }
 
@@ -42,7 +42,7 @@ public class TriggerIntakeStatemachine extends Command {
         }
     }
 
-    enum TriggerIntakeState{
+    enum FlywheelIntakeState{
         //TODO
         RETRACT(0.0,0.0),
         INTAKE(0.0,0.0),
@@ -60,7 +60,7 @@ public class TriggerIntakeStatemachine extends Command {
             return speed;
         }
 
-        private TriggerIntakeState (Double deployAngle, Double speed){
+        private FlywheelIntakeState (Double deployAngle, Double speed){
             this.deployAngle = deployAngle;
             this.speed = speed;
         }
