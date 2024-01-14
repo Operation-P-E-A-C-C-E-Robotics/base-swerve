@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,9 +17,9 @@ import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.JoystickCurves;
 import frc.robot.Constants;
-
 import static frc.robot.Constants.Swerve.*;
 
+@Deprecated
 public class DriveTrainTuner extends SubsystemBase {
     private PeaccefulSwerve swerve;
 
@@ -30,7 +31,7 @@ public class DriveTrainTuner extends SubsystemBase {
     private final SwerveRequest.FieldCentric fieldCentricRequest = new SwerveRequest.FieldCentric();
     private final SwerveRequest.RobotCentric robotCentricRequest = new SwerveRequest.RobotCentric();
     private final SwerveRequest.FieldCentricFacingAngle autoHeadingRequest = new SwerveRequest.FieldCentricFacingAngle();
-    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.SwerveDriveBrake lockInRequest = new SwerveRequest.SwerveDriveBrake().withDriveRequestType(DriveRequestType.Velocity);
 
     private double newAutoHeadingKP = autoHeadingKP;
     private double newAutoHeadingKI = autoHeadingKI;
@@ -59,6 +60,7 @@ public class DriveTrainTuner extends SubsystemBase {
 
     /**
      * DO NOT USE THIS INSTEAD OF DriveTrain.java
+     * Repalced by PeaccyTuner
      * HAS BUILT IN DRIVE MODE SO DOESNT WORK WITH COMMANDS
      * This is a copy of DriveTrain.java that is used for tuning the drivetrain.
      * It is not used in the actual robot code.
@@ -86,7 +88,7 @@ public class DriveTrainTuner extends SubsystemBase {
 
         //log swerve state data as fast as it comes in
         swerve.registerTelemetry((SwerveDriveState state) -> {
-            SwerveTelemetry.updateSwerveState(state, swerve.getChassisSpeeds());
+            SwerveTelemetry.updateSwerveState(state, swerve.getChassisSpeeds(), swerve.getPose3d());
             SmartDashboard.putNumber("Front Left Module Angle", state.ModuleStates[0].angle.getRotations());
             SmartDashboard.putNumber("Front Right Module Angle", state.ModuleStates[1].angle.getRotations());
             SmartDashboard.putNumber("Rear Left Module Angle", state.ModuleStates[2].angle.getRotations());
@@ -300,14 +302,14 @@ public class DriveTrainTuner extends SubsystemBase {
         //handle lock in
         if (isLockIn) {
             if (linearVelocity.equals(new Translation2d(0,0)) && angularVelocity == 0) {
-                swerve.setControl(lockInRequest.withIsOpenLoop(isOpenLoop));
+                swerve.setControl(lockInRequest.withDriveRequestType(DriveRequestType.Velocity));
                 return;
             }
         }
 
         //handle auto angle
         if (isAutoHeading) {
-            autoHeadingRequest.withIsOpenLoop(isOpenLoop)
+            autoHeadingRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity)
                             .withVelocityX(linearVelocity.getX())
                             .withVelocityY(linearVelocity.getY())
                             .withTargetDirection(Rotation2d.fromDegrees(autoHeadingAngle))
@@ -319,7 +321,7 @@ public class DriveTrainTuner extends SubsystemBase {
 
         //handle field relative
         if (isFieldRelative) {
-            fieldCentricRequest.withIsOpenLoop(isOpenLoop)
+            fieldCentricRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity)
                                 .withVelocityX(linearVelocity.getX())
                                 .withVelocityY(linearVelocity.getY())
                                 .withRotationalRate(angularVelocity);
@@ -329,7 +331,7 @@ public class DriveTrainTuner extends SubsystemBase {
         }
 
         //handle robot relative
-        robotCentricRequest.withIsOpenLoop(isOpenLoop)
+        robotCentricRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity)
                             .withVelocityX(linearVelocity.getX())
                             .withVelocityY(linearVelocity.getY())
                             .withRotationalRate(angularVelocity);

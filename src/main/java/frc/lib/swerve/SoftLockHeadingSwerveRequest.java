@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.utility.PhoenixPIDController;
 
@@ -20,6 +21,23 @@ public class SoftLockHeadingSwerveRequest implements SwerveRequest{
     /**
      * A swerve request that is equivalent to @link{FieldCentricSwerveRequest} but when the rotation is under the deadband it
      * uses a gentle position controller to hold the last heading.
+     * 
+     * Written at the smae time as the vastly superior PeaccyRequest.
+     * So never tested. I'm sure it works though.
+     * Here is a neat poem about being delusional:
+     * Yeah bro my code legit so works,
+     * It always works, it never quirks,
+     * I'm sure it's fine, 
+     * No need to test,
+     * No need to stress,
+     * Despite the fact that it's a mess,
+     * It will always be a success,
+     * We will never have to regress,
+     * So don't you dare try to suggest,
+     * That I should test,
+     * Stop doubting you jerks,
+     * My code always legit so works.
+     * -Peaccy
      */
     public SoftLockHeadingSwerveRequest(double kP, DoubleSupplier totalDriveCurrent, double totalDriveCurrentLimit) {
         HeadingController.setP(kP);
@@ -108,7 +126,7 @@ public class SoftLockHeadingSwerveRequest implements SwerveRequest{
         var states = parameters.kinematics.toSwerveModuleStates(speeds, new Translation2d());
 
         for (int i = 0; i < modulesToApply.length; ++i) {
-            modulesToApply[i].apply(states[i], IsOpenLoop);
+            modulesToApply[i].apply(states[i],  IsOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity);
         }
 
         return StatusCode.OK;

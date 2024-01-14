@@ -5,7 +5,9 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -30,7 +32,9 @@ public class SwerveTelemetry {
     private static final StructPublisher<Pose3d> pathplannerTargetPosePublisher = swerveTable.getStructTopic("Target Pose", Pose3d.struct).publish();
     private static final StructArrayPublisher <Pose2d> pathplannerTrajectoryPublisher = swerveTable.getStructArrayTopic("Path", Pose2d.struct).publish();
     
-    private static final DoubleArrayPublisher swerveDataPublisher = swerveTable.getDoubleArrayTopic("Swerve Data").publish();
+    private static final DoubleArrayPublisher swerveDataPublisher = swerveTable.getDoubleArrayTopic("Swerve Measured Data").publish();
+    private static final DoubleArrayPublisher swerveRequestedData = swerveTable.getDoubleArrayTopic("Swerve Requested Data").publish();
+
     private static final DoublePublisher measuredXVelocity = swerveTable.getDoubleTopic("Measured X Velocity").publish();
     private static final DoublePublisher measuredYVelocity = swerveTable.getDoubleTopic("Measured Y Velocity").publish();
     private static final DoublePublisher measuredAngularVelocity = swerveTable.getDoubleTopic("Measured Angular Velocity").publish();
@@ -43,7 +47,9 @@ public class SwerveTelemetry {
     
     private static final DoublePublisher swerveRequestedXVelocity = swerveCommandTable.getDoubleTopic("Requested X Velocity").publish();
     private static final DoublePublisher swerveRequestedYVelocity = swerveCommandTable.getDoubleTopic("Requested Y Velocity").publish();
-    
+    private static final DoublePublisher swerveRequestedRawXVelocity = swerveCommandTable.getDoubleTopic("Requested Raw X Velocity").publish();
+    private static final DoublePublisher swerveRequestedRawYVelocity = swerveCommandTable.getDoubleTopic("Requested Raw Y Velocity").publish();
+
     private static final DoublePublisher swerveRequestedAngularVelocity = swerveCommandTable.getDoubleTopic("Requested Angular Velocity").publish();
     private static final DoublePublisher swerveRequestedAutoHeadingAngle = swerveCommandTable.getDoubleTopic("Requested Auto Heading Angle").publish();
     private static final BooleanPublisher requestFieldCentricPublisher = swerveCommandTable.getBooleanTopic("Request Field Centric").publish();
@@ -52,6 +58,18 @@ public class SwerveTelemetry {
     private static final BooleanPublisher requestLockInPublisher = swerveCommandTable.getBooleanTopic("Request Lock In").publish();
     private static final BooleanPublisher requestZeroOdometryPublisher = swerveCommandTable.getBooleanTopic("Request Zero Odometry").publish();
 
+    private static final NetworkTable autoHeadingTable = swerveTable.getSubTable("Auto Heading");
+    private static final DoublePublisher autoHeadingAngle = autoHeadingTable.getDoubleTopic("Target").publish();
+    private static final DoublePublisher autoHeadingError = autoHeadingTable.getDoubleTopic("Error").publish();
+    private static final DoublePublisher autoHeadingPComponent = autoHeadingTable.getDoubleTopic("P Component").publish();
+    private static final DoublePublisher autoHeadingFeedForward = autoHeadingTable.getDoubleTopic("Feed Forward").publish();
+    private static final DoublePublisher autoHeadingTrajectoryVelocity = autoHeadingTable.getDoubleTopic("Trajectory Velocity").publish();
+    private static final DoublePublisher autoHeadingTrajectoryAcceleration = autoHeadingTable.getDoubleTopic("Trajectory Acceleration").publish();
+    private static final DoublePublisher autoHeadingTrajectoryPosition = autoHeadingTable.getDoubleTopic("Trajectory Position").publish();
+    private static final BooleanPublisher autoHeadingCurrentLimited = autoHeadingTable.getBooleanTopic("Current Limited").publish();
+
+    private static final StructPublisher <Translation2d> positionCorrectionDeltaPublisher = swerveTable.getStructTopic("Position Correction Requested Delta", Translation2d.struct).publish();
+    private static final StructPublisher <Translation2d> positionCorrectionMeasuredPublisher = swerveTable.getStructTopic("Position Correction Measured Delta", Translation2d.struct).publish();
 
     
     private static final Mechanism2d swerve = new Mechanism2d(5, 5);
@@ -88,8 +106,8 @@ public class SwerveTelemetry {
         });
     }
 
-    public static void updateSwerveState(SwerveDriveState state, ChassisSpeeds measuredSpeeds) {
-        swervePosePublisher.accept(new Pose3d(state.Pose));//TODO update once have 3d odometry stuff
+    public static void updateSwerveState(SwerveDriveState state, ChassisSpeeds measuredSpeeds, Pose3d pose) {
+        swervePosePublisher.accept(pose);//TODO update once have 3d odometry stuff
         field.setRobotPose(state.Pose);
 
         frontLeftLigament.setAngle(state.ModuleStates[0].angle.getDegrees());
@@ -97,10 +115,10 @@ public class SwerveTelemetry {
         rearLeftLigament.setAngle(state.ModuleStates[2].angle.getDegrees());
         rearRightLigament.setAngle(state.ModuleStates[3].angle.getDegrees());
 
-        frontLeftLigament.setLength(state.ModuleStates[0].speedMetersPerSecond / Constants.Swerve.measuredMaxVelocity);
-        frontRightLigament.setLength(state.ModuleStates[1].speedMetersPerSecond / Constants.Swerve.measuredMaxVelocity);
-        rearLeftLigament.setLength(state.ModuleStates[2].speedMetersPerSecond / Constants.Swerve.measuredMaxVelocity);
-        rearRightLigament.setLength(state.ModuleStates[3].speedMetersPerSecond / Constants.Swerve.measuredMaxVelocity);
+        frontLeftLigament.setLength(state.ModuleStates[0].speedMetersPerSecond / Constants.Swerve.pathfollowingMaxVelocity);
+        frontRightLigament.setLength(state.ModuleStates[1].speedMetersPerSecond / Constants.Swerve.pathfollowingMaxVelocity);
+        rearLeftLigament.setLength(state.ModuleStates[2].speedMetersPerSecond / Constants.Swerve.pathfollowingMaxVelocity);
+        rearRightLigament.setLength(state.ModuleStates[3].speedMetersPerSecond / Constants.Swerve.pathfollowingMaxVelocity);
 
         /*
         format needed for advantagescope:
@@ -127,6 +145,8 @@ public class SwerveTelemetry {
 
     public static void updateSwerveCommand(double requestedXVelocity, 
                                             double requestedYVelocity, 
+                                            double rawXVelocity,
+                                            double rawYVelocity,
                                             double requestedAngularVelocity, 
                                             double requestedAutoHeading, 
                                             boolean isAutoHeading, 
@@ -136,6 +156,8 @@ public class SwerveTelemetry {
                                             boolean isZeroOdometry) {
         swerveRequestedXVelocity.accept(requestedXVelocity);
         swerveRequestedYVelocity.accept(requestedYVelocity);
+        swerveRequestedRawXVelocity.accept(rawXVelocity);
+        swerveRequestedRawYVelocity.accept(rawYVelocity);
         swerveRequestedAngularVelocity.accept(requestedAngularVelocity);
         swerveRequestedAutoHeadingAngle.accept(requestedAutoHeading);
         requestFieldCentricPublisher.accept(isFieldRelative);
@@ -145,4 +167,44 @@ public class SwerveTelemetry {
         requestZeroOdometryPublisher.accept(isZeroOdometry);
     }
 
+    public static void updateAutoHeading(double targetAngle, 
+                                        double error, 
+                                        double pComponent, 
+                                        double feedForward, 
+                                        double trajectoryVelocity, 
+                                        double trajectoryAcceleration, 
+                                        double trajectoryPosition, 
+                                        boolean isCurrentLimited) {
+        autoHeadingAngle.accept(targetAngle);
+        autoHeadingError.accept(error);
+        autoHeadingPComponent.accept(pComponent);
+        autoHeadingFeedForward.accept(feedForward);
+        autoHeadingTrajectoryVelocity.accept(trajectoryVelocity);
+        autoHeadingTrajectoryAcceleration.accept(trajectoryAcceleration);
+        autoHeadingTrajectoryPosition.accept(trajectoryPosition);
+        autoHeadingCurrentLimited.accept(isCurrentLimited);
+    }
+
+    public static void updateRequestedState(SwerveModuleState... states){
+        //required for advantagescope:
+        // [
+        //     rotation_1, velocity_1,
+        //     rotation_2, velocity_2,
+        //     rotation_3, velocity_3,
+        //     rotation_4, velocity_4
+        // ]
+
+        double[] swerveRequestedData = new double[]{
+            states[0].angle.getDegrees(), states[0].speedMetersPerSecond,
+            states[1].angle.getDegrees(), states[1].speedMetersPerSecond,
+            states[2].angle.getDegrees(), states[2].speedMetersPerSecond,
+            states[3].angle.getDegrees(), states[3].speedMetersPerSecond
+        };
+        SwerveTelemetry.swerveRequestedData.accept(swerveRequestedData);
+    }
+
+    public static void updatePositionCorrection(Translation2d delta, Translation2d measured){
+        positionCorrectionDeltaPublisher.accept(delta);
+        positionCorrectionMeasuredPublisher.accept(measured);
+    }
 }

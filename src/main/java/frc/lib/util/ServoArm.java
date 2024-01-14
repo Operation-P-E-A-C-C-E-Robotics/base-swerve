@@ -36,6 +36,7 @@ public class ServoArm extends SubsystemBase {
     private Runnable superPeriodic;
     /**
      * A messy ass helper class to run trajectories on an arm
+     * #authentic2023experience
      * @param constants The constants for the system
      * @param armLength The length of the arm (m)
      * @param armMass The mass of the arm (kg)

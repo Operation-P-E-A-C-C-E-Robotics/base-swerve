@@ -24,6 +24,15 @@ import edu.wpi.first.wpilibj.Timer;
  * ADD ONE FUNCTION SO I CAN GET THE GODDAMN KNEMATICS DONT MAKE THEM """"PROTECTED"""" SO I HAVE TO DO ALL THIS NONSENSE JUST TO GET THE
  * CHASSIS SPEEDS. 
  * Okay maybe I wanted to do a couple other things too...
+ * 
+ * Heres a terrible poem about having to re-write other ppls code because they didn't include the function you wanted,
+ * and that kind of irritated you, and so you made the stupid class and then ended up adding a bunch of other crap too,
+ * so it was probably for the better in the first place, and so it is what it is:
+ * I litterally don't know what i'm doing with my life,
+ * writing poems about my superficial strife,
+ * stupiditiy creating stupidity,
+ * like a stupid casarole or whatever.
+ * -Peaccy
  */
 public class PeaccefulSwerve extends SwerveDrivetrain {
     private Rotation3d pigeonOdometryOffset = new Rotation3d();

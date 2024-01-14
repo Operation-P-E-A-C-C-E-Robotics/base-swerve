@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.motion.Trajectory;
+import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.Util;
 
 /**
@@ -27,6 +29,29 @@ import frc.lib.util.Util;
  * I'll get a good one, but I don't know how to make it happen. I just keep putting coffee in my mouth and it keeps coming out.
  * Anyway. This is a swerve request that does all the things. It's got a heading controller, a position correction controller,
  * and a bunch of other stuff. It's pretty cool. I think. I don't know. I'm just a monkey with a keyboard.
+ * 
+ * UPDATE: it was a good one. :D
+ * 
+ * here's a poem about actually thinking you wrote good code (and probably being delusional):
+ * Yeah bro my code legit so works,
+ * It always works, it never quirks,
+ * I'm sure it's fine,
+ * cause I tested it a million goddamn times
+ * So I can believe my code legit so works.
+ * Please don't tell me it doesn't work.
+ * I legit am getting pissed off with computer daily
+ * These poems are gettings worse and worse
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I'm sure it's fine,
+ * I hate programming.
+ * -Peaccy
  */
 public class PeaccyRequest implements SwerveRequest {
 
@@ -74,6 +99,7 @@ public class PeaccyRequest implements SwerveRequest {
 
     private final double CURRENT_LIMIT_THRESHOLD = 0.01; //percent of the current limit to start throttling at.
     private final SlewRateLimiter currentLimitSmoother = new SlewRateLimiter(10); //limit the amps per second for the current to change, to help find equilibrium.
+    private double maxLinearVelocity;
 
 
     /**
@@ -81,6 +107,7 @@ public class PeaccyRequest implements SwerveRequest {
      * Made by the one and only Peaccy.
      * @param maxAngularVelocity the maximum angular velocity to use when turning to the set trajectory
      * @param maxAngularAcceleration the maximum angular acceleration to use when turning to the set trajectory
+     * @param maxLinearVelocity the maximum linear velocity (for scaling between open loop and closed loop)
      * @param holdHeadingkP the proportional gain to use when turning to the set trajectory
      * @param holdHeadingkV the velocity feedforward to use when turning to the set trajectory
      * @param holdHeadingkA the acceleration feedforward to use when turning to the set trajectory
@@ -90,6 +117,7 @@ public class PeaccyRequest implements SwerveRequest {
      */
     public PeaccyRequest(double maxAngularVelocity, 
                     double maxAngularAcceleration, 
+                    double maxLinearVelocity,
                     double holdHeadingkP, 
                     double holdHeadingkV, 
                     double holdHeadingkA, 
@@ -100,18 +128,26 @@ public class PeaccyRequest implements SwerveRequest {
         holdHeadingVelocity = maxAngularVelocity;
         headingFeedforward = new SimpleMotorFeedforward(0, holdHeadingkV, holdHeadingkA);
         this.holdHeadingkP = holdHeadingkP;
+
+        this.maxLinearVelocity = maxLinearVelocity;
         
         this.getChassisSpeeds = chassisSpeedsSupplier;
         this.totalDriveCurrent = totalDriveCurrentSupplier;
         this.totalDriveCurrentLimit = softHeadingCurrentLimit;
         robotMovingTimer.start();
         robotNotMovingTimer.start();
+
+        System.out.println("PeaccyRequest Initialized");
     }
 
     @Override
     public StatusCode apply(SwerveControlRequestParameters parameters, SwerveModule... modulesToApply) {
         Translation2d toApplyTranslation = new Translation2d(VelocityX, VelocityY);
         double toApplyRotation = RotationalRate;
+
+        if(IsOpenLoop) {
+            toApplyTranslation = toApplyTranslation.times(12/maxLinearVelocity);
+        }
 
         //position correction only works for field centric :|
         if(IsFieldCentric) toApplyTranslation = applyPositionCorrection(toApplyTranslation, parameters.currentPose, parameters.updatePeriod);
@@ -144,11 +180,10 @@ public class PeaccyRequest implements SwerveRequest {
                 toApplyTranslation.getY(), 
                 toApplyRotation,
                 parameters.currentPose.getRotation()
-            ) : ChassisSpeeds.fromRobotRelativeSpeeds(
+            ) : new ChassisSpeeds(
                 toApplyTranslation.getX(), 
                 toApplyTranslation.getY(), 
-                toApplyRotation,
-                parameters.currentPose.getRotation()
+                toApplyRotation
             ),
             parameters.updatePeriod
         );
@@ -156,8 +191,10 @@ public class PeaccyRequest implements SwerveRequest {
         //wowie make it go.
         var states = parameters.kinematics.toSwerveModuleStates(speeds, new Translation2d());
 
+        SwerveTelemetry.updateRequestedState(states);
+
         for (int i = 0; i < modulesToApply.length; ++i) {
-            modulesToApply[i].apply(states[i], IsOpenLoop);
+            modulesToApply[i].apply(states[i], IsOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity);
         }
 
         return StatusCode.OK;
@@ -284,16 +321,17 @@ public class PeaccyRequest implements SwerveRequest {
         this.PositionCorrectionWeight = Util.limit(positionCorrectionWeight,0,1);
         return this;
     }
+    
 
-    boolean autoHeadingDeadbandEnabled = true;
-
+    double prevHeading = 0;
     /**
      * Get the rotation rate to apply to the robot to go to the target heading
      */
     private double applyAutoHeading(SwerveControlRequestParameters parameters) {
         var currentHeading = parameters.currentPose.getRotation().getRadians();
+        SmartDashboard.putNumber("current heading", currentHeading);
 
-        //make sure our odometry heading is within 180 degrees of the target heading to prevent it from wrapping LIKE CTRE DOES >:(
+        //make sure our odometry heading is within +/- 180 degrees of the target heading to prevent it from wrapping LIKE CTRE DOES >:(
         while (Math.abs(currentHeading - Heading) > Math.PI) {
             if (currentHeading > Heading) {
                 currentHeading -= 2 * Math.PI;
@@ -301,37 +339,52 @@ public class PeaccyRequest implements SwerveRequest {
                 currentHeading += 2 * Math.PI;
             }
         }
+        SmartDashboard.putNumber("current heading fixed", currentHeading);
 
         //regenerate the trajectory if the target heading has changed
-        if(Heading != headingTrajectory.getTarget().position) {
+        if(Heading != headingTrajectory.getTarget().position || Math.abs(currentHeading - prevHeading) > (Math.PI/4)) {
             headingTrajectory = Trajectory.trapezoidTrajectory(
-                new State(currentHeading, getChassisSpeeds.get().omegaRadiansPerSecond), 
+                new State(currentHeading, 0), 
                 new State(Heading, 0), 
                 holdHeadingVelocity,
                 holdHeadingAcceleration 
             );
+            
             holdHeadingTrajectoryTimer.reset();
             holdHeadingTrajectoryTimer.start();
         }
+
+        prevHeading = currentHeading;
 
         
         //calculate the correction
         var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod);
         var error = target.position - currentHeading;
 
-        if(robotMovingTimer.get() < 0.3 && Math.abs(error) < 0.2){
+        var acceleration = (target.velocity - getChassisSpeeds.get().omegaRadiansPerSecond);
+
+        if(robotMovingTimer.get() < 0.3 && Math.abs(error) < 0.002){
             return 0;
         }
 
-        SmartDashboard.putNumber("target heading",target.position);
-        var feedforward = headingFeedforward.calculate(target.velocity);
+        var feedforward = headingFeedforward.calculate(target.velocity, acceleration);
         var pGain = error * holdHeadingkP * parameters.updatePeriod;
-        SmartDashboard.putNumber("heading error", target.position - currentHeading);
-        var currentDraw = currentLimitSmoother.calculate(totalDriveCurrent.getAsDouble());
-        if(SoftHoldHeading) pGain = pGain * compress(currentDraw, totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
+        if(SoftHoldHeading) {
+            var currentDraw = currentLimitSmoother.calculate(totalDriveCurrent.getAsDouble());
+            pGain = pGain * compress(currentDraw, totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);
+        }
         var delta = pGain + feedforward;
 
-        SmartDashboard.putNumber("holdheading gain", delta);
+        SwerveTelemetry.updateAutoHeading(
+            Heading,
+            error,
+            pGain,
+            feedforward,
+            target.velocity,
+            acceleration,
+            target.position,
+            SoftHoldHeading
+        );
 
         return delta;
     }
@@ -367,6 +420,11 @@ public class PeaccyRequest implements SwerveRequest {
 
         Translation2d realPositionDelta = currentPose.getTranslation().minus(positionCorrectionRealPositions.getFirst());
         Translation2d positionError = requestedPositionDelta.minus(realPositionDelta);
+
+        SwerveTelemetry.updatePositionCorrection(
+            requestedPositionDelta,
+            realPositionDelta
+        );
 
         Translation2d newRequestedVelocity = requestedTranslation.plus(positionError.times(PositionCorrectionWeight));
         return newRequestedVelocity;
