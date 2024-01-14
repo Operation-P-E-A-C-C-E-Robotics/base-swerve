@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drivetrain.PeaccyDrive;
-import frc.robot.commands.drivetrain.PeaccyTuner;
+// import frc.robot.commands.drivetrain.PeaccyTuner;
 import frc.robot.subsystems.DriveTrain;
 
 
@@ -42,7 +42,7 @@ public class RobotContainer {
 
 
   /* COMMANDS */
-  private final PeaccyTuner peaccyDrive = new PeaccyTuner(driveTrain);
+  private final PeaccyDrive peaccyDrive = new PeaccyDrive(driveTrain);
 
   private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
