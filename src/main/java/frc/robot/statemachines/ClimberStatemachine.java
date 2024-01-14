@@ -7,12 +7,6 @@ public class ClimberStatemachine extends Command {
 
     private void updateState(){
         switch (state) {
-            case BALANCE:
-                break;
-            case EXTEND:
-                break;
-            case RETRACT:
-                break;
             default:
                 break;
         }
@@ -30,12 +24,6 @@ public class ClimberStatemachine extends Command {
     public void execute(){
         updateState();
         switch(state) {
-            case BALANCE:
-                break;
-            case EXTEND:
-                break;
-            case RETRACT:
-                break;
             default:
                 break;            
         }

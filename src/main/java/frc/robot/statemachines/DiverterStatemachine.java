@@ -7,16 +7,6 @@ public class DiverterStatemachine extends Command {
 
     private void updateState(){
         switch (state) {
-            case ALIGN_AMP:
-                break;
-            case ALIGN_TRAP:
-                break;
-            case PLACE_AMP:
-                break;
-            case PLACE_TRAP:
-                break;
-            case RETRACT:
-                break;
             default:
                 break;
         }
@@ -34,16 +24,6 @@ public class DiverterStatemachine extends Command {
     public void execute(){
         updateState();
         switch(state) {
-            case ALIGN_AMP:
-                break;
-            case ALIGN_TRAP:
-                break;
-            case PLACE_AMP:
-                break;
-            case PLACE_TRAP:
-                break;
-            case RETRACT:
-                break;
             default:
                 break;            
         }
@@ -51,6 +31,7 @@ public class DiverterStatemachine extends Command {
 
     enum DiverterState {
         RETRACT(0.0,0.0),
+        HANDOFF(0.0,0.0), //from shooter
         ALIGN_AMP(0.0,0.0),
         ALIGN_TRAP(0.0,0.0),
         PLACE_AMP(0.0,1.0),

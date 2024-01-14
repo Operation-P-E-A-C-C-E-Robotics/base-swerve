@@ -9,7 +9,7 @@ import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 
 public class SupersystemStatemachine {
     private SupersystemState state = SupersystemState.REST_WITHOUT_GAMEPIECE;
-
+    
     private static final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine();
     private static final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine();
     private static final ShooterStatemachine shooterStatemachine = new ShooterStatemachine();
@@ -17,71 +17,31 @@ public class SupersystemStatemachine {
     private static final DiverterStatemachine diverterStatemachine = new DiverterStatemachine();
     private static final ClimberStatemachine climberStatemachine = new ClimberStatemachine();
 
+    /**
+     * Request a state change.
+     * Won't change state if the requested state results in a dangerous situation,
+     * e.g. intaking while climbing.
+     * @param state
+     */
     public void requestState(SupersystemState state){
 
     }
 
+    /**
+     * handle automatic state transitions,
+     * e.g. intaking flywheel-side to intaking trigger-side when the robot
+     * changes direction
+     */
     private void updateState(){
         switch (state) {
-            case REST_WITHOUT_GAMEPIECE:
-                break;
-            case REST_WITH_GAMEPIECE:
-                break;
-            case INTAKE_FLYWHEEL:
-                break;
-            case INTAKE_TRIGGER:
-                break;
-            case AIM:
-                break;
-            case SHOOT:
-                break;
-            case ALIGN_AMP:
-                break;
-            case PLACE_AMP:
-                break;
-            case PRE_CLIMB:
-                break;
-            case CLIMB_EXTEND:
-                break;
-            case CLIMB_RETRACT:
-                break;
-            case ALIGN_TRAP:
-                break;
-            case PLACE_TRAP:
-                break;
             default:
                 break;
         }
     }
 
-    public SupersystemState getState(){
-        return state;
-    }
-
-    public static FlywheelIntakeState getFlywheelIntakeState(){
-        return flywheelIntakeStatemachine.getState();
-    }
-
-    public static TriggerIntakeState getTriggerIntakeState(){
-        return triggerIntakeStatemachine.getState();
-    }
-
-    public static ShooterState getShooterState(){
-        return shooterStatemachine.getState();
-    }
-
-    public static PivotState getPivotState(){
-        return pivotStatemachine.getState();
-    }
-
-    public static DiverterState getDiverterState(){
-        return diverterStatemachine.getState();
-    }
-
-    public static ClimberState getClimberState(){
-        return climberStatemachine.getState();
-    }
-
+    /**
+     * Make the robot attain the desired state
+     */
     public void execute(){
         updateState();
         flywheelIntakeStatemachine.requestState(state.getFlywheelIntakeState());
@@ -90,6 +50,56 @@ public class SupersystemStatemachine {
         pivotStatemachine.requestState(state.getPivotState());
         diverterStatemachine.requestState(state.getDiverterState());
         climberStatemachine.requestState(state.getClimberState());
+    }
+
+    /**
+     * Get the state that is currently being
+     * requested by the state machine
+     */
+    public SupersystemState getState(){
+        return state;
+    }
+
+    /**
+     * Get the state that the flywheel intake is currently executing
+     */
+    public static FlywheelIntakeState getFlywheelIntakeState(){
+        return flywheelIntakeStatemachine.getState();
+    }
+
+    /**
+     * Get the state that the trigger intake is currently executing
+     */
+    public static TriggerIntakeState getTriggerIntakeState(){
+        return triggerIntakeStatemachine.getState();
+    }
+
+    /**
+     * Get the state that the shooter is currently executing
+     */
+    public static ShooterState getShooterState(){
+        return shooterStatemachine.getState();
+    }
+
+    /**
+     * Get the state that the pivot is currently executing
+     */
+    public static PivotState getPivotState(){
+        return pivotStatemachine.getState();
+    }
+
+    /**
+     * Get the state that the diverter is currently executing
+     */
+    public static DiverterState getDiverterState(){
+        return diverterStatemachine.getState();
+    }
+
+    /**
+     * Get the state that the climber is currently executing
+     */
+    public static ClimberState getClimberState(){
+        return climberStatemachine.getState();
     }
     
 
@@ -130,23 +140,34 @@ public class SupersystemStatemachine {
             PivotState.PRE_CLIMB
         ),
         CLIMB_EXTEND(
+            TriggerIntakeState.AVOID,
             PivotState.CLIMB,
             DiverterState.RETRACT, //possible climb state
             ClimberState.EXTEND
         ),
         CLIMB_RETRACT(
+            TriggerIntakeState.AVOID,
             PivotState.CLIMB,
             DiverterState.RETRACT,
             ClimberState.RETRACT
         ),
+        HANDOFF(
+            FlywheelIntakeState.RETRACT, 
+            TriggerIntakeState.AVOID, 
+            ShooterState.HANDOFF, 
+            PivotState.CLIMB, 
+            DiverterState.HANDOFF, 
+            ClimberState.RETRACT
+        ),
         ALIGN_TRAP(
-            PivotState.AMP,
+            TriggerIntakeState.AVOID,
+            PivotState.CLIMB,
             DiverterState.ALIGN_TRAP,
             ClimberState.RETRACT
         ),
         PLACE_TRAP(
             ShooterState.REST,
-            PivotState.AMP,
+            PivotState.CLIMB,
             DiverterState.PLACE_TRAP
         ),; 
 
@@ -209,8 +230,8 @@ public class SupersystemStatemachine {
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, diverterState, ClimberState.RETRACT);
         }
 
-        private SupersystemState(PivotState pivotState, DiverterState diverterState, ClimberState climberState){
-            this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, ShooterState.REST, pivotState, diverterState, climberState);
+        private SupersystemState(TriggerIntakeState triggerIntakeState, PivotState pivotState, DiverterState diverterState, ClimberState climberState){
+            this(FlywheelIntakeState.RETRACT, triggerIntakeState, ShooterState.REST, pivotState, diverterState, climberState);
         }
 
         private SupersystemState(){

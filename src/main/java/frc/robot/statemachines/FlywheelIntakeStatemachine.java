@@ -7,14 +7,6 @@ public class FlywheelIntakeStatemachine extends Command {
 
     private void updateState(){
         switch (state) {
-            case AVOID:
-                break;
-            case EJECT:
-                break;
-            case INTAKE:
-                break;
-            case RETRACT:
-                break;
             default:
                 break;
         }
@@ -24,26 +16,18 @@ public class FlywheelIntakeStatemachine extends Command {
 
     }
 
-    public FlywheelIntakeState getState(){
-        return state;
-    }
-
     @Override
     public void execute(){
         updateState();
         switch(state) {
-            case AVOID:
-                break;
-            case EJECT:
-                break;
-            case INTAKE:
-                break;
-            case RETRACT:
-                break;
             default:
                 break;
             
         }
+    }
+
+    public FlywheelIntakeState getState(){
+        return state;
     }
 
     enum FlywheelIntakeState{
