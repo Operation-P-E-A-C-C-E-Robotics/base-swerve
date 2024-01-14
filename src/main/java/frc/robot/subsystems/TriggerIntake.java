@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
-public class TriggerIntake {
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class TriggerIntake extends SubsystemBase{
     
 }
