@@ -24,6 +24,10 @@ public class TriggerIntakeStatemachine extends Command {
 
     }
 
+    public TriggerIntakeState getState(){
+        return state;
+    }
+
     @Override
     public void execute(){
         updateState();

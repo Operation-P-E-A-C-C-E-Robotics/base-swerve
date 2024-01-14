@@ -28,6 +28,10 @@ public class ShooterStatemachine extends Command{
 
     }
 
+    public ShooterState getState(){
+        return state;
+    }
+
     @Override
     public void execute(){
         updateState();

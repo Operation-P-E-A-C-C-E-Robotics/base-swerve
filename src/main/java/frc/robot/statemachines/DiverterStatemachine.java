@@ -26,6 +26,10 @@ public class DiverterStatemachine extends Command {
 
     }
 
+    public DiverterState getState(){
+        return state;
+    }
+
     @Override
     public void execute(){
         updateState();

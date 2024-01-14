@@ -8,6 +8,89 @@ import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 
 public class SupersystemStatemachine {
+    private SupersystemState state = SupersystemState.REST_WITHOUT_GAMEPIECE;
+
+    private static final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine();
+    private static final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine();
+    private static final ShooterStatemachine shooterStatemachine = new ShooterStatemachine();
+    private static final PivotStatemachine pivotStatemachine = new PivotStatemachine();
+    private static final DiverterStatemachine diverterStatemachine = new DiverterStatemachine();
+    private static final ClimberStatemachine climberStatemachine = new ClimberStatemachine();
+
+    public void requestState(SupersystemState state){
+
+    }
+
+    private void updateState(){
+        switch (state) {
+            case REST_WITHOUT_GAMEPIECE:
+                break;
+            case REST_WITH_GAMEPIECE:
+                break;
+            case INTAKE_FLYWHEEL:
+                break;
+            case INTAKE_TRIGGER:
+                break;
+            case AIM:
+                break;
+            case SHOOT:
+                break;
+            case ALIGN_AMP:
+                break;
+            case PLACE_AMP:
+                break;
+            case PRE_CLIMB:
+                break;
+            case CLIMB_EXTEND:
+                break;
+            case CLIMB_RETRACT:
+                break;
+            case ALIGN_TRAP:
+                break;
+            case PLACE_TRAP:
+                break;
+            default:
+                break;
+        }
+    }
+
+    public SupersystemState getState(){
+        return state;
+    }
+
+    public static FlywheelIntakeState getFlywheelIntakeState(){
+        return flywheelIntakeStatemachine.getState();
+    }
+
+    public static TriggerIntakeState getTriggerIntakeState(){
+        return triggerIntakeStatemachine.getState();
+    }
+
+    public static ShooterState getShooterState(){
+        return shooterStatemachine.getState();
+    }
+
+    public static PivotState getPivotState(){
+        return pivotStatemachine.getState();
+    }
+
+    public static DiverterState getDiverterState(){
+        return diverterStatemachine.getState();
+    }
+
+    public static ClimberState getClimberState(){
+        return climberStatemachine.getState();
+    }
+
+    public void execute(){
+        updateState();
+        flywheelIntakeStatemachine.requestState(state.getFlywheelIntakeState());
+        triggerIntakeStatemachine.requestState(state.getTriggerIntakeState());
+        shooterStatemachine.requestState(state.getShooterState());
+        pivotStatemachine.requestState(state.getPivotState());
+        diverterStatemachine.requestState(state.getDiverterState());
+        climberStatemachine.requestState(state.getClimberState());
+    }
     
 
     enum SupersystemState {

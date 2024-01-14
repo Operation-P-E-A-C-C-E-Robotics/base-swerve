@@ -28,6 +28,10 @@ public class PivotStatemachine extends Command{
 
     }
 
+    public PivotState getState(){
+        return state;
+    }
+
     @Override
     public void execute(){
         updateState();

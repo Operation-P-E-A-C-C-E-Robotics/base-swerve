@@ -22,6 +22,10 @@ public class ClimberStatemachine extends Command {
 
     }
 
+    public ClimberState getState(){
+        return state;
+    }
+
     @Override
     public void execute(){
         updateState();

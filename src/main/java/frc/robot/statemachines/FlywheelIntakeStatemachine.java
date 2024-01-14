@@ -24,6 +24,10 @@ public class FlywheelIntakeStatemachine extends Command {
 
     }
 
+    public FlywheelIntakeState getState(){
+        return state;
+    }
+
     @Override
     public void execute(){
         updateState();
