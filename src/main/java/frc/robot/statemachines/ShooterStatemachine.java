@@ -7,11 +7,11 @@ public class ShooterStatemachine extends Command{
 
     private void updateState(){
         switch (state) {
-            case AUTOAIM:
+            case AIM:
                 break;
             case AUTOSHOOT:
                 break;
-            case FIRE:
+            case SHOOT:
                 break;
             case INDEX:
                 break;
@@ -32,11 +32,11 @@ public class ShooterStatemachine extends Command{
     public void execute(){
         updateState();
         switch(state) {
-            case AUTOAIM:
+            case AIM:
                 break;
             case AUTOSHOOT:
                 break;
-            case FIRE:
+            case SHOOT:
                 break;
             case INDEX:
                 break;
@@ -51,11 +51,11 @@ public class ShooterStatemachine extends Command{
 
     enum ShooterState{
         REST(0.0,0.0),
-        INTAKE(-0.0,0.0),
+        INTAKE(-0.0,0.0), //NOTE: this should fold flat if the flywheel-side intake is out
         INDEX(0.0,-0.0),
         //add shooter setpoints
-        AUTOAIM,
-        FIRE,
+        AIM,
+        SHOOT,
         AUTOSHOOT;
 
         private Double flywheelVelocity, triggerPercentage;

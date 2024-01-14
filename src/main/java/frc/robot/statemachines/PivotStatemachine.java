@@ -9,7 +9,9 @@ public class PivotStatemachine extends Command{
         switch (state) {
             case AMP:
                 break;
-            case AUTOAIM:
+            case AIM:
+                break;
+            case PRE_CLIMB:
                 break;
             case CLIMB:
                 break;
@@ -32,7 +34,9 @@ public class PivotStatemachine extends Command{
         switch(state) {
             case AMP:
                 break;
-            case AUTOAIM:
+            case AIM:
+                break;
+            case PRE_CLIMB:
                 break;
             case CLIMB:
                 break;
@@ -49,9 +53,10 @@ public class PivotStatemachine extends Command{
         REST(0.0),
         INTAKE(0.0),
         AMP(0.0),
+        PRE_CLIMB(0.0),
         CLIMB(0.0),
         //add shooter setpoints
-        AUTOAIM(0.0);
+        AIM(0.0);
 
         private Double angle;
 
