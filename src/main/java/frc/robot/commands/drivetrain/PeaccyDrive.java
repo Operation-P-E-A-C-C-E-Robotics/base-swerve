@@ -21,6 +21,7 @@ import frc.lib.swerve.PeaccyRequest;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
 import frc.robot.OI;
+import frc.robot.Robot;
 import frc.robot.subsystems.DriveTrain;
 
 public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
@@ -127,6 +128,8 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
 
     @Override
     public void update() {
+        driveTrain.periodic();
+        if(Robot.isSimulation()) driveTrain.simulationPeriodic();
         /* OBSERVATION */
         observation = new DriveTrainObservation(driveTrain.getPose(), driveTrain.getChassisSpeeds());
         /* PATH FOLLOWING */

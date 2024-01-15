@@ -24,7 +24,6 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     super(Constants.period);
-    // CommandScheduler.getInstance().setPeriod(Constants.period);
     SmartDashboard.updateValues();
   }
 
@@ -52,7 +51,6 @@ public class Robot extends TimedRobot {
     scheduleTimer.start();
     supersystemStatemachine.update();
 
-    // CommandScheduler.getInstance().run();
     ControlSystemTelemetry.update(null, scheduleTimer.get());
   }
 

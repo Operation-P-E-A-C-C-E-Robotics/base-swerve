@@ -128,7 +128,7 @@ public class PeaccefulSwerve extends SwerveDrivetrain {
             m_pigeon2.getQuatX().getValueAsDouble(),
             m_pigeon2.getQuatY().getValueAsDouble(),
             m_pigeon2.getQuatZ().getValueAsDouble()
-        )).minus(pigeonOdometryOffset);
+        ));//.minus(pigeonOdometryOffset);
         return new Pose3d(new Translation3d(odometry.getX(), odometry.getY(), visionZ), imu);
     }
 

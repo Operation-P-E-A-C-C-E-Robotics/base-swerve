@@ -37,7 +37,7 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
      * The drivetrain is it's own thing lol
      * @param state
      */
-    public void requestState(DriveTrainState state){
+    public void driveState(DriveTrainState state){
         driveTrainStatemachine.requestState(state);
     }
 
@@ -95,6 +95,7 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
         if(!pivotStatemachine.isDone()) return false;
         if(!diverterStatemachine.isDone()) return false;
         if(!climberStatemachine.isDone()) return false;
+        if(!driveTrainStatemachine.isDone()) return false;
         return true;
     }
 
@@ -207,7 +208,7 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
             ShooterState.REST,
             PivotState.CLIMB,
             DiverterState.PLACE_TRAP
-        ),; 
+        );
 
         private FlywheelIntakeState flywheelIntakeState;
         private TriggerIntakeState triggerIntakeState;
