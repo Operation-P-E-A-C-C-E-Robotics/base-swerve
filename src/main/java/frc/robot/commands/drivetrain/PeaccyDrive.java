@@ -20,19 +20,20 @@ import frc.lib.state.StateMachine;
 import frc.lib.swerve.PeaccyRequest;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
+import frc.robot.OI;
 import frc.robot.subsystems.DriveTrain;
 
 public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
     /* Initialize the suppliers to default values */
-    private DoubleSupplier xVelocitySup = () -> 0,
-                           yVelocitySup = () -> 0, 
-                           angularVelocitySup = () -> 0, 
-                           autoHeadingAngleSup = () -> 0;
-    private BooleanSupplier isAutoAngleSup = () -> false, 
-                            isFieldRelativeSup = () -> false, 
-                            isOpenLoopSup = () -> true, 
-                            isLockInSup = () -> false,
-                            isZeroOdometrySup = () -> false;
+    private DoubleSupplier xVelocitySup = OI.DriveTrain.translation,
+                           yVelocitySup = OI.DriveTrain.strafe, 
+                           angularVelocitySup = OI.DriveTrain.rotation, 
+                           autoHeadingAngleSup = OI.DriveTrain.heading;
+    private BooleanSupplier isAutoAngleSup = OI.DriveTrain.useHeading, 
+                            isFieldRelativeSup = OI.DriveTrain.isFieldRelative, 
+                            isOpenLoopSup = OI.DriveTrain.isOpenLoop, 
+                            isLockInSup = OI.DriveTrain.isLockIn,
+                            isZeroOdometrySup = OI.DriveTrain.isZeroOdometry;
 
     private DriveTrain driveTrain;
 
@@ -91,97 +92,6 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
         System.out.println("PeacyDrive initialized");
     }
 
-    /**
-     * give the supplier to control robot translatoin
-     * @param xVelocitySup supplier that gives desired x velocity as a percentage of max velocity
-     * @return this (so u can chain em)
-     */
-    public PeaccyDrive withTranslation(DoubleSupplier xVelocitySup){
-        this.xVelocitySup = xVelocitySup;
-        return this;
-    }
-
-    /**
-     * give the supplier to control robot strafe
-     * @param yVelocitySup supplier that gives desired y velocity as a percentage of max velocity
-     * @return this (so u can chain em)
-     */
-    public PeaccyDrive withStrafe(DoubleSupplier yVelocitySup){
-        this.yVelocitySup = yVelocitySup;
-        return this;
-    }
-
-    /**
-     * give the supplier to control robot rotation
-     * @param angularVelocitySup supplier that gives desired angular velocity as a percentage of max velocity
-     * @return this (so u can chain em)
-     */
-    public PeaccyDrive withRotation(DoubleSupplier angularVelocitySup){
-        this.angularVelocitySup = angularVelocitySup;
-        return this;
-    }
-
-    /**
-     * give the supplier to control robot heading - will be overrided by rotation, if the rotation value is nonzero (below the deadband)
-     * @param headingSup supplier that gives desired heading in field-centric degrees
-     * @return this (so u can chain em)
-     */
-    public PeaccyDrive withHeading(DoubleSupplier headingSup){
-        this.autoHeadingAngleSup = headingSup;
-        return this;
-    }
-
-    /**
-     * give the supplier for whether to X-lock the wheels when stopped
-     * @param isLockInSup supplier that gives whether to X-lock the wheels when stopped
-     * @return this (so u can chain em)
-     */
-    public PeaccyDrive isLockIn(BooleanSupplier isLockInSup){
-        this.isLockInSup = isLockInSup;
-        return this;
-    }
-
-    /**
-     * give the supplier for whether to use field centric controls
-     * @param isFieldRelativeSup supplier that gives whether to use field centric controls
-     * @return this (so u can chain em)
-     */
-    public PeaccyDrive isFieldRelative(BooleanSupplier isFieldRelativeSup){
-        this.isFieldRelativeSup = isFieldRelativeSup;
-        return this;
-    }
-
-    /**
-     * give the supplier for whether to use open loop controls (no velocity controllers on the drive motors)
-     * @param isOpenLoopSup supplier that gives whether to use open loop controls
-     * @return this (so u can chain em)
-     */
-    public PeaccyDrive isOpenLoop(BooleanSupplier isOpenLoopSup){
-        this.isOpenLoopSup = isOpenLoopSup;
-        return this;
-    }
-
-    /**
-     * give the supplier for whether to zero the odometry (use with caution ofc since this resets field position)
-     * @param isZeroOdometrySup supplier that gives whether to zero the odometry
-     * @return this (so u can chain em)
-     */
-    public PeaccyDrive isZeroOdometry(BooleanSupplier isZeroOdometrySup){
-        this.isZeroOdometrySup = isZeroOdometrySup;
-        return this;
-    }
-
-    /**
-     * whether to update the robot's target heading using the specified heading.
-     * (otherwise, withHeading will be ignored)
-     * @param useHeadingSup supplier that gives whether to use the heading
-     * @return this (so u can chain em)
-     */
-    public PeaccyDrive useHeading(BooleanSupplier useHeadingSup){
-        this.isAutoAngleSup = useHeadingSup;
-        return this;
-    }
-
     // @Override
     // public void initialize(){
     //     //seed with initial heading to stop the robot turning to 0
@@ -191,12 +101,17 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
 
     @Override
     public void requestState(DriveTrainState state){
+        if(state == this.state) return;
+        //handle command end function
+        if((this.state.isFollowingPath() || this.state.isPathFinding()) && pathCommand != null){
+            pathCommand.end(!pathFinished);
+        }
+        //reset the request heading to avoid erronious heading changes
         if(state == DriveTrainState.TELEOP) {
             request.withHeading(driveTrain.getPose().getRotation().getRadians());
-            if((this.state.isFollowingPath() || this.state.isPathFinding()) && pathCommand != null){
-                pathCommand.end(!pathFinished);
-            }
         }
+
+        //handle path following
         if(state.isFollowingPath() || state.isPathFinding()){
             pathCommand = state.isFollowingPath() ? state.getPathCommand() : state.getPathFindingCommand();
             pathInitialized = false;
@@ -216,6 +131,7 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
         observation = new DriveTrainObservation(driveTrain.getPose(), driveTrain.getChassisSpeeds());
         /* PATH FOLLOWING */
         if(state.isFollowingPath() || state.isPathFinding()){
+
             if(!pathInitialized){
                 pathCommand.initialize();
                 pathInitialized = true;

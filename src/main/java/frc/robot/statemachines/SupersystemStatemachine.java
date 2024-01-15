@@ -1,16 +1,20 @@
 package frc.robot.statemachines;
 
 import frc.lib.state.StateMachine;
+import frc.robot.commands.drivetrain.PeaccyDrive;
+import frc.robot.commands.drivetrain.PeaccyDrive.DriveTrainState;
 import frc.robot.statemachines.ClimberStatemachine.ClimberState;
 import frc.robot.statemachines.DiverterStatemachine.DiverterState;
 import frc.robot.statemachines.FlywheelIntakeStatemachine.FlywheelIntakeState;
 import frc.robot.statemachines.PivotStatemachine.PivotState;
 import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
+import frc.robot.subsystems.DriveTrain;
 
 public class SupersystemStatemachine extends StateMachine<SupersystemStatemachine.SupersystemState>{
     private SupersystemState state = SupersystemState.REST_WITHOUT_GAMEPIECE;
     
+    private static final PeaccyDrive driveTrainStatemachine = new PeaccyDrive(new DriveTrain());
     private static final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine();
     private static final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine();
     private static final ShooterStatemachine shooterStatemachine = new ShooterStatemachine();
@@ -27,6 +31,14 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
     @Override
     public void requestState(SupersystemState state){
 
+    }
+
+    /**
+     * The drivetrain is it's own thing lol
+     * @param state
+     */
+    public void requestState(DriveTrainState state){
+        driveTrainStatemachine.requestState(state);
     }
 
     /**
@@ -60,6 +72,7 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
         pivotStatemachine.update();
         diverterStatemachine.update();
         climberStatemachine.update();
+        driveTrainStatemachine.update();
     }
 
     /**
