@@ -13,6 +13,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.state.StateMachine;
@@ -51,9 +52,12 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
 
     private DriveTrainState state = DriveTrainState.TELEOP; //disable risky features
 
+    /* the path we're following if the state has a path in it */
     private Command pathCommand = null;
     private boolean pathInitialized = false;
     private boolean pathFinished = false;
+
+    private static DriveTrainObservation observation = new DriveTrainObservation(new Pose2d(), new ChassisSpeeds());
 
     /**
      * PeaccyDrive is a swerve drive command designed to handle all the different
@@ -208,6 +212,8 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
 
     @Override
     public void update() {
+        /* OBSERVATION */
+        observation = new DriveTrainObservation(driveTrain.getPose(), driveTrain.getChassisSpeeds());
         /* PATH FOLLOWING */
         if(state.isFollowingPath() || state.isPathFinding()){
             if(!pathInitialized){
@@ -322,6 +328,10 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
             //TODO
         }
         return true;
+    }
+
+    public static DriveTrainObservation getObservation(){
+        return observation;
     }
 
     /**
@@ -447,6 +457,16 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
 
         public boolean isPathFinding(){
             return pathFinding;
+        }
+    }
+
+    public static class DriveTrainObservation{
+        public final Pose2d odometryPose;
+        public final ChassisSpeeds measuredSpeed;
+
+        public DriveTrainObservation(Pose2d odometryPose, ChassisSpeeds measuredSpeed){
+            this.odometryPose = odometryPose;
+            this.measuredSpeed = measuredSpeed;
         }
     }
 }

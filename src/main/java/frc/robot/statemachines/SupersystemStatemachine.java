@@ -53,6 +53,13 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
         pivotStatemachine.requestState(state.getPivotState());
         diverterStatemachine.requestState(state.getDiverterState());
         climberStatemachine.requestState(state.getClimberState());
+
+        flywheelIntakeStatemachine.update();
+        triggerIntakeStatemachine.update();
+        shooterStatemachine.update();
+        pivotStatemachine.update();
+        diverterStatemachine.update();
+        climberStatemachine.update();
     }
 
     /**
