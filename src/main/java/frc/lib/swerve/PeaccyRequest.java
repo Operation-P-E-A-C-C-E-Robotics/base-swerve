@@ -8,6 +8,7 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -63,6 +64,7 @@ public class PeaccyRequest implements SwerveRequest {
     public double RotationalDeadband = 0;
 
     public boolean HoldHeading = false; //keeps the robot facing Heading unless RotationalRate is over the RotationalDeadband
+    public boolean LockHeading = false; //HoldHeading but way faster and more aggressive
     public boolean SoftHoldHeading = false; //scales HoldHeading by an allowed total drive current draw to prevent tread wear and brownouts
     public boolean IsOpenLoop = false; //if true, the robot will not use the drive velocity controller
     public boolean IsFieldCentric = false; //if false, position correction will not be applied
@@ -80,6 +82,8 @@ public class PeaccyRequest implements SwerveRequest {
     //heading trajectory constraints
     private double holdHeadingVelocity = 0;
     private double holdHeadingAcceleration = 0;
+    private double lockHeadingVelocity = 0;
+    private double lockHeadingAcceleration = 0;
 
     private Timer holdHeadingTrajectoryTimer = new Timer();
     private final Timer robotMovingTimer = new Timer();
@@ -115,8 +119,10 @@ public class PeaccyRequest implements SwerveRequest {
      * @param totalDriveCurrentSupplier a supplier for the sum of current draw of all the drive motors (used for soft heading current limiting)
      * @param softHeadingCurrentLimit the maximum current draw allowed for the heading correction in soft heading mode
      */
-    public PeaccyRequest(double maxAngularVelocity, 
-                    double maxAngularAcceleration, 
+    public PeaccyRequest(double holdHeadingVelocity, 
+                    double holdHeadingAcceleration, 
+                    double lockHeadingVelocity,
+                    double lockHeadingAcceleration,
                     double maxLinearVelocity,
                     double holdHeadingkP, 
                     double holdHeadingkV, 
@@ -124,8 +130,11 @@ public class PeaccyRequest implements SwerveRequest {
                     Supplier<ChassisSpeeds> chassisSpeedsSupplier,
                     DoubleSupplier totalDriveCurrentSupplier,
                     double softHeadingCurrentLimit) {
-        holdHeadingAcceleration = maxAngularAcceleration;
-        holdHeadingVelocity = maxAngularVelocity;
+        this.holdHeadingVelocity = holdHeadingVelocity;
+        this.holdHeadingAcceleration = holdHeadingAcceleration;
+        this.lockHeadingVelocity = lockHeadingVelocity;
+        this.lockHeadingAcceleration = lockHeadingAcceleration;
+
         headingFeedforward = new SimpleMotorFeedforward(0, holdHeadingkV, holdHeadingkA);
         this.holdHeadingkP = holdHeadingkP;
 
@@ -194,7 +203,7 @@ public class PeaccyRequest implements SwerveRequest {
         SwerveTelemetry.updateRequestedState(states);
 
         for (int i = 0; i < modulesToApply.length; ++i) {
-            modulesToApply[i].apply(states[i], IsOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity);
+            modulesToApply[i].apply(states[i], IsOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity, SteerRequestType.MotionMagic); //TODO change to motion magic expo
         }
 
         return StatusCode.OK;
@@ -260,6 +269,16 @@ public class PeaccyRequest implements SwerveRequest {
      */
     public PeaccyRequest withHoldHeading(boolean holdHeading) {
         this.HoldHeading = holdHeading;
+        return this;
+    }
+
+    /**
+     * Set whether or not to lock the heading.
+     * @param lockHeading whether or not to lock the heading
+     * @return this (so you can chain em nicely :D)
+     */
+    public PeaccyRequest withLockHeading(boolean lockHeading) {
+        this.LockHeading = lockHeading;
         return this;
     }
 
@@ -346,8 +365,8 @@ public class PeaccyRequest implements SwerveRequest {
             headingTrajectory = Trajectory.trapezoidTrajectory(
                 new State(currentHeading, 0), 
                 new State(Heading, 0), 
-                holdHeadingVelocity,
-                holdHeadingAcceleration 
+                LockHeading ? lockHeadingVelocity : holdHeadingVelocity,
+                LockHeading ? lockHeadingAcceleration : holdHeadingAcceleration 
             );
             
             holdHeadingTrajectoryTimer.reset();

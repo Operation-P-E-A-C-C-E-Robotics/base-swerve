@@ -248,6 +248,8 @@ public class PeaccyTuner extends Command {
         request  = new PeaccyRequest(
             autoHeadingMaxVelocity, 
             autoHeadingMaxAcceleration,
+            Constants.Swerve.lockHeadingMaxVelocity,
+            Constants.Swerve.lockHeadingMaxAcceleration,
             Constants.Swerve.teleopLinearMultiplier,
             autoHeadingKP, 
             autoHeadingKV, 

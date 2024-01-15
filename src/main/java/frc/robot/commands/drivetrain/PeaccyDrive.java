@@ -62,6 +62,8 @@ public class PeaccyDrive extends Command {
         request  = new PeaccyRequest(
             Constants.Swerve.autoHeadingMaxVelocity, 
             Constants.Swerve.autoHeadingMaxAcceleration,
+            Constants.Swerve.lockHeadingMaxVelocity,
+            Constants.Swerve.lockHeadingMaxAcceleration,
             Constants.Swerve.teleopLinearMultiplier,
             Constants.Swerve.autoHeadingKP, 
             Constants.Swerve.autoHeadingKV, 
