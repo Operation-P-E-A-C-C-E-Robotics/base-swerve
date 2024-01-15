@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.state.Statemachine;
 
-public class FlywheelIntakeStatemachine extends Command {
+public class FlywheelIntakeStatemachine implements Statemachine<FlywheelIntakeStatemachine.FlywheelIntakeState>{
     private FlywheelIntakeState state = FlywheelIntakeState.RETRACT;
 
     private void updateState(){
@@ -12,12 +12,13 @@ public class FlywheelIntakeStatemachine extends Command {
         }
     }
 
+    @Override
     public void requestState(FlywheelIntakeState state){
 
     }
 
     @Override
-    public void execute(){
+    public void update(){
         updateState();
         switch(state) {
             default:
@@ -26,8 +27,17 @@ public class FlywheelIntakeStatemachine extends Command {
         }
     }
 
+    @Override
     public FlywheelIntakeState getState(){
         return state;
+    }
+
+    @Override
+    public boolean isDone(){
+        switch(state){
+            default:
+                return true;
+        }
     }
 
     enum FlywheelIntakeState{

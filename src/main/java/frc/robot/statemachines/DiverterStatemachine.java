@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.state.Statemachine;
 
-public class DiverterStatemachine extends Command {
+public class DiverterStatemachine implements Statemachine<DiverterStatemachine.DiverterState> {
     private DiverterState state = DiverterState.RETRACT;
 
     private void updateState(){
@@ -12,20 +12,30 @@ public class DiverterStatemachine extends Command {
         }
     }
 
+    @Override
     public void requestState(DiverterState state){
 
     }
 
+    @Override
     public DiverterState getState(){
         return state;
     }
 
     @Override
-    public void execute(){
+    public void update(){
         updateState();
         switch(state) {
             default:
                 break;            
+        }
+    }
+
+    @Override
+    public boolean isDone(){
+        switch(state){
+            default:
+                return true;
         }
     }
 

@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.state.Statemachine;
 
-public class ClimberStatemachine extends Command {
+public class ClimberStatemachine implements Statemachine<ClimberStatemachine.ClimberState>{
     private ClimberState state = ClimberState.RETRACT;
 
     private void updateState(){
@@ -12,16 +12,26 @@ public class ClimberStatemachine extends Command {
         }
     }
 
+    @Override
     public void requestState(ClimberState state){
 
     }
 
+    @Override
     public ClimberState getState(){
         return state;
     }
 
     @Override
-    public void execute(){
+    public boolean isDone(){
+        switch(state){
+            default:
+                return true;
+        }
+    }
+
+    @Override
+    public void update(){
         updateState();
         switch(state) {
             default:

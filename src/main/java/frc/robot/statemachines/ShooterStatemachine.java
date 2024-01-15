@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.state.Statemachine;
 
-public class ShooterStatemachine extends Command{
+public class ShooterStatemachine implements Statemachine<ShooterStatemachine.ShooterState> {
     private ShooterState state = ShooterState.REST;
 
     /**
@@ -22,6 +22,7 @@ public class ShooterStatemachine extends Command{
      * e.g. changing state before we have finished INDEXing
      * @param state
      */
+    @Override
     public void requestState(ShooterState state){
 
     }
@@ -30,7 +31,7 @@ public class ShooterStatemachine extends Command{
      * make the mechanism attain the desired state
      */
     @Override
-    public void execute(){
+    public void update(){
         updateState();
         switch(state) {
             default:
@@ -38,13 +39,22 @@ public class ShooterStatemachine extends Command{
         }
     }
 
+    @Override
     public ShooterState getState(){
         return state;
     }
 
+    @Override
+    public boolean isDone(){
+        switch(state){
+            default:
+                return true;
+        }
+    }
+
     enum ShooterState{
         REST(0.0,0.0),
-        INTAKE(-0.0,0.0), //NOTE: this should fold flat if the flywheel-side intake is out
+        INTAKE(0.0,0.0), //NOTE: this should fold flat if the flywheel-side intake is out
         INDEX,
         HANDOFF(0.0,0.0), //to diverter
         //add shooter setpoints

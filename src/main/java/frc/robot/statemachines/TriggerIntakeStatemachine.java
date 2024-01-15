@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.state.Statemachine;
 
-public class TriggerIntakeStatemachine extends Command {
+public class TriggerIntakeStatemachine implements Statemachine<TriggerIntakeStatemachine.TriggerIntakeState>{
     private TriggerIntakeState state = TriggerIntakeState.RETRACT;
 
     /**
@@ -22,6 +22,7 @@ public class TriggerIntakeStatemachine extends Command {
      * Won't allow for a state that would result in a collision or other dangerous situation
      * @param state the desired state
      */
+    @Override
     public void requestState(TriggerIntakeState state){
 
     }
@@ -30,7 +31,7 @@ public class TriggerIntakeStatemachine extends Command {
      * Make the mechanism attain the desired state
      */
     @Override
-    public void execute(){
+    public void update(){
         updateState();
         switch(state) {
             default:
@@ -39,8 +40,17 @@ public class TriggerIntakeStatemachine extends Command {
         }
     }
 
+    @Override
     public TriggerIntakeState getState(){
         return state;
+    }
+
+    @Override
+    public boolean isDone(){
+        switch(state){
+            default:
+                return true;
+        }
     }
 
     enum TriggerIntakeState{

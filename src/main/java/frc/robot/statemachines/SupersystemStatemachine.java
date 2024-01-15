@@ -1,5 +1,6 @@
 package frc.robot.statemachines;
 
+import frc.lib.state.Statemachine;
 import frc.robot.statemachines.ClimberStatemachine.ClimberState;
 import frc.robot.statemachines.DiverterStatemachine.DiverterState;
 import frc.robot.statemachines.FlywheelIntakeStatemachine.FlywheelIntakeState;
@@ -7,7 +8,7 @@ import frc.robot.statemachines.PivotStatemachine.PivotState;
 import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 
-public class SupersystemStatemachine {
+public class SupersystemStatemachine implements Statemachine<SupersystemStatemachine.SupersystemState>{
     private SupersystemState state = SupersystemState.REST_WITHOUT_GAMEPIECE;
     
     private static final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine();
@@ -23,6 +24,7 @@ public class SupersystemStatemachine {
      * e.g. intaking while climbing.
      * @param state
      */
+    @Override
     public void requestState(SupersystemState state){
 
     }
@@ -42,7 +44,8 @@ public class SupersystemStatemachine {
     /**
      * Make the robot attain the desired state
      */
-    public void execute(){
+    @Override
+    public void update(){
         updateState();
         flywheelIntakeStatemachine.requestState(state.getFlywheelIntakeState());
         triggerIntakeStatemachine.requestState(state.getTriggerIntakeState());
@@ -56,8 +59,23 @@ public class SupersystemStatemachine {
      * Get the state that is currently being
      * requested by the state machine
      */
+    @Override
     public SupersystemState getState(){
         return state;
+    }
+
+    /**
+     * Check if the robot has finished attaining the desired state
+     */
+    @Override
+    public boolean isDone(){
+        if(!flywheelIntakeStatemachine.isDone()) return false;
+        if(!triggerIntakeStatemachine.isDone()) return false;
+        if(!shooterStatemachine.isDone()) return false;
+        if(!pivotStatemachine.isDone()) return false;
+        if(!diverterStatemachine.isDone()) return false;
+        if(!climberStatemachine.isDone()) return false;
+        return true;
     }
 
     /**

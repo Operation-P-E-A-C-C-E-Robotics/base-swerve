@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.state.Statemachine;
 
-public class PivotStatemachine extends Command{
+public class PivotStatemachine implements Statemachine<PivotStatemachine.PivotState> {
     private PivotState state = PivotState.REST;
 
     /**
@@ -22,15 +22,24 @@ public class PivotStatemachine extends Command{
      * e.g. flattening to intake before the intake is extended
      * @param state
      */
+    @Override
     public void requestState(PivotState state){
 
+    }
+
+    @Override
+    public boolean isDone() {
+        switch(state) {
+            default:
+                return true;
+        }
     }
 
     /**
      * Make the mechanism attain the desired state
      */
     @Override
-    public void execute(){
+    public void update(){
         updateState();
         switch(state) {
             default:
@@ -38,6 +47,7 @@ public class PivotStatemachine extends Command{
         }
     }
 
+    @Override
     public PivotState getState(){
         return state;
     }
