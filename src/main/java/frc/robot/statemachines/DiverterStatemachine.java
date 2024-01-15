@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import frc.lib.state.Statemachine;
+import frc.lib.state.StateMachine;
 
-public class DiverterStatemachine implements Statemachine<DiverterStatemachine.DiverterState> {
+public class DiverterStatemachine extends StateMachine<DiverterStatemachine.DiverterState> {
     private DiverterState state = DiverterState.RETRACT;
 
     private void updateState(){

@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import frc.lib.state.Statemachine;
+import frc.lib.state.StateMachine;
 
-public class ShooterStatemachine implements Statemachine<ShooterStatemachine.ShooterState> {
+public class ShooterStatemachine extends StateMachine<ShooterStatemachine.ShooterState> {
     private ShooterState state = ShooterState.REST;
 
     /**

@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import frc.lib.state.Statemachine;
+import frc.lib.state.StateMachine;
 
-public class PivotStatemachine implements Statemachine<PivotStatemachine.PivotState> {
+public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState> {
     private PivotState state = PivotState.REST;
 
     /**

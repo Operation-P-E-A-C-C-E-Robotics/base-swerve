@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import frc.lib.state.Statemachine;
+import frc.lib.state.StateMachine;
 
-public class FlywheelIntakeStatemachine implements Statemachine<FlywheelIntakeStatemachine.FlywheelIntakeState>{
+public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeStatemachine.FlywheelIntakeState>{
     private FlywheelIntakeState state = FlywheelIntakeState.RETRACT;
 
     private void updateState(){

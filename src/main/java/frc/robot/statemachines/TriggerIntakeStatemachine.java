@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import frc.lib.state.Statemachine;
+import frc.lib.state.StateMachine;
 
-public class TriggerIntakeStatemachine implements Statemachine<TriggerIntakeStatemachine.TriggerIntakeState>{
+public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatemachine.TriggerIntakeState>{
     private TriggerIntakeState state = TriggerIntakeState.RETRACT;
 
     /**

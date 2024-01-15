@@ -1,8 +1,8 @@
 package frc.robot.statemachines;
 
-import frc.lib.state.Statemachine;
+import frc.lib.state.StateMachine;
 
-public class ClimberStatemachine implements Statemachine<ClimberStatemachine.ClimberState>{
+public class ClimberStatemachine extends StateMachine<ClimberStatemachine.ClimberState>{
     private ClimberState state = ClimberState.RETRACT;
 
     private void updateState(){

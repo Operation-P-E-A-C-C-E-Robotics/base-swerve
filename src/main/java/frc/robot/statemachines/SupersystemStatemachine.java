@@ -1,6 +1,6 @@
 package frc.robot.statemachines;
 
-import frc.lib.state.Statemachine;
+import frc.lib.state.StateMachine;
 import frc.robot.statemachines.ClimberStatemachine.ClimberState;
 import frc.robot.statemachines.DiverterStatemachine.DiverterState;
 import frc.robot.statemachines.FlywheelIntakeStatemachine.FlywheelIntakeState;
@@ -8,7 +8,7 @@ import frc.robot.statemachines.PivotStatemachine.PivotState;
 import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 
-public class SupersystemStatemachine implements Statemachine<SupersystemStatemachine.SupersystemState>{
+public class SupersystemStatemachine extends StateMachine<SupersystemStatemachine.SupersystemState>{
     private SupersystemState state = SupersystemState.REST_WITHOUT_GAMEPIECE;
     
     private static final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine();
