@@ -121,7 +121,7 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
     }
     
 
-    enum SupersystemState {
+    public enum SupersystemState {
         REST_WITHOUT_GAMEPIECE,
         REST_WITH_GAMEPIECE,
         INTAKE_FLYWHEEL (

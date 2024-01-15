@@ -53,7 +53,7 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
         }
     }
 
-    enum TriggerIntakeState{
+    public enum TriggerIntakeState{
         //TODO
         RETRACT(0.0,0.0),
         INTAKE(0.0,0.0),

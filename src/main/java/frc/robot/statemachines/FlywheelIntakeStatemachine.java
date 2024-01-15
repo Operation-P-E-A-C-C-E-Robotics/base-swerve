@@ -40,7 +40,7 @@ public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeState
         }
     }
 
-    enum FlywheelIntakeState{
+    public enum FlywheelIntakeState{
         //TODO
         RETRACT(0.0,0.0),
         INTAKE(0.0,0.0),

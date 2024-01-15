@@ -39,7 +39,7 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
         }
     }
 
-    enum ClimberState{
+    public enum ClimberState{
         //todo
         RETRACT(0.0, false),
         EXTEND(0.0, false),

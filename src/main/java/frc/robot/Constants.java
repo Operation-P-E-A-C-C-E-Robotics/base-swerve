@@ -11,6 +11,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.lib.swerve.SwerveDescription.CANIDs;
@@ -122,6 +123,10 @@ public final class Constants {
   public static final class ControlSystem {
     public static final int PDPCanId = 0;
     public static final ModuleType PDPModuleType = ModuleType.kCTRE;
+  }
+
+  public static final class Field{
+    public static final Translation2d targetTranslation = new Translation2d(0, 0);
   }
 
   //stolen from 364 :D

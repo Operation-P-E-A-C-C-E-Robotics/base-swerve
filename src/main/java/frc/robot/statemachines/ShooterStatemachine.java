@@ -52,7 +52,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         }
     }
 
-    enum ShooterState{
+    public enum ShooterState{
         REST(0.0,0.0),
         INTAKE(0.0,0.0), //NOTE: this should fold flat if the flywheel-side intake is out
         INDEX,

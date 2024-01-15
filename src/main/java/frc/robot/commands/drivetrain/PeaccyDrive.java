@@ -5,19 +5,23 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.state.StateMachine;
 import frc.lib.swerve.PeaccyRequest;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 
-public class PeaccyDrive extends Command {
+public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
     /* Initialize the suppliers to default values */
     private DoubleSupplier xVelocitySup = () -> 0,
                            yVelocitySup = () -> 0, 
@@ -45,7 +49,11 @@ public class PeaccyDrive extends Command {
     private final Debouncer linearDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
     private final Debouncer angularDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
 
-    private FallbackMode fallback = FallbackMode.Normal; //disable risky features
+    private DriveTrainState state = DriveTrainState.TELEOP; //disable risky features
+
+    private Command pathCommand = null;
+    private boolean pathInitialized = false;
+    private boolean pathFinished = false;
 
     /**
      * PeaccyDrive is a swerve drive command designed to handle all the different
@@ -75,7 +83,7 @@ public class PeaccyDrive extends Command {
         .withSoftHoldHeading(Constants.Swerve.useSoftHoldHeading)
         .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
 
-        addRequirements(driveTrain);
+        // addRequirements(driveTrain);
         System.out.println("PeacyDrive initialized");
     }
 
@@ -170,14 +178,48 @@ public class PeaccyDrive extends Command {
         return this;
     }
 
+    // @Override
+    // public void initialize(){
+    //     //seed with initial heading to stop the robot turning to 0
+    //     request.withHeading(driveTrain.getPose().getRotation().getRadians());
+    // }
+
+
     @Override
-    public void initialize(){
-        //seed with initial heading to stop the robot turning to 0
-        request.withHeading(driveTrain.getPose().getRotation().getRadians());
+    public void requestState(DriveTrainState state){
+        if(state == DriveTrainState.TELEOP) {
+            request.withHeading(driveTrain.getPose().getRotation().getRadians());
+            if((this.state.isFollowingPath() || this.state.isPathFinding()) && pathCommand != null){
+                pathCommand.end(!pathFinished);
+            }
+        }
+        if(state.isFollowingPath() || state.isPathFinding()){
+            pathCommand = state.isFollowingPath() ? state.getPathCommand() : state.getPathFindingCommand();
+            pathInitialized = false;
+            pathFinished = false;
+        }
+        this.state = state;
     }
 
     @Override
-    public void execute() {
+    public DriveTrainState getState(){
+        return state;
+    }
+
+    @Override
+    public void update() {
+        /* PATH FOLLOWING */
+        if(state.isFollowingPath() || state.isPathFinding()){
+            if(!pathInitialized){
+                pathCommand.initialize();
+                pathInitialized = true;
+            }
+            pathCommand.execute();
+            pathFinished = pathCommand.isFinished();
+            return;
+        }
+
+        /* TELEOP */
         //get the values from the suppliers
         double xVelocity = xVelocitySup.getAsDouble();
         double yVelocity = yVelocitySup.getAsDouble();
@@ -238,6 +280,7 @@ public class PeaccyDrive extends Command {
                //true will use pid control to maintain heading, or set to "isAutoHeading" if you want to only turn to specified headings 
                //rather than holding whatever direction you're facing :)
                .withHoldHeading(true)
+               .withLockHeading(false)
                .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
 
         //update the robot's target heading if we're using auto heading
@@ -245,15 +288,20 @@ public class PeaccyDrive extends Command {
             request.withHeading(Rotation2d.fromDegrees(autoHeadingAngle).getRadians());
         }
 
-        //disable risky features if we're in fallback mode
-        if(fallback != FallbackMode.Normal){
-            request.withPositionCorrectionIterations(0); //position correction depends on odometry
-        }
-        if(fallback == FallbackMode.PigeonFailure){
+
+        if(state == DriveTrainState.ROBOT_CENTRIC){
             //these depend on the robot's angle
             request.withIsFieldCentric(false);
             request.withHoldHeading(false);
             request.withSoftHoldHeading(false);
+        }
+
+        if(state == DriveTrainState.AIM){
+            Translation2d targetFromRobot = Constants.Field.targetTranslation.minus(driveTrain.getPose().getTranslation());
+            double targetAngle = targetFromRobot.getAngle().getRadians();
+            request.withHeading(targetAngle);
+            request.withLockHeading(true);
+            // request.withHeading();
         }
 
         //yay peaccyrequest,
@@ -266,6 +314,14 @@ public class PeaccyDrive extends Command {
         //for the rest of my life.
         // -peaccy
         driveTrain.drive(request);
+    }
+
+    @Override
+    public boolean isDone(){
+        if(state.isFollowingPath() || state.isPathFinding()){
+            //TODO
+        }
+        return true;
     }
 
     /**
@@ -341,18 +397,56 @@ public class PeaccyDrive extends Command {
         return Math.abs(mod) > deadband ? mod : 0;
     }
 
-    public void fallback(){
-        if(fallback == FallbackMode.Normal) fallback = FallbackMode.OdmetryFailure;
-        if(fallback == FallbackMode.OdmetryFailure) fallback = FallbackMode.PigeonFailure;
-    }
-
     public void resetFallback(){
-        fallback = FallbackMode.Normal;
+        state = DriveTrainState.TELEOP;
     }
     
-    public enum FallbackMode{
-        Normal,
-        OdmetryFailure,
-        PigeonFailure
+    public enum DriveTrainState{
+        TELEOP,
+        ROBOT_CENTRIC,
+        AIM,
+        TEST_PATH("Example Path");
+
+        private String path = "";
+        boolean followingPath = false;
+        boolean pathFinding = false;
+        Pose2d pathFindingTarget = null;
+
+        private DriveTrainState(){
+        }
+
+        private DriveTrainState(String path){
+            this.path = path;
+            followingPath = true;
+        }
+
+        private DriveTrainState(Pose2d target){
+            pathFindingTarget = target;
+            pathFinding = true;
+        }
+
+        public PathPlannerPath getPath(){
+            return PathPlannerPath.fromPathFile(path);
+        }
+
+        public Command getPathCommand(){
+            return AutoBuilder.followPath(getPath());
+        }
+
+        public Pose2d getPathFindingTarget(){
+            return pathFindingTarget;
+        }
+
+        public Command getPathFindingCommand(){
+            return AutoBuilder.pathfindToPose(pathFindingTarget, Constants.Swerve.autoMaxSpeed);
+        }
+
+        public boolean isFollowingPath(){
+            return followingPath;
+        }
+
+        public boolean isPathFinding(){
+            return pathFinding;
+        }
     }
 }

@@ -52,7 +52,7 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
         return state;
     }
 
-    enum PivotState {
+    public enum PivotState {
         REST(0.0),
         INTAKE(0.0),
         AMP(0.0),

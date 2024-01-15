@@ -39,7 +39,7 @@ public class DiverterStatemachine extends StateMachine<DiverterStatemachine.Dive
         }
     }
 
-    enum DiverterState {
+    public enum DiverterState {
         RETRACT(0.0,0.0),
         HANDOFF(0.0,0.0), //from shooter
         ALIGN_AMP(0.0,0.0),
