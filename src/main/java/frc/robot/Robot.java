@@ -19,7 +19,7 @@ public class Robot extends TimedRobot {
   private PowerDistribution pdp = new PowerDistribution(ControlSystem.PDPCanId, ControlSystem.PDPModuleType);
   private Timer scheduleTimer = new Timer();
 
-  RobotStatemachine supersystemStatemachine = new RobotStatemachine();
+  RobotStatemachine statemachine = new RobotStatemachine();
 
   public Robot() {
     super(Constants.period);
@@ -42,13 +42,13 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     if(edu.wpi.first.wpilibj.RobotState.isDisabled()) {
-      supersystemStatemachine.requestState(RobotState.REST_WITHOUT_GAMEPIECE);
+      statemachine.requestState(RobotState.REST_WITHOUT_GAMEPIECE);
       return;
     }
     //run the robot
     scheduleTimer.reset();
     scheduleTimer.start();
-    supersystemStatemachine.update();
+    statemachine.update();
 
     ControlSystemTelemetry.update(null, scheduleTimer.get());
   }
