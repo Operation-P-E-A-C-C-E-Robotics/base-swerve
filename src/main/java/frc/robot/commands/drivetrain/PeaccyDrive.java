@@ -49,8 +49,8 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit); //limit the change in angular velocity
 
     /* Debounce the deadband to prevent jitter when the joystick is near the edge of the deadband */
-    private final Debouncer linearDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
-    private final Debouncer angularDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
+    // private final Debouncer linearDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
+    // private final Debouncer angularDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
 
     private DriveTrainState state = DriveTrainState.TELEOP; //disable risky features
 
@@ -205,7 +205,7 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
                //true will use pid control to maintain heading, or set to "isAutoHeading" if you want to only turn to specified headings 
                //rather than holding whatever direction you're facing :)
                .withHoldHeading(true)
-               .withLockHeading(false)
+               .withLockHeading(true)
                .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
 
         //update the robot's target heading if we're using auto heading
@@ -267,7 +267,7 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
      */
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
         //handle deadband and reset the rate limiter if we're in the deadband
-        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,0.03,linearVelocity.getNorm(), linearDeadbandDebouncer);
+        double rawLinearSpeed = handleDeadbandFixSlope(0.001,0.1,linearVelocity.getNorm());
         if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
         rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
@@ -300,7 +300,7 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
      */
     private double smoothAndDeadband (double angularVelocity) {
         //apply deadband to angular velocity
-        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, 0.3, angularVelocity, angularDeadbandDebouncer);
+        angularVelocity = handleDeadbandFixSlope(0.001, 0.1, angularVelocity);
 
         angularVelocity = Constants.Swerve.teleopAngularVelocityCurve.apply(angularVelocity);
 
@@ -320,8 +320,8 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
      * @param value the value to apply the deadband to
      * @return the value with the deadband applied (like magic)
      */
-    private double handleDeadbandFixSlope (double modband, double deadband, double value, Debouncer debounce) {
-        if (debounce.calculate(Math.abs(value) < deadband)) return 0;
+    private double handleDeadbandFixSlope (double modband, double deadband, double value) {
+        if(Math.abs(value) < deadband) return 0;
         var mod = (value - (deadband * Math.signum(value)))/(1 - deadband);
         return Math.abs(mod) > deadband ? mod : 0;
     }

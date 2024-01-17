@@ -7,20 +7,19 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.ControlSystemTelemetry;
 import frc.robot.Constants.ControlSystem;
-import frc.robot.statemachines.SupersystemStatemachine;
-import frc.robot.statemachines.SupersystemStatemachine.SupersystemState;
+import frc.robot.statemachines.RobotStatemachine;
+import frc.robot.statemachines.RobotStatemachine.RobotState;
 
 public class Robot extends TimedRobot {
   private PowerDistribution pdp = new PowerDistribution(ControlSystem.PDPCanId, ControlSystem.PDPModuleType);
   private Timer scheduleTimer = new Timer();
 
-  SupersystemStatemachine supersystemStatemachine = new SupersystemStatemachine();
+  RobotStatemachine supersystemStatemachine = new RobotStatemachine();
 
   public Robot() {
     super(Constants.period);
@@ -42,8 +41,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    if(RobotState.isDisabled()) {
-      supersystemStatemachine.requestState(SupersystemState.REST_WITHOUT_GAMEPIECE);
+    if(edu.wpi.first.wpilibj.RobotState.isDisabled()) {
+      supersystemStatemachine.requestState(RobotState.REST_WITHOUT_GAMEPIECE);
       return;
     }
     //run the robot

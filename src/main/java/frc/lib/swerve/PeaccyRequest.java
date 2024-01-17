@@ -382,7 +382,7 @@ public class PeaccyRequest implements SwerveRequest {
 
         var acceleration = (target.velocity - getChassisSpeeds.get().omegaRadiansPerSecond);
 
-        if(robotMovingTimer.get() < 0.3 && Math.abs(error) < 0.002){
+        if(robotMovingTimer.get() < 0.3 && Math.abs(error) < 0.01 && !LockHeading){
             return 0;
         }
 

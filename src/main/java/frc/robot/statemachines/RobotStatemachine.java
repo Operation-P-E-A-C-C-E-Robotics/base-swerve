@@ -1,6 +1,9 @@
 package frc.robot.statemachines;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
+import frc.robot.Robot;
 import frc.robot.commands.drivetrain.PeaccyDrive;
 import frc.robot.commands.drivetrain.PeaccyDrive.DriveTrainState;
 import frc.robot.statemachines.ClimberStatemachine.ClimberState;
@@ -10,9 +13,12 @@ import frc.robot.statemachines.PivotStatemachine.PivotState;
 import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.FlywheelIntake;
 
-public class SupersystemStatemachine extends StateMachine<SupersystemStatemachine.SupersystemState>{
-    private SupersystemState state = SupersystemState.REST_WITHOUT_GAMEPIECE;
+public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState>{
+    private RobotState state = RobotState.REST_WITHOUT_GAMEPIECE;
+
+    public static FlywheelIntake flywheelIntake = new FlywheelIntake();
     
     private static final PeaccyDrive driveTrainStatemachine = new PeaccyDrive(new DriveTrain());
     private static final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine();
@@ -21,6 +27,28 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
     private static final PivotStatemachine pivotStatemachine = new PivotStatemachine();
     private static final DiverterStatemachine diverterStatemachine = new DiverterStatemachine();
     private static final ClimberStatemachine climberStatemachine = new ClimberStatemachine();
+    
+    private final SendableChooser<RobotState> simStateChooser = new SendableChooser<>();
+
+    public RobotStatemachine () {
+        if(Robot.isSimulation()) {
+            simStateChooser.setDefaultOption("Rest Without Gamepiece", RobotState.REST_WITHOUT_GAMEPIECE);
+            simStateChooser.addOption("Rest With Gamepiece", RobotState.REST_WITH_GAMEPIECE);
+            simStateChooser.addOption("Intake Flywheel", RobotState.INTAKE_FLYWHEEL);
+            simStateChooser.addOption("Intake Trigger", RobotState.INTAKE_TRIGGER);
+            simStateChooser.addOption("Aim", RobotState.AIM);
+            simStateChooser.addOption("Shoot", RobotState.SHOOT);
+            simStateChooser.addOption("Align Amp", RobotState.ALIGN_AMP);
+            simStateChooser.addOption("Place Amp", RobotState.PLACE_AMP);
+            simStateChooser.addOption("Pre Climb", RobotState.PRE_CLIMB);
+            simStateChooser.addOption("Climb Extend", RobotState.CLIMB_EXTEND);
+            simStateChooser.addOption("Climb Retract", RobotState.CLIMB_RETRACT);
+            simStateChooser.addOption("Handoff", RobotState.HANDOFF);
+            simStateChooser.addOption("Align Trap", RobotState.ALIGN_TRAP);
+            simStateChooser.addOption("Place Trap", RobotState.PLACE_TRAP);
+            SmartDashboard.putData("Supersystem State", simStateChooser);
+        }
+    }
 
     /**
      * Request a state change.
@@ -29,8 +57,24 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
      * @param state
      */
     @Override
-    public void requestState(SupersystemState state){
+    public void requestState(RobotState state){
+        //Conditional state transitions:
+        switch (this.state) {
+            default:
+                break;
+        }
 
+        //Automatic state transitions:
+        switch (this.state) {
+            default:
+                break;
+        }
+
+        //illegal state transitions:
+        switch (this.state) {
+            default:
+                break;
+        }
     }
 
     /**
@@ -58,6 +102,7 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
      */
     @Override
     public void update(){
+        if(Robot.isSimulation()) requestState(simStateChooser.getSelected());
         updateState();
         flywheelIntakeStatemachine.requestState(state.getFlywheelIntakeState());
         triggerIntakeStatemachine.requestState(state.getTriggerIntakeState());
@@ -80,7 +125,7 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
      * requested by the state machine
      */
     @Override
-    public SupersystemState getState(){
+    public RobotState getState(){
         return state;
     }
 
@@ -142,7 +187,7 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
     }
     
 
-    public enum SupersystemState {
+    public enum RobotState {
         REST_WITHOUT_GAMEPIECE,
         REST_WITH_GAMEPIECE,
         INTAKE_FLYWHEEL (
@@ -241,7 +286,7 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
             return climberState;
         }
 
-        private SupersystemState (FlywheelIntakeState flywheelIntakeState,
+        private RobotState (FlywheelIntakeState flywheelIntakeState,
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState,
                                 PivotState pivotState,
@@ -255,25 +300,25 @@ public class SupersystemStatemachine extends StateMachine<SupersystemStatemachin
             this.climberState = climberState;
         }
 
-        private SupersystemState(FlywheelIntakeState flywheelIntakeState,
+        private RobotState(FlywheelIntakeState flywheelIntakeState,
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState) {
             this(flywheelIntakeState, triggerIntakeState, shooterState, PivotState.REST, DiverterState.RETRACT, ClimberState.RETRACT);
         }
 
-        private SupersystemState(ShooterState shooterState, PivotState pivotState){
+        private RobotState(ShooterState shooterState, PivotState pivotState){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, DiverterState.RETRACT, ClimberState.RETRACT);
         }
 
-        private SupersystemState(ShooterState shooterState, PivotState pivotState, DiverterState diverterState){
+        private RobotState(ShooterState shooterState, PivotState pivotState, DiverterState diverterState){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, diverterState, ClimberState.RETRACT);
         }
 
-        private SupersystemState(TriggerIntakeState triggerIntakeState, PivotState pivotState, DiverterState diverterState, ClimberState climberState){
+        private RobotState(TriggerIntakeState triggerIntakeState, PivotState pivotState, DiverterState diverterState, ClimberState climberState){
             this(FlywheelIntakeState.RETRACT, triggerIntakeState, ShooterState.REST, pivotState, diverterState, climberState);
         }
 
-        private SupersystemState(){
+        private RobotState(){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, ShooterState.REST, PivotState.REST, DiverterState.RETRACT, ClimberState.RETRACT);
         }
     }

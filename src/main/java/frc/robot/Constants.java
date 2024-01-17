@@ -84,8 +84,8 @@ public final class Constants {
     public static final double autoHeadingKA = 0.02;
     public static final double autoHeadingMaxVelocity = 3; //deg/s (i think)
     public static final double autoHeadingMaxAcceleration = 10; //deg/s^2
-    public static final double lockHeadingMaxVelocity = 5;
-    public static final double lockHeadingMaxAcceleration = 10;
+    public static final double lockHeadingMaxVelocity = 6;
+    public static final double lockHeadingMaxAcceleration = 20;
     public static final boolean useSoftHoldHeading = false;
     public static final double softHeadingCurrentLimit = 30;
 
