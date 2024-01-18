@@ -43,6 +43,14 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
         }
     }
 
+    @Override
+    public boolean isDynamic() {
+        switch(state){
+            default:
+                return true;
+        }
+    }
+
     public static ClimberObservation getObservation(){
         return observation;
     }

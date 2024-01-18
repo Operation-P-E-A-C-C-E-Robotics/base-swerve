@@ -144,6 +144,14 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
         return true;
     }
 
+    @Override
+    public boolean isDynamic() {
+        switch(state){
+            default:
+                return true;
+        }
+    }
+
     /**
      * Get the state that the flywheel intake is currently executing
      */

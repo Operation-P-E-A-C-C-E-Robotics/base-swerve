@@ -327,6 +327,11 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
     public void resetFallback(){
         state = DriveTrainState.TELEOP;
     }
+
+    @Override
+    public boolean isDynamic() {
+        return true;
+    }
     
     public enum DriveTrainState{
         TELEOP,

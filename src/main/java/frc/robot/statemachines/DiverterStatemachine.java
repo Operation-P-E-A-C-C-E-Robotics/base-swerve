@@ -39,6 +39,14 @@ public class DiverterStatemachine extends StateMachine<DiverterStatemachine.Dive
         }
     }
 
+    @Override
+    public boolean isDynamic() {
+        switch(state){
+            default:
+                return true;
+        }
+    }
+
     public enum DiverterState {
         RETRACT(0.0,0.0),
         HANDOFF(0.0,0.0), //from shooter

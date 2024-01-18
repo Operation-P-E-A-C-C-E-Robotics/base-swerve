@@ -27,14 +27,6 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
 
     }
 
-    @Override
-    public boolean isDone() {
-        switch(state) {
-            default:
-                return true;
-        }
-    }
-
     /**
      * Make the mechanism attain the desired state
      */
@@ -50,6 +42,22 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
     @Override
     public PivotState getState(){
         return state;
+    }
+    
+    @Override
+    public boolean isDone() {
+        switch(state) {
+            default:
+                return true;
+        }
+    }
+
+    @Override
+    public boolean isDynamic() {
+        switch(state){
+            default:
+                return true;
+        }
     }
 
     public enum PivotState {

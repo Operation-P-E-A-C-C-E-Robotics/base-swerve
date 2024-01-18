@@ -40,6 +40,14 @@ public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeState
         }
     }
 
+    @Override
+    public boolean isDynamic() {
+        switch(state){
+            default:
+                return true;
+        }
+    }
+
     public enum FlywheelIntakeState{
         //TODO
         RETRACT(0.0,0.0),

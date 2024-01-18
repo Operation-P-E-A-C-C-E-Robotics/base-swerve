@@ -53,6 +53,14 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
         }
     }
 
+    @Override
+    public boolean isDynamic() {
+        switch(state){
+            default:
+                return true;
+        }
+    }
+
     public enum TriggerIntakeState{
         //TODO
         RETRACT(0.0,0.0),

@@ -52,6 +52,14 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         }
     }
 
+    @Override
+    public boolean isDynamic() {
+        switch(state){
+            default:
+                return true;
+        }
+    }
+
     public enum ShooterState{
         REST(0.0,0.0),
         INTAKE(0.0,0.0), //NOTE: this should fold flat if the flywheel-side intake is out
