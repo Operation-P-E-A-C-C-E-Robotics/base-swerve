@@ -1,9 +1,19 @@
 package frc.robot.statemachines;
 
 import frc.lib.state.StateMachine;
+import frc.robot.planners.AimPlanner;
+import frc.robot.subsystems.Shooter;
 
 public class ShooterStatemachine extends StateMachine<ShooterStatemachine.ShooterState> {
     private ShooterState state = ShooterState.REST;
+
+    private final Shooter shooter;
+    private final AimPlanner aimPlanner;
+
+    public ShooterStatemachine(Shooter shooter, AimPlanner aimPlanner){
+        this.shooter = shooter;
+        this.aimPlanner = aimPlanner;
+    }
 
     /**
      * Handle the logic for changing states

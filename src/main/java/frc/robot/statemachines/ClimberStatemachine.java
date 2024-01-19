@@ -1,12 +1,16 @@
 package frc.robot.statemachines;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import frc.lib.state.StateMachine;
+import frc.robot.subsystems.Climber;
 
 public class ClimberStatemachine extends StateMachine<ClimberStatemachine.ClimberState>{
     private ClimberState state = ClimberState.RETRACT;
 
-    private static ClimberObservation observation = new ClimberObservation();
+    private final Climber climber;
+
+    public ClimberStatemachine(Climber climber){
+        this.climber = climber;
+    }
 
     private void updateState(){
         switch (state) {
@@ -51,10 +55,6 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
         }
     }
 
-    public static ClimberObservation getObservation(){
-        return observation;
-    }
-
     public enum ClimberState{
         //todo
         RETRACT(0.0, false),
@@ -75,21 +75,6 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
         private ClimberState(Double position, Boolean balance){
             this.position = position;
             this.balance = balance;
-        }
-    }
-
-    public static class ClimberObservation{
-        public final double extension;
-        public final Pose3d pose;
-
-        public ClimberObservation(){
-            extension = 0.0;
-            pose = new Pose3d();
-        }
-
-        public ClimberObservation(double extension, Pose3d pose){
-            this.extension = extension;
-            this.pose = pose;
         }
     }
 }

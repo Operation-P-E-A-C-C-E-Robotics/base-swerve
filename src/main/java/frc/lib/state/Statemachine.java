@@ -24,7 +24,9 @@ public abstract class StateMachine <T extends Enum<T>> {
      * check if the state machine is in a stable state
      * @return true if the subsystem is in the desired state
      */
-    public abstract boolean isDone();
+    public boolean isDone() {
+        return false;
+    }
 
     /**
      * check if the state machine is in a dynamic state
@@ -32,7 +34,9 @@ public abstract class StateMachine <T extends Enum<T>> {
      * need to be updated every loop
      * @return true if the state machine is in a dynamic state
      */
-    public abstract boolean isDynamic();
+    public boolean isDynamic() {
+        return true;
+    }
 
     /**
      * Get a callback that will request a state change
@@ -41,5 +45,22 @@ public abstract class StateMachine <T extends Enum<T>> {
      */
     public final Runnable action(T state){
         return () -> requestState(state);
+    }
+
+    /**
+     * Update the state machine with a desired state.
+     * Will skip the state transition if the state is already the desired state.
+     * Won't update the state machine if it is stable in the requested state.
+     * @param state the current state
+     */
+    public final void updateWithState(T state){
+        if(getState() != state){
+            requestState(state);
+            update();
+            return;
+        }
+        if(isDynamic() || !isDone()){
+            update();
+        }
     }
 }

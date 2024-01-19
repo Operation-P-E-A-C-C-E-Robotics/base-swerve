@@ -1,4 +1,4 @@
-package frc.robot.commands.drivetrain;
+package frc.robot.statemachines;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -11,7 +11,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.state.StateMachine;
@@ -20,21 +19,21 @@ import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.Robot;
-import frc.robot.subsystems.DriveTrain;
+import frc.robot.planners.AimPlanner;
+import frc.robot.subsystems.Swerve;
 
-public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
+/**
+ * Adopted from Command Based architecture so it's not the neatest :|
+ */
+public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveState> {
     /* Initialize the suppliers to default values */
     private DoubleSupplier xVelocitySup = OI.DriveTrain.translation,
                            yVelocitySup = OI.DriveTrain.strafe, 
                            angularVelocitySup = OI.DriveTrain.rotation, 
                            autoHeadingAngleSup = OI.DriveTrain.heading;
-    private BooleanSupplier isAutoAngleSup = OI.DriveTrain.useHeading, 
-                            isFieldRelativeSup = OI.DriveTrain.isFieldRelative, 
-                            isOpenLoopSup = OI.DriveTrain.isOpenLoop, 
-                            isLockInSup = OI.DriveTrain.isLockIn,
-                            isZeroOdometrySup = OI.DriveTrain.isZeroOdometry;
+    private BooleanSupplier isZeroOdometrySup = OI.DriveTrain.isZeroOdometry;
 
-    private DriveTrain driveTrain;
+    private Swerve driveTrain;
 
     /* "Swerve Requests" are what the drivetrain subsystem accepts. They figure out how to orient and drive the wheels. */
     private final PeaccyRequest request; //custom fancy request than handles everything
@@ -46,18 +45,14 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit); //limit the change in direction
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit); //limit the change in angular velocity
 
-    /* Debounce the deadband to prevent jitter when the joystick is near the edge of the deadband */
-    // private final Debouncer linearDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
-    // private final Debouncer angularDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
-
-    private DriveTrainState state = DriveTrainState.TELEOP; //disable risky features
+    private SwerveState state = SwerveState.OPEN_LOOP_TELEOP;
 
     /* the path we're following if the state has a path in it */
     private Command pathCommand = null;
     private boolean pathInitialized = false;
     private boolean pathFinished = false;
 
-    private static DriveTrainObservation observation = new DriveTrainObservation(new Pose2d(), new ChassisSpeeds());
+    private final AimPlanner aimPlanner;
 
     /**
      * PeaccyDrive is a swerve drive command designed to handle all the different
@@ -68,8 +63,9 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
      * and auto angle (automatic heading adjustment) modes.
      * @param driveTrain the swerve subsystem
      */
-    public PeaccyDrive(DriveTrain driveTrain) {
+    public SwerveStatemachine(Swerve driveTrain, AimPlanner aimPlanner) {
         this.driveTrain = driveTrain;
+        this.aimPlanner = aimPlanner;
 
         request  = new PeaccyRequest(
             Constants.Swerve.autoHeadingMaxVelocity, 
@@ -87,26 +83,28 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
         .withSoftHoldHeading(Constants.Swerve.useSoftHoldHeading)
         .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
 
-        // addRequirements(driveTrain);
         System.out.println("PeacyDrive initialized");
     }
 
-    // @Override
-    // public void initialize(){
-    //     //seed with initial heading to stop the robot turning to 0
-    //     request.withHeading(driveTrain.getPose().getRotation().getRadians());
-    // }
-
 
     @Override
-    public void requestState(DriveTrainState state){
+    public void requestState(SwerveState state){
         if(state == this.state) return;
+
+        if(state == SwerveState.LOCK_IN){
+            if(Math.abs(xVelocitySup.getAsDouble()) > Constants.Swerve.teleopLinearSpeedDeadband || 
+                Math.abs(yVelocitySup.getAsDouble()) > Constants.Swerve.teleopLinearSpeedDeadband || 
+                Math.abs(angularVelocitySup.getAsDouble()) > Constants.Swerve.teleopAngularVelocityDeadband){
+                return;
+            }
+        }
+
         //handle command end function
         if((this.state.isFollowingPath() || this.state.isPathFinding()) && pathCommand != null){
             pathCommand.end(!pathFinished);
         }
         //reset the request heading to avoid erronious heading changes
-        if(state == DriveTrainState.TELEOP) {
+        if(state == SwerveState.OPEN_LOOP_TELEOP || state == SwerveState.CLOSED_LOOP_TELEOP) {
             request.withHeading(driveTrain.getPose().getRotation().getRadians());
         }
 
@@ -119,17 +117,27 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
         this.state = state;
     }
 
+    private void updateState() {
+        //unlock the wheels if we wanna move
+        if(state == SwerveState.LOCK_IN){
+            if(Math.abs(xVelocitySup.getAsDouble()) > Constants.Swerve.teleopLinearSpeedDeadband || 
+                Math.abs(yVelocitySup.getAsDouble()) > Constants.Swerve.teleopLinearSpeedDeadband || 
+                Math.abs(angularVelocitySup.getAsDouble()) > Constants.Swerve.teleopAngularVelocityDeadband){
+                requestState(SwerveState.OPEN_LOOP_TELEOP);
+            }
+        }
+    }
+
     @Override
-    public DriveTrainState getState(){
+    public SwerveState getState(){
         return state;
     }
 
     @Override
     public void update() {
         driveTrain.periodic();
+        updateState();
         if(Robot.isSimulation()) driveTrain.simulationPeriodic();
-        /* OBSERVATION */
-        observation = new DriveTrainObservation(driveTrain.getPose(), driveTrain.getChassisSpeeds());
         /* PATH FOLLOWING */
         if(state.isFollowingPath() || state.isPathFinding()){
 
@@ -149,10 +157,10 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
         double angularVelocity = angularVelocitySup.getAsDouble();
         double autoHeadingAngle = autoHeadingAngleSup.getAsDouble();
 
-        boolean isAutoHeading = isAutoAngleSup.getAsBoolean();
-        boolean isFieldRelative = isFieldRelativeSup.getAsBoolean();
-        boolean isOpenLoop = isOpenLoopSup.getAsBoolean();
-        boolean isLockIn = isLockInSup.getAsBoolean();
+        boolean isAutoHeading = state.isHoldHeading();
+        boolean isFieldRelative = !state.isRobotCentric();
+        boolean isOpenLoop = state.isOpenLoop();
+        boolean isLockIn = state.isLockIn();
         boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean();
 
         if(isZeroOdometry) {
@@ -186,12 +194,7 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
 
         //X-lock the wheels if we're stopped and the driver wants to
         if (isLockIn) {
-            //only lock in if we're stopped
-            if (linearVelocity.equals(new Translation2d(0,0)) && angularVelocity == 0) {
-                //use CTRE lock in, then return so it's not overridden by the normal request :)
-                driveTrain.drive(lockInRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
-                return;
-            }
+            driveTrain.drive(lockInRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
         }
 
         //update my very nice swerve request with the values we've calculated
@@ -212,19 +215,16 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
         }
 
 
-        if(state == DriveTrainState.ROBOT_CENTRIC){
+        if(state == SwerveState.ROBOT_CENTRIC){
             //these depend on the robot's angle
             request.withIsFieldCentric(false);
             request.withHoldHeading(false);
             request.withSoftHoldHeading(false);
         }
 
-        if(state == DriveTrainState.AIM){
-            Translation2d targetFromRobot = Constants.Field.targetTranslation.minus(driveTrain.getPose().getTranslation());
-            double targetAngle = targetFromRobot.getAngle().getRadians();
-            request.withHeading(targetAngle);
+        if(state == SwerveState.AIM){
+            request.withHeading(aimPlanner.getTargetDrivetrainAngle());
             request.withLockHeading(true);
-            // request.withHeading();
         }
 
         //yay peaccyrequest,
@@ -245,10 +245,6 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
             //TODO
         }
         return true;
-    }
-
-    public static DriveTrainObservation getObservation(){
-        return observation;
     }
 
     /**
@@ -324,35 +320,42 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
         return Math.abs(mod) > deadband ? mod : 0;
     }
 
-    public void resetFallback(){
-        state = DriveTrainState.TELEOP;
-    }
-
     @Override
     public boolean isDynamic() {
         return true;
     }
     
-    public enum DriveTrainState{
-        TELEOP,
-        ROBOT_CENTRIC,
-        AIM,
-        TEST_PATH("Example Path");
+    public enum SwerveState{
+        CLOSED_LOOP_TELEOP  (false, false, false, true),
+        OPEN_LOOP_TELEOP    (true, false, false, true),
+        ROBOT_CENTRIC       (true, true, false, false),
+        LOCK_IN             (true, false, true, false),
+        AIM                 (true, false, false, true),
+        TEST_PATH("Example Path"),
+        TEST_PATHFIND(new Pose2d());
 
         private String path = "";
         boolean followingPath = false;
         boolean pathFinding = false;
+        boolean openLoop = false;
+        boolean robotCentric = false;
+        boolean lockIn = false;
+        boolean holdHeading;
         Pose2d pathFindingTarget = null;
 
-        private DriveTrainState(){
+        private SwerveState(boolean openLoop, boolean robotCentric, boolean lockIn, boolean holdHeading){
+            this.openLoop = openLoop;
+            this.robotCentric = robotCentric;
+            this.lockIn = lockIn;
+            this.holdHeading = holdHeading;
         }
 
-        private DriveTrainState(String path){
+        private SwerveState(String path){
             this.path = path;
             followingPath = true;
         }
 
-        private DriveTrainState(Pose2d target){
+        private SwerveState(Pose2d target){
             pathFindingTarget = target;
             pathFinding = true;
         }
@@ -380,15 +383,21 @@ public class PeaccyDrive extends StateMachine<PeaccyDrive.DriveTrainState> {
         public boolean isPathFinding(){
             return pathFinding;
         }
-    }
 
-    public static class DriveTrainObservation{
-        public final Pose2d odometryPose;
-        public final ChassisSpeeds measuredSpeed;
+        public boolean isOpenLoop(){
+            return openLoop;
+        }
 
-        public DriveTrainObservation(Pose2d odometryPose, ChassisSpeeds measuredSpeed){
-            this.odometryPose = odometryPose;
-            this.measuredSpeed = measuredSpeed;
+        public boolean isRobotCentric(){
+            return robotCentric;
+        }
+
+        public boolean isLockIn(){
+            return lockIn;
+        }
+
+        public boolean isHoldHeading(){
+            return holdHeading;
         }
     }
 }

@@ -1,18 +1,22 @@
-package frc.robot.statemachines;
+package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
-import frc.robot.Robot;
-import frc.robot.commands.drivetrain.PeaccyDrive;
-import frc.robot.commands.drivetrain.PeaccyDrive.DriveTrainState;
+import frc.robot.statemachines.ClimberStatemachine;
+import frc.robot.statemachines.DiverterStatemachine;
+import frc.robot.statemachines.FlywheelIntakeStatemachine;
+import frc.robot.statemachines.PivotStatemachine;
+import frc.robot.statemachines.ShooterStatemachine;
+import frc.robot.statemachines.SwerveStatemachine;
+import frc.robot.statemachines.TriggerIntakeStatemachine;
 import frc.robot.statemachines.ClimberStatemachine.ClimberState;
 import frc.robot.statemachines.DiverterStatemachine.DiverterState;
 import frc.robot.statemachines.FlywheelIntakeStatemachine.FlywheelIntakeState;
+import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.statemachines.PivotStatemachine.PivotState;
 import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
-import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.FlywheelIntake;
 
 public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState>{
@@ -20,17 +24,31 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
 
     public static FlywheelIntake flywheelIntake = new FlywheelIntake();
     
-    private static final PeaccyDrive driveTrainStatemachine = new PeaccyDrive(new DriveTrain());
-    private static final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine();
-    private static final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine();
-    private static final ShooterStatemachine shooterStatemachine = new ShooterStatemachine();
-    private static final PivotStatemachine pivotStatemachine = new PivotStatemachine();
-    private static final DiverterStatemachine diverterStatemachine = new DiverterStatemachine();
-    private static final ClimberStatemachine climberStatemachine = new ClimberStatemachine();
+    private final SwerveStatemachine swerveStatemachine;
+    private final FlywheelIntakeStatemachine flywheelIntakeStatemachine;
+    private final TriggerIntakeStatemachine triggerIntakeStatemachine;
+    private final ShooterStatemachine shooterStatemachine;
+    private final PivotStatemachine pivotStatemachine;
+    private final DiverterStatemachine diverterStatemachine;
+    private final ClimberStatemachine climberStatemachine;
     
     private final SendableChooser<RobotState> simStateChooser = new SendableChooser<>();
 
-    public RobotStatemachine () {
+    public RobotStatemachine (SwerveStatemachine swerveStatemachine, 
+                            FlywheelIntakeStatemachine flywheelIntakeStatemachine, 
+                            TriggerIntakeStatemachine triggerIntakeStatemachine, 
+                            ShooterStatemachine shooterStatemachine, 
+                            PivotStatemachine pivotStatemachine, 
+                            DiverterStatemachine diverterStatemachine, 
+                            ClimberStatemachine climberStatemachine) {
+        this.swerveStatemachine = swerveStatemachine;
+        this.flywheelIntakeStatemachine = flywheelIntakeStatemachine;
+        this.triggerIntakeStatemachine = triggerIntakeStatemachine;
+        this.shooterStatemachine = shooterStatemachine;
+        this.pivotStatemachine = pivotStatemachine;
+        this.diverterStatemachine = diverterStatemachine;
+        this.climberStatemachine = climberStatemachine;
+
         if(Robot.isSimulation()) {
             simStateChooser.setDefaultOption("Rest Without Gamepiece", RobotState.REST_WITHOUT_GAMEPIECE);
             simStateChooser.addOption("Rest With Gamepiece", RobotState.REST_WITH_GAMEPIECE);
@@ -81,8 +99,8 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
      * The drivetrain is it's own thing lol
      * @param state
      */
-    public void driveState(DriveTrainState state){
-        driveTrainStatemachine.requestState(state);
+    public void requestSwerveState(SwerveState state){
+        swerveStatemachine.requestState(state);
     }
 
     /**
@@ -104,20 +122,12 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
     public void update(){
         if(Robot.isSimulation()) requestState(simStateChooser.getSelected());
         updateState();
-        flywheelIntakeStatemachine.requestState(state.getFlywheelIntakeState());
-        triggerIntakeStatemachine.requestState(state.getTriggerIntakeState());
-        shooterStatemachine.requestState(state.getShooterState());
-        pivotStatemachine.requestState(state.getPivotState());
-        diverterStatemachine.requestState(state.getDiverterState());
-        climberStatemachine.requestState(state.getClimberState());
-
-        flywheelIntakeStatemachine.update();
-        triggerIntakeStatemachine.update();
-        shooterStatemachine.update();
-        pivotStatemachine.update();
-        diverterStatemachine.update();
-        climberStatemachine.update();
-        driveTrainStatemachine.update();
+        flywheelIntakeStatemachine.updateWithState(state.getFlywheelIntakeState());
+        triggerIntakeStatemachine.updateWithState(state.getTriggerIntakeState());
+        shooterStatemachine.updateWithState(state.getShooterState());
+        pivotStatemachine.updateWithState(state.getPivotState());
+        diverterStatemachine.updateWithState(state.getDiverterState());
+        climberStatemachine.updateWithState(state.getClimberState());
     }
 
     /**
@@ -140,58 +150,9 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
         if(!pivotStatemachine.isDone()) return false;
         if(!diverterStatemachine.isDone()) return false;
         if(!climberStatemachine.isDone()) return false;
-        if(!driveTrainStatemachine.isDone()) return false;
+        if(!swerveStatemachine.isDone()) return false;
         return true;
-    }
-
-    @Override
-    public boolean isDynamic() {
-        switch(state){
-            default:
-                return true;
-        }
-    }
-
-    /**
-     * Get the state that the flywheel intake is currently executing
-     */
-    public static FlywheelIntakeState getFlywheelIntakeState(){
-        return flywheelIntakeStatemachine.getState();
-    }
-
-    /**
-     * Get the state that the trigger intake is currently executing
-     */
-    public static TriggerIntakeState getTriggerIntakeState(){
-        return triggerIntakeStatemachine.getState();
-    }
-
-    /**
-     * Get the state that the shooter is currently executing
-     */
-    public static ShooterState getShooterState(){
-        return shooterStatemachine.getState();
-    }
-
-    /**
-     * Get the state that the pivot is currently executing
-     */
-    public static PivotState getPivotState(){
-        return pivotStatemachine.getState();
-    }
-
-    /**
-     * Get the state that the diverter is currently executing
-     */
-    public static DiverterState getDiverterState(){
-        return diverterStatemachine.getState();
-    }
-
-    /**
-     * Get the state that the climber is currently executing
-     */
-    public static ClimberState getClimberState(){
-        return climberStatemachine.getState();
+        
     }
     
 

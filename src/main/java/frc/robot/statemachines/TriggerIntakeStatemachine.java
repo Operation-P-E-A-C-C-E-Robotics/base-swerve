@@ -1,9 +1,19 @@
 package frc.robot.statemachines;
 
 import frc.lib.state.StateMachine;
+import frc.robot.planners.IntakeMotionPlanner;
+import frc.robot.subsystems.TriggerIntake;
 
 public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatemachine.TriggerIntakeState>{
+    private final TriggerIntake triggerIntake;
+    private final IntakeMotionPlanner supersystemMotionPlanner;
+    
     private TriggerIntakeState state = TriggerIntakeState.RETRACT;
+
+    public TriggerIntakeStatemachine(TriggerIntake triggerIntake, IntakeMotionPlanner supersystemMotionPlanner){
+        this.triggerIntake = triggerIntake;
+        this.supersystemMotionPlanner = supersystemMotionPlanner;
+    }
 
     /**
      * Update the desired state of the mechanism

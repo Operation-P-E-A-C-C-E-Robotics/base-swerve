@@ -1,9 +1,19 @@
 package frc.robot.statemachines;
 
 import frc.lib.state.StateMachine;
+import frc.robot.planners.IntakeMotionPlanner;
+import frc.robot.subsystems.FlywheelIntake;
 
 public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeStatemachine.FlywheelIntakeState>{
     private FlywheelIntakeState state = FlywheelIntakeState.RETRACT;
+
+    private final FlywheelIntake flywheelIntake;
+    private final IntakeMotionPlanner supersystemMotionPlanner;
+
+    public FlywheelIntakeStatemachine(FlywheelIntake flywheelIntake, IntakeMotionPlanner supersystemMotionPlanner){
+        this.flywheelIntake = flywheelIntake;
+        this.supersystemMotionPlanner = supersystemMotionPlanner;
+    }
 
     private void updateState(){
         switch (state) {

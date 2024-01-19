@@ -1,9 +1,19 @@
 package frc.robot.statemachines;
 
 import frc.lib.state.StateMachine;
+import frc.robot.planners.AimPlanner;
+import frc.robot.subsystems.Pivot;
 
 public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState> {
     private PivotState state = PivotState.REST;
+
+    private final Pivot pivot;
+    private final AimPlanner aimPlanner;
+
+    public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner){
+        this.pivot = pivot;
+        this.aimPlanner = aimPlanner;
+    }
 
     /**
      * Handle automatic state transitions
