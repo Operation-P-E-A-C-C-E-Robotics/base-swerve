@@ -2,9 +2,10 @@ package frc.robot;
 
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotState;
+import frc.robot.RobotStatemachine.RobotState;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.IntakeMotionPlanner;
+import frc.robot.planners.StageAvoidancePlanner;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.DiverterStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine;
@@ -12,7 +13,6 @@ import frc.robot.statemachines.PivotStatemachine;
 import frc.robot.statemachines.ShooterStatemachine;
 import frc.robot.statemachines.SwerveStatemachine;
 import frc.robot.statemachines.TriggerIntakeStatemachine;
-import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Diverter;
 import frc.robot.subsystems.FlywheelIntake;
@@ -21,7 +21,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.TriggerIntake;
 
 public class RobotContainer {
-    private static RobotContainer instance = null;
+    private static RobotContainer instance = new RobotContainer();
 
     /* SUBSYSTEMS */
     private final Swerve swerve = new Swerve();
@@ -44,6 +44,10 @@ public class RobotContainer {
         false
     );
 
+    StageAvoidancePlanner pivotMotionPlanner = new StageAvoidancePlanner(
+        swerve::getPose
+    );
+
     /* STATE MACHINES */
     private final SwerveStatemachine swerveStatemachine = new SwerveStatemachine(swerve, aimPlanner);
     private final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine(flywheelIntake, intakeMotionPlanner);
@@ -51,7 +55,7 @@ public class RobotContainer {
     private final PivotStatemachine pivotStatemachine = new PivotStatemachine(pivot, aimPlanner);
     private final ShooterStatemachine shooterStatemachine = new ShooterStatemachine(shooter, aimPlanner);
     private final DiverterStatemachine diverterStatemachine = new DiverterStatemachine(diverter);
-    private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber);
+    private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber, () -> swerve.getGyroAngle().getX());
 
     /* Joysticks */
     private final Joystick driverJoystick = new Joystick(0);
@@ -67,10 +71,7 @@ public class RobotContainer {
         climberStatemachine
     );
 
-    public RobotContainer getInstance() {
-        if (instance == null) {
-            instance = new RobotContainer();
-        }
+    public static RobotContainer getInstance() {
         return instance;
     }
 
@@ -79,8 +80,12 @@ public class RobotContainer {
     }
 
     public void run() {
-        if(RobotState.isTeleop()) updateTeleopControls();
+        if(edu.wpi.first.wpilibj.RobotState.isTeleop()) updateTeleopControls();
         robotStatemachine.update();
+    }
+
+    public void requestState(RobotState state) {
+        robotStatemachine.requestState(state);
     }
 
     private void updateTeleopControls () {

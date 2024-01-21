@@ -2,6 +2,8 @@ package frc.robot.statemachines;
 
 import frc.lib.state.StateMachine;
 import frc.robot.planners.AimPlanner;
+import frc.robot.planners.IntakeMotionPlanner;
+import frc.robot.planners.StageAvoidancePlanner;
 import frc.robot.subsystems.Pivot;
 
 public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState> {
@@ -9,10 +11,14 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
 
     private final Pivot pivot;
     private final AimPlanner aimPlanner;
+    private final StageAvoidancePlanner stageAvoidancePlanner;
+    private final IntakeMotionPlanner intakeMotionPlanner;
 
-    public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner){
+    public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner, StageAvoidancePlanner stageAvoidancePlanner, IntakeMotionPlanner intakeMotionPlanner){
         this.pivot = pivot;
         this.aimPlanner = aimPlanner;
+        this.stageAvoidancePlanner = stageAvoidancePlanner;
+        this.intakeMotionPlanner = intakeMotionPlanner;
     }
 
     /**
@@ -20,10 +26,11 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
      * e.g. AIM to REST when a gamepiece is fired
      */
     private void updateState(){
-        switch (state) {
-            default:
-                break;
-        }
+        //don't crash into the stage
+        if((state == PivotState.AIM || state == PivotState.AMP) && stageAvoidancePlanner.shouldStow()) state = PivotState.REST;
+
+        //don't crash into the intake
+        if(state == PivotState.INTAKE && !intakeMotionPlanner.canFlattenPivot()) state = PivotState.REST;
     }
 
     /**
@@ -34,7 +41,7 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
      */
     @Override
     public void requestState(PivotState state){
-
+        this.state = state;
     }
 
     /**
@@ -43,10 +50,12 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
     @Override
     public void update(){
         updateState();
-        switch(state) {
-            default:
-                break;            
+        
+        if(state == PivotState.AIM) {
+            pivot.setPivotPosition(aimPlanner.getTargetPivotAngle());
+            return;
         }
+        pivot.setPivotPosition(state.getAngle());
     }
 
     @Override
@@ -56,18 +65,12 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
     
     @Override
     public boolean isDone() {
-        switch(state) {
-            default:
-                return true;
-        }
+       return pivot.atSetpoint();
     }
 
     @Override
     public boolean isDynamic() {
-        switch(state){
-            default:
-                return true;
-        }
+        return state == PivotState.AIM || state == PivotState.AMP || state == PivotState.INTAKE;
     }
 
     public enum PivotState {

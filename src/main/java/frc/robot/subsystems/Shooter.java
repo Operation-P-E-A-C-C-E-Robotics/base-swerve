@@ -27,4 +27,8 @@ public class Shooter {
     public boolean triggerBeamBroken () {
         return false;
     }
+
+    public boolean hasNote () {
+        return false;
+    }
 }

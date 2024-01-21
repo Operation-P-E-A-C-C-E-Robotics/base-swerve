@@ -29,11 +29,13 @@ public class AimPlanner {
         return 0;
     }
 
-    public void getTargetPivotAngle() {
+    public double getTargetPivotAngle() {
+        return 0;
         //TODO
     }
 
-    public void getTargetFlywheelVelocity() {
+    public double getTargetFlywheelVelocity() {
+        return 0;
         //TODO
     }
 }

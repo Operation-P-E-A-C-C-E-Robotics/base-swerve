@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.ControlSystemTelemetry;
 import frc.robot.Constants.ControlSystem;
-import frc.robot.RobotStatemachine.RobotState;
 
 public class Robot extends TimedRobot {
   private PowerDistribution pdp = new PowerDistribution(ControlSystem.PDPCanId, ControlSystem.PDPModuleType);
@@ -48,6 +47,7 @@ public class Robot extends TimedRobot {
     scheduleTimer.reset();
     scheduleTimer.start();
     // statemachine.update();
+    RobotContainer.getInstance().run();
 
     ControlSystemTelemetry.update(null, scheduleTimer.get());
   }

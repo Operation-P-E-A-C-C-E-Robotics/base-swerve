@@ -19,4 +19,8 @@ public class Diverter {
     public boolean atSetpoint () {
         return false;
     }
+
+    public boolean detectsNote () {
+        return false;
+    }
 }

@@ -1,37 +1,44 @@
 package frc.robot.statemachines;
 
+import java.util.function.DoubleSupplier;
+
 import frc.lib.state.StateMachine;
 import frc.robot.subsystems.Climber;
 
+/**
+ * In charge of controlling the climber.
+ */
 public class ClimberStatemachine extends StateMachine<ClimberStatemachine.ClimberState>{
     private ClimberState state = ClimberState.RETRACT;
 
     private final Climber climber;
 
-    public ClimberStatemachine(Climber climber){
-        this.climber = climber;
-    }
+    private double balanceOffset = 0.0;
+    private final double balanceOffsestGain = 0.0;
+    private DoubleSupplier robotRollSupplier;
 
-    private void updateState(){
-        switch (state) {
-            default:
-                break;
-        }
+    private final double balanceTolerance = 0.0;
+    private final double extensionTolerance = 0.0;
+
+    public ClimberStatemachine(Climber climber, DoubleSupplier robotRollSupplier){
+        this.climber = climber;
+        this.robotRollSupplier = robotRollSupplier;
     }
 
     @Override
     public void requestState(ClimberState state){
-
+        this.state = state;
     }
 
     @Override
     public void update(){
-        //TODO climber observation
-        updateState();
-        switch(state) {
-            default:
-                break;            
+        if(!state.isBalance()){
+            climber.setClimberPosition(state.getPosition());
+            return;
         }
+        
+        balanceOffset += robotRollSupplier.getAsDouble() * balanceOffsestGain;
+        climber.setClimberPosition(state.getPosition() + balanceOffset, state.getPosition() - balanceOffset);
     }
 
     @Override
@@ -41,24 +48,22 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
 
     @Override
     public boolean isDone(){
-        switch(state){
-            default:
-                return true;
-        }
+        //done when we are at the desired position and the robot is balanced or we are not balancing
+        var atPosition = Math.abs(climber.getClimberPosition() - state.getPosition()) < extensionTolerance;
+        var balanced = Math.abs(robotRollSupplier.getAsDouble()) < balanceTolerance;
+        return atPosition && (balanced || !state.isBalance());
     }
 
     @Override
     public boolean isDynamic() {
-        switch(state){
-            default:
-                return true;
-        }
+        return false;
     }
 
     public enum ClimberState{
         //todo
         RETRACT(0.0, false),
         EXTEND(0.0, false),
+        CENTER(0.0, false),
         BALANCE(0.0, true);
 
         private Double position;

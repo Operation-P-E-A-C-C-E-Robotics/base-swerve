@@ -1,5 +1,14 @@
 package frc.lib.state;
 
+/**
+ * A state machine is a way to organize the logic for a subsystem.
+ * This class is very flexible so please use it in a way that makes sense for your subsystem.
+ * You should break up the logic for your subsystem into states and transitions between states,
+ * and then implement those states and transitions in the state machine.
+ * 
+ * This class takes a generic type T that is an enum, which should
+ * be used to hold the states of the state machine.
+ */
 public abstract class StateMachine <T extends Enum<T>> {
     /**
      * This is the method that is called every loop to update the state machine.
