@@ -34,7 +34,6 @@ public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeState
     @Override
     public void requestState(FlywheelIntakeState state){
         this.state = state;
-
     }
 
     @Override

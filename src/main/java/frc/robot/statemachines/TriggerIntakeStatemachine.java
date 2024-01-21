@@ -1,18 +1,22 @@
 package frc.robot.statemachines;
 
+import java.util.function.BooleanSupplier;
+
 import frc.lib.state.StateMachine;
 import frc.robot.planners.IntakeMotionPlanner;
 import frc.robot.subsystems.TriggerIntake;
 
 public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatemachine.TriggerIntakeState>{
     private final TriggerIntake triggerIntake;
-    private final IntakeMotionPlanner supersystemMotionPlanner;
+    private final IntakeMotionPlanner intakeMotionPlanner;
     
     private TriggerIntakeState state = TriggerIntakeState.RETRACT;
+    private BooleanSupplier hasNote;
 
-    public TriggerIntakeStatemachine(TriggerIntake triggerIntake, IntakeMotionPlanner supersystemMotionPlanner){
+    public TriggerIntakeStatemachine(TriggerIntake triggerIntake, IntakeMotionPlanner intakeMotionPlanner, BooleanSupplier hasNote){
         this.triggerIntake = triggerIntake;
-        this.supersystemMotionPlanner = supersystemMotionPlanner;
+        this.intakeMotionPlanner = intakeMotionPlanner;
+        this.hasNote = hasNote;
     }
 
     /**
@@ -21,10 +25,15 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
      * (e.g. transitioning from intaking to resting when the game piece is detected)
      */
     private void updateState(){
-        switch (state) {
-            default:
-                break;
-        }
+        //don't intake until the shooter is ready (otherwise we'd spit it onto the bellypan which would be incredibly bad)
+        if(state == TriggerIntakeState.INTAKE && !intakeMotionPlanner.readyToIntake()) state = TriggerIntakeState.EXTEND;
+
+        //don't allow the shooter to hit the intake
+        if(state == TriggerIntakeState.RETRACT && intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = TriggerIntakeState.AVOID;
+        if(state == TriggerIntakeState.AVOID && !intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = TriggerIntakeState.RETRACT;
+
+        //automatically transition to retracting the intake once we have detected a note
+        if(state == TriggerIntakeState.INTAKE && hasNote.getAsBoolean()) state = TriggerIntakeState.RETRACT; //TODO make sure this isn't prone to sensor failure / noise
     }
 
     /**
@@ -34,7 +43,7 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
      */
     @Override
     public void requestState(TriggerIntakeState state){
-
+        this.state = state;
     }
 
     /**
@@ -43,11 +52,8 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
     @Override
     public void update(){
         updateState();
-        switch(state) {
-            default:
-                break;
-            
-        }
+        triggerIntake.setDeploymentAngle(state.deployAngle);
+        triggerIntake.setRollerSpeed(state.speed);
     }
 
     @Override
@@ -57,23 +63,18 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
 
     @Override
     public boolean isDone(){
-        switch(state){
-            default:
-                return true;
-        }
+        return triggerIntake.deployedToSetpoint();
     }
 
     @Override
     public boolean isDynamic() {
-        switch(state){
-            default:
-                return true;
-        }
+        return true;
     }
 
     public enum TriggerIntakeState{
         //TODO
         RETRACT(0.0,0.0),
+        EXTEND(0.0,0.0),
         INTAKE(0.0,0.0),
         AVOID(0.0,0.0),
         EJECT(0.0,0.0);

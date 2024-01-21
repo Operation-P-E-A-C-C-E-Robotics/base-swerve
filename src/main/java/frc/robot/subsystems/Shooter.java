@@ -31,4 +31,8 @@ public class Shooter {
     public boolean hasNote () {
         return false;
     }
+
+    public boolean shotDetected() {
+        return false;
+    }
 }

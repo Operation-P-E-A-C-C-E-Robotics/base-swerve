@@ -242,7 +242,10 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
     @Override
     public boolean isDone(){
         if(state.isFollowingPath() || state.isPathFinding()){
-            //TODO
+            return pathFinished;
+        }
+        if(state == SwerveState.AIM) {
+            return false; //TODO
         }
         return true;
     }
