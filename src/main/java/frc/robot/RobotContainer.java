@@ -33,28 +33,28 @@ public class RobotContainer {
     private final Climber climber = new Climber();
 
     /* PLANNERS */
-    IntakeMotionPlanner intakeMotionPlanner = new IntakeMotionPlanner(
+    private final IntakeMotionPlanner intakeMotionPlanner = new IntakeMotionPlanner(
         pivot::getPivotPosition,
         flywheelIntake::getDeploymentAngle
     );
 
-    AimPlanner aimPlanner = new AimPlanner(
+    private final AimPlanner aimPlanner = new AimPlanner(
         swerve::getPose,
         swerve::getChassisSpeeds,
         false
     );
 
-    StageAvoidancePlanner pivotMotionPlanner = new StageAvoidancePlanner(
+    private final StageAvoidancePlanner stageAvoidancePlanner = new StageAvoidancePlanner(
         swerve::getPose
     );
 
     /* STATE MACHINES */
     private final SwerveStatemachine swerveStatemachine = new SwerveStatemachine(swerve, aimPlanner);
-    private final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine(flywheelIntake, intakeMotionPlanner);
-    private final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine(triggerIntake, intakeMotionPlanner);
-    private final PivotStatemachine pivotStatemachine = new PivotStatemachine(pivot, aimPlanner);
-    private final ShooterStatemachine shooterStatemachine = new ShooterStatemachine(shooter, aimPlanner);
-    private final DiverterStatemachine diverterStatemachine = new DiverterStatemachine(diverter);
+    private final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine(flywheelIntake, intakeMotionPlanner, shooter::hasNote);
+    private final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine(triggerIntake, intakeMotionPlanner, shooter::hasNote);
+    private final PivotStatemachine pivotStatemachine = new PivotStatemachine(pivot, aimPlanner, stageAvoidancePlanner, intakeMotionPlanner);
+    private final ShooterStatemachine shooterStatemachine = new ShooterStatemachine(shooter, aimPlanner, () -> false); //TODO
+    private final DiverterStatemachine diverterStatemachine = new DiverterStatemachine(diverter, stageAvoidancePlanner);
     private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber, () -> swerve.getGyroAngle().getX());
 
     /* Joysticks */

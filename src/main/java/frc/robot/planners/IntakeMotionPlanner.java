@@ -13,18 +13,13 @@ import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 public class IntakeMotionPlanner {
     private final DoubleSupplier pivotAngle;
     private final DoubleSupplier flywheelIntakeExtension;
-    private final Supplier<ShooterState> shooterStateSupplier;
-    private final BooleanSupplier shooterReadySupplier;
 
-    public IntakeMotionPlanner (DoubleSupplier pivotAngle, DoubleSupplier flywheelIntakeExtension, Supplier<ShooterState> shooterStateSupplier, BooleanSupplier shooterReadySupplier) {
+    public IntakeMotionPlanner (DoubleSupplier pivotAngle, DoubleSupplier flywheelIntakeExtension) {
         this.pivotAngle = pivotAngle;
         this.flywheelIntakeExtension = flywheelIntakeExtension;
-        this.shooterStateSupplier = shooterStateSupplier;
-        this.shooterReadySupplier = shooterReadySupplier;
     }
 
     public void update() {
-        pivotAngle.getAsDouble();
         //TODO
     }
 
