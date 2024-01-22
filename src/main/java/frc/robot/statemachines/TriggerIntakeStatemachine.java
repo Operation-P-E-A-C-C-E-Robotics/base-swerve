@@ -25,9 +25,6 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
      * (e.g. transitioning from intaking to resting when the game piece is detected)
      */
     private void updateState(){
-        //don't intake until the shooter is ready (otherwise we'd spit it onto the bellypan which would be incredibly bad)
-        if(state == TriggerIntakeState.INTAKE && !intakeMotionPlanner.readyToIntake()) state = TriggerIntakeState.EXTEND;
-
         //don't allow the shooter to hit the intake
         if(state == TriggerIntakeState.RETRACT && intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = TriggerIntakeState.AVOID;
         if(state == TriggerIntakeState.AVOID && !intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = TriggerIntakeState.RETRACT;

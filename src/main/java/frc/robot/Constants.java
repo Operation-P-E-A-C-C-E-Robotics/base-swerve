@@ -25,6 +25,90 @@ import frc.lib.util.JoystickCurves;
 
 public final class Constants {
   public static final double period = 0.01;
+
+  public static final class Shooter {
+    public static final int upperFlywheelMotorId = 0;
+    public static final int lowerFlywheelMotorId = 0;
+    public static final int triggerMotorId = 0;
+
+    public static final double flywheelMaxControllableVelocity = 0; //rotations per second
+    public static final double flywheelGearRatio = 1;
+    public static final double flywheelDiameter = Units.inchesToMeters(5);
+    public static final double flywheelKv = 0;
+    public static final double flywheelKa = 0;
+    public static final double flywheelModelStDev = 0;
+    public static final double flywheelEncoderStDev = 0;
+    public static final double flywheelControlEffort = 0;
+    public static final double flywheelErrorTolerance = 0;
+
+    public static final double triggerMetersPerRotation = 0;
+    public static final double triggerKp = 0;
+  }
+
+  public static final class FlywheelIntake {
+    public static final int flywheelIntakeDeployMotorId = 0;
+    public static final int flywheelIntakeRollerMotorId = 0;
+
+    public static final double flywheelIntakeDeployKp = 0;
+    public static final double flywheelIntakeDeployKi = 0;
+    public static final double flywheelIntakeDeployKd = 0;
+  }
+
+  public static final class TriggerIntake {
+    public static final int triggerIntakeMotorId = 0;
+    public static final int triggerIntakeDeployMotorId = 0;
+
+    public static final double triggerIntakeDeployKp = 0;
+    public static final double triggerIntakeDeployKi = 0;
+    public static final double triggerIntakeDeployKd = 0;
+  }
+
+  public static final class Pivot {
+    public static final int pivotMotorId = 0;
+
+    public static final double pivotMinAngle = 0;
+    public static final double pivotMaxAngle = 0;
+    
+    public static final double pivotKp = 0;
+    public static final double pivotKi = 0;
+    public static final double pivotKd = 0;
+    public static final double pivotKs = 0;
+    public static final double pivotKv = 0;
+    public static final double pivotKa = 0;
+    public static final double pivotCruiseVelocity = 0;
+    public static final double pivotMotionMagicExpoKv = pivotKv;
+    public static final double pivotMotionMagicExpoKa = pivotKa;
+  }
+
+  public static final class Diverter {
+    public static final int diverterMotorId = 0;
+    public static final int diverterDeployMotorId = 0;
+
+    public static final double diverterDeployKp = 0;
+    public static final double diverterDeployKi = 0;
+    public static final double diverterDeployKd = 0;
+    public static final double diverterDeployKs = 0;
+    public static final double diverterDeployKv = 0;
+    public static final double diverterDeployKa = 0;
+    public static final double diverterDeployCruiseVelocity = 0;
+    public static final double diverterDeployMotionMagicExpoKv = diverterDeployKv;
+    public static final double diverterDeployMotionMagicExpoKa = diverterDeployKa;
+  }
+
+  public static final class Climber {
+    public static final int climberLeftMotorId = 0;
+    public static final int climberRightMotorId = 0;
+
+    public static final double climberDeployKp = 0;
+    public static final double climberDeployKi = 0;
+    public static final double climberDeployKd = 0;
+    public static final double climberDeployKs = 0;
+    public static final double climberDeployKv = 0;
+    public static final double climberDeployKa = 0;
+    public static final double climberDeployCruiseVelocity = 0;
+    public static final double climberDeployMotionMagicExpoKv = climberDeployKv;
+    public static final double climberDeployMotionMagicExpoKa = climberDeployKa;
+  }
   public static final class Swerve {
     /* TELEOP */
     //speeds in m/s (probably)

@@ -69,12 +69,12 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     public void update(){
         updateState();
         if(state == ShooterState.AIM) {
-            shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocity());
+            shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
             return;
         }
 
         if(state == ShooterState.SHOOT) {
-            if(lastAimingState == ShooterState.AIM) shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocity());
+            if(lastAimingState == ShooterState.AIM) shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
             else shooter.setFlywheelVelocity(lastAimingState.getFlywheelVelocity());
             shooter.setTrigerPercent(state.getTriggerPercent());
             return;

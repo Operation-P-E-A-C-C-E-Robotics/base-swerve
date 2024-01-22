@@ -52,7 +52,7 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
         updateState();
         
         if(state == PivotState.AIM) {
-            pivot.setPivotPosition(aimPlanner.getTargetPivotAngle());
+            pivot.setPivotPosition(aimPlanner.getTargetPivotAngle().getRotations());
             return;
         }
         pivot.setPivotPosition(state.getAngle());

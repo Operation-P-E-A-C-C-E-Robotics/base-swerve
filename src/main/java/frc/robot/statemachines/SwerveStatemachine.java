@@ -223,7 +223,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         }
 
         if(state == SwerveState.AIM){
-            request.withHeading(aimPlanner.getTargetDrivetrainAngle());
+            request.withHeading(aimPlanner.getTargetDrivetrainAngle().getDegrees());
             request.withLockHeading(true);
         }
 

@@ -1,7 +1,6 @@
 package frc.robot;
 
 import frc.robot.subsystems.Swerve;
-import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.RobotStatemachine.RobotState;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.IntakeMotionPlanner;
@@ -13,6 +12,7 @@ import frc.robot.statemachines.PivotStatemachine;
 import frc.robot.statemachines.ShooterStatemachine;
 import frc.robot.statemachines.SwerveStatemachine;
 import frc.robot.statemachines.TriggerIntakeStatemachine;
+import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Diverter;
 import frc.robot.subsystems.FlywheelIntake;
@@ -57,10 +57,6 @@ public class RobotContainer {
     private final DiverterStatemachine diverterStatemachine = new DiverterStatemachine(diverter, stageAvoidancePlanner);
     private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber, () -> swerve.getGyroAngle().getX());
 
-    /* Joysticks */
-    private final Joystick driverJoystick = new Joystick(0);
-    // private final Joystick operatorJoystick = new Joystick(1);
-
     private final RobotStatemachine robotStatemachine = new RobotStatemachine(
         swerveStatemachine,
         flywheelIntakeStatemachine,
@@ -81,6 +77,9 @@ public class RobotContainer {
 
     public void run() {
         if(edu.wpi.first.wpilibj.RobotState.isTeleop()) updateTeleopControls();
+        intakeMotionPlanner.update();
+        aimPlanner.update();
+        stageAvoidancePlanner.update();
         robotStatemachine.update();
     }
 
@@ -90,8 +89,14 @@ public class RobotContainer {
 
     private void updateTeleopControls () {
         //EXAMPLE BUTTON:
-        // if(driverJoystick.getRawButtonPressed(0)) {
-        //     robotStatemachine.requestSwerveState(SwerveState.ROBOT_CENTRIC);
-        // }
+        if(OI.DriveTrain.isLockIn.getAsBoolean()) {
+            robotStatemachine.requestSwerveState(SwerveState.LOCK_IN);
+        }
+        else if(!OI.DriveTrain.isFieldRelative.getAsBoolean()) {
+            robotStatemachine.requestSwerveState(SwerveState.ROBOT_CENTRIC);
+        }
+        else {
+            robotStatemachine.requestSwerveState(OI.DriveTrain.isOpenLoop.getAsBoolean() ? SwerveState.OPEN_LOOP_TELEOP : SwerveState.CLOSED_LOOP_TELEOP);
+        }
     }
 }
