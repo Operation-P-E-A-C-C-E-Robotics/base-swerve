@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.LinearInterpolate;
 import frc.robot.Constants;
@@ -52,23 +53,37 @@ public class AimPlanner {
         Pose2d blueOriginPose = AllianceFlipUtil.apply(robotPoseSupplier.get());
         double distanceToTarget = blueOriginPose.getTranslation().getDistance(targetCenterTranslation);
 
-        Rotation2d drivetrainAngle = blueOriginPose.getTranslation().minus(targetCenterTranslation).getAngle();
+        Rotation2d angleToTarget = blueOriginPose.getTranslation().minus(targetCenterTranslation).getAngle();
         Rotation2d pivotAngle = Rotation2d.fromDegrees(pivotInterpolator.interpolate(distanceToTarget));
         double exitVelocity = exitVelocityInterpolator.interpolate(distanceToTarget);
 
         if(!shootWhileMoving) {
+            drivetrainAngularVelocity = 0;
+            pivotAngularVelocity = 0;
+            shooterAngularAcceleration = 0;
             this.pivotAngle = pivotAngle;
             this.shooterRPS = exitVelocityToRPS(exitVelocity);
-            this.drivetrainAngle = drivetrainAngle;
+            this.drivetrainAngle = angleToTarget;
             return;
         }
 
         ChassisSpeeds robotVelocity = robotVelocitySupplier.get();
-        ShotAngle uncorrectedShotAngle = new ShotAngle(drivetrainAngle, pivotAngle, exitVelocity);
+        ShotAngle uncorrectedShotAngle = new ShotAngle(angleToTarget, pivotAngle, exitVelocity);
         ShotAngle correctedShotAngle = ShotAngle.correctFromChassisSpeeds(uncorrectedShotAngle, robotVelocity, blueOriginPose.getRotation());
         this.pivotAngle = correctedShotAngle.getPivotAngle();
         this.shooterRPS = exitVelocityToRPS(correctedShotAngle.getExitVelocity());
         this.drivetrainAngle = correctedShotAngle.getDrivetrainAngle();
+
+        //calculate the angular velocities of the mechanisms
+        //first get the robots velocity relative to the target
+        Translation2d robotVelocityTranslation = new Translation2d(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
+        Translation2d targetRelativeVelocity = robotVelocityTranslation.rotateBy(angleToTarget);
+        double deltaDistance = targetRelativeVelocity.getX();
+
+        //use the distarce to the target to get the angular velocity
+        drivetrainAngularVelocity = Units.radiansToDegrees((targetRelativeVelocity.getY() / distanceToTarget) + robotVelocity.omegaRadiansPerSecond);
+        pivotAngularVelocity = pivotInterpolator.derivative(distanceToTarget) * deltaDistance;
+        shooterAngularAcceleration = exitVelocityInterpolator.derivative(distanceToTarget) * deltaDistance;
     }
 
     public Rotation2d getTargetDrivetrainAngle() {
@@ -81,6 +96,18 @@ public class AimPlanner {
 
     public double getTargetFlywheelVelocityRPS() {
         return shooterRPS;
+    }
+
+    public double getDrivetrainAngularVelocity() {
+        return drivetrainAngularVelocity;
+    }
+
+    public double getPivotAngularVelocity() {
+        return pivotAngularVelocity;
+    }
+
+    public double getShooterAngularAcceleration() {
+        return shooterAngularAcceleration;
     }
 
     private double exitVelocityToRPS(double exitVelocity) {
