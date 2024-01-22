@@ -33,6 +33,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
     private final ClimberStatemachine climberStatemachine;
     
     private final SendableChooser<RobotState> simStateChooser = new SendableChooser<>();
+    private final SendableChooser<SwerveState> simSwerveStateChooser = new SendableChooser<>();
 
     public RobotStatemachine (SwerveStatemachine swerveStatemachine, 
                             FlywheelIntakeStatemachine flywheelIntakeStatemachine, 
@@ -65,6 +66,14 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
             simStateChooser.addOption("Align Trap", RobotState.ALIGN_TRAP);
             simStateChooser.addOption("Place Trap", RobotState.PLACE_TRAP);
             SmartDashboard.putData("Supersystem State", simStateChooser);
+
+            simSwerveStateChooser.setDefaultOption("Open Loop", SwerveState.OPEN_LOOP_TELEOP);
+            simSwerveStateChooser.addOption("Closed Loop", SwerveState.CLOSED_LOOP_TELEOP);
+            simSwerveStateChooser.addOption("Robot Centric", SwerveState.ROBOT_CENTRIC);
+            simSwerveStateChooser.addOption("Lock In", SwerveState.LOCK_IN);
+            simSwerveStateChooser.addOption("Aim", SwerveState.AIM);
+            SmartDashboard.putData("Swerve State", simSwerveStateChooser);
+
         }
     }
 
@@ -120,8 +129,12 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
      */
     @Override
     public void update(){
-        if(Robot.isSimulation()) requestState(simStateChooser.getSelected());
+        if(Robot.isSimulation()) {
+            requestState(simStateChooser.getSelected());
+            requestSwerveState(simSwerveStateChooser.getSelected());
+        }
         updateState();
+        swerveStatemachine.update();
         flywheelIntakeStatemachine.updateWithState(state.getFlywheelIntakeState());
         triggerIntakeStatemachine.updateWithState(state.getTriggerIntakeState());
         shooterStatemachine.updateWithState(state.getShooterState());

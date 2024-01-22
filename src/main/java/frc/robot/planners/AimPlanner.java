@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.LinearInterpolate;
 import frc.robot.Constants;
@@ -25,8 +26,8 @@ public class AimPlanner {
     private final Translation2d targetCenterTranslation = new Translation2d(0, 0);
 
     private final double[][] distanceCalibrationData = {
-        {0, 1}, // pivot angles (deg)
-        {0, 1}, //exit velocities (m/s)
+        {90, 80}, // pivot angles (deg)
+        {0, 10}, //exit velocities (m/s)
         {0, 1}  //distances (m)
     };
 
@@ -51,11 +52,17 @@ public class AimPlanner {
 
     public void update() {
         Pose2d blueOriginPose = AllianceFlipUtil.apply(robotPoseSupplier.get());
+        SmartDashboard.putString("aim fixed pose", blueOriginPose.toString());
         double distanceToTarget = blueOriginPose.getTranslation().getDistance(targetCenterTranslation);
 
         Rotation2d angleToTarget = blueOriginPose.getTranslation().minus(targetCenterTranslation).getAngle();
         Rotation2d pivotAngle = Rotation2d.fromDegrees(pivotInterpolator.interpolate(distanceToTarget));
         double exitVelocity = exitVelocityInterpolator.interpolate(distanceToTarget);
+
+        SmartDashboard.putNumber("Distance to Target", distanceToTarget);
+        SmartDashboard.putNumber("Angle to Target", angleToTarget.getDegrees());
+        SmartDashboard.putNumber("Pivot Angle", pivotAngle.getDegrees());
+        SmartDashboard.putNumber("Exit Velocity", exitVelocity);
 
         if(!shootWhileMoving) {
             drivetrainAngularVelocity = 0;
@@ -74,6 +81,10 @@ public class AimPlanner {
         this.shooterRPS = exitVelocityToRPS(correctedShotAngle.getExitVelocity());
         this.drivetrainAngle = correctedShotAngle.getDrivetrainAngle();
 
+        SmartDashboard.putNumber("Corrected Pivot Angle", this.pivotAngle.getDegrees());
+        SmartDashboard.putNumber("Corrected Exit Velocity", correctedShotAngle.getExitVelocity());
+        SmartDashboard.putNumber("Corrected Drivetrain Angle", this.drivetrainAngle.getDegrees());
+
         //calculate the angular velocities of the mechanisms
         //first get the robots velocity relative to the target
         Translation2d robotVelocityTranslation = new Translation2d(robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond);
@@ -81,9 +92,13 @@ public class AimPlanner {
         double deltaDistance = targetRelativeVelocity.getX();
 
         //use the distarce to the target to get the angular velocity
-        drivetrainAngularVelocity = Units.radiansToDegrees((targetRelativeVelocity.getY() / distanceToTarget) + robotVelocity.omegaRadiansPerSecond);
+        drivetrainAngularVelocity = Units.radiansToDegrees((targetRelativeVelocity.getY() / distanceToTarget));
         pivotAngularVelocity = pivotInterpolator.derivative(distanceToTarget) * deltaDistance;
         shooterAngularAcceleration = exitVelocityInterpolator.derivative(distanceToTarget) * deltaDistance;
+
+        SmartDashboard.putNumber("Drivetrain wanted Angular Velocity", drivetrainAngularVelocity);
+        SmartDashboard.putNumber("Pivot Angular Velocity", pivotAngularVelocity);
+        SmartDashboard.putNumber("Shooter Angular Acceleration", shooterAngularAcceleration);
     }
 
     public Rotation2d getTargetDrivetrainAngle() {

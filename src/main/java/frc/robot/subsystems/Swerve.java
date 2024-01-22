@@ -20,6 +20,7 @@ import frc.lib.telemetry.LimelightTelemetry;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 import static frc.robot.Constants.Swerve.*;
 
@@ -88,8 +89,9 @@ public class Swerve extends SubsystemBase {
      * @return the pose of the robot.
      */
     public Pose2d getPose () {
-        if(swerve.odometryIsValid()) return swerve.getState().Pose;
-        return new Pose2d();
+        var pose = swerve.getState().Pose;
+        if (pose == null) return new Pose2d();
+        return pose;
     }
 
     /**

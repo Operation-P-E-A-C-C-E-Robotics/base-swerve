@@ -9,6 +9,7 @@ import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,11 +22,13 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     super(Constants.period);
+    RobotContainer.getInstance();
     SmartDashboard.updateValues();
   }
 
   @Override
   public void robotInit() {
+    // RobotContainer.getInstance().run();
     //log data from network tables (SmartDashboard, etc.)
     DataLogManager.start();
     DataLogManager.logNetworkTables(false);
@@ -39,10 +42,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    if(edu.wpi.first.wpilibj.RobotState.isDisabled()) {
-      // statemachine.requestState(RobotState.REST_WITHOUT_GAMEPIECE);
-      return;
-    }
+    // if (RobotState.isDisabled()) return;
     //run the robot
     scheduleTimer.reset();
     scheduleTimer.start();

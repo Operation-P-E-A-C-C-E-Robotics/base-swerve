@@ -1,13 +1,37 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/POSE SEED": "String Chooser",
-      "/SmartDashboard/Swerve Mech": "Mechanism2d"
+      "/SmartDashboard/Supersystem State": "String Chooser",
+      "/SmartDashboard/Swerve Mech": "Mechanism2d",
+      "/SmartDashboard/Swerve State": "String Chooser"
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Supersystem State": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Swerve Mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Swerve State": {
         "window": {
           "visible": true
         }
@@ -15,8 +39,19 @@
     }
   },
   "NetworkTables": {
+    "retained": {
+      "SmartDashboard": {
+        "open": true
+      }
+    },
     "transitory": {
+      "SmartDashboard": {
+        "open": true
+      },
       "Swerve": {
+        "Auto Heading": {
+          "open": true
+        },
         "Command": {
           "open": true
         },

@@ -11,6 +11,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.state.StateMachine;
@@ -31,7 +32,8 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
                            yVelocitySup = OI.DriveTrain.strafe, 
                            angularVelocitySup = OI.DriveTrain.rotation, 
                            autoHeadingAngleSup = OI.DriveTrain.heading;
-    private BooleanSupplier isZeroOdometrySup = OI.DriveTrain.isZeroOdometry;
+    private BooleanSupplier isZeroOdometrySup = OI.DriveTrain.isZeroOdometry,
+                            useHeadingSup = OI.DriveTrain.useHeading;
 
     private Swerve driveTrain;
 
@@ -104,9 +106,9 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             pathCommand.end(!pathFinished);
         }
         //reset the request heading to avoid erronious heading changes
-        if(state == SwerveState.OPEN_LOOP_TELEOP || state == SwerveState.CLOSED_LOOP_TELEOP) {
-            request.withHeading(driveTrain.getPose().getRotation().getRadians());
-        }
+        // if((state == SwerveState.OPEN_LOOP_TELEOP || state == SwerveState.CLOSED_LOOP_TELEOP) && state != this.state) {
+        //     request.withHeading(driveTrain.getPose().getRotation().getRadians());
+        // }
 
         //handle path following
         if(state.isFollowingPath() || state.isPathFinding()){
@@ -157,7 +159,8 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         double angularVelocity = angularVelocitySup.getAsDouble();
         double autoHeadingAngle = autoHeadingAngleSup.getAsDouble();
 
-        boolean isAutoHeading = state.isHoldHeading();
+        boolean useHeading = useHeadingSup.getAsBoolean();
+        boolean holdHeading = state.isHoldHeading();
         boolean isFieldRelative = !state.isRobotCentric();
         boolean isOpenLoop = state.isOpenLoop();
         boolean isLockIn = state.isLockIn();
@@ -183,7 +186,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             rawLinearVelocity.getY(),
             angularVelocity, 
             autoHeadingAngle, 
-            isAutoHeading, 
+            useHeading, 
             isFieldRelative, 
             isOpenLoop, 
             isLockIn, 
@@ -205,12 +208,12 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
                .withIsFieldCentric(isFieldRelative)
                //true will use pid control to maintain heading, or set to "isAutoHeading" if you want to only turn to specified headings 
                //rather than holding whatever direction you're facing :)
-               .withHoldHeading(true)
-               .withLockHeading(true)
+               .withHoldHeading(holdHeading)
+               .withLockHeading(false)
                .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
 
         //update the robot's target heading if we're using auto heading
-        if(isAutoHeading) {
+        if(useHeading) {
             request.withHeading(Rotation2d.fromDegrees(autoHeadingAngle).getRadians());
         }
 
@@ -223,8 +226,9 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         }
 
         if(state == SwerveState.AIM){
-            request.withHeading(aimPlanner.getTargetDrivetrainAngle().getDegrees());
+            request.withHeading(aimPlanner.getTargetDrivetrainAngle().getRadians());
             request.withLockHeading(true);
+            request.withLockHeadingVelocity(Units.degreesToRadians(aimPlanner.getDrivetrainAngularVelocity()));
         }
 
         //yay peaccyrequest,

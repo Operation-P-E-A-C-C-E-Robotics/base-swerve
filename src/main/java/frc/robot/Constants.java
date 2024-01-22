@@ -161,10 +161,10 @@ public final class Constants {
     public static final boolean invertSteerMotors = Robot.isReal(); //cant invert in simulation which is dumb.
 
     /* HEADING CONTROLLER CONSTANTS */
-    public static final double autoHeadingKP = 500;
+    public static final double autoHeadingKP = 2000;//500;
     public static final double autoHeadingKI = 0.0; //DOES NOTHING LOL
     public static final double autoHeadingKD = 0.0; //ALSO DOES NOTHING LOL
-    public static final double autoHeadingKV = 0.7;
+    public static final double autoHeadingKV = 10;//0.7;
     public static final double autoHeadingKA = 0.02;
     public static final double autoHeadingMaxVelocity = 3; //deg/s (i think)
     public static final double autoHeadingMaxAcceleration = 10; //deg/s^2

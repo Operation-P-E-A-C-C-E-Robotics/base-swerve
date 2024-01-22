@@ -21,7 +21,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.TriggerIntake;
 
 public class RobotContainer {
-    private static RobotContainer instance = new RobotContainer();
+    private static RobotContainer instance = null;
 
     /* SUBSYSTEMS */
     private final Swerve swerve = new Swerve();
@@ -39,9 +39,9 @@ public class RobotContainer {
     );
 
     private final AimPlanner aimPlanner = new AimPlanner(
-        swerve::getPose,
-        swerve::getChassisSpeeds,
-        false
+        () -> swerve.getPose(),
+        () -> swerve.getChassisSpeeds(),
+        true
     );
 
     private final StageAvoidancePlanner stageAvoidancePlanner = new StageAvoidancePlanner(
@@ -68,6 +68,7 @@ public class RobotContainer {
     );
 
     public static RobotContainer getInstance() {
+        if(instance == null) instance = new RobotContainer();
         return instance;
     }
 

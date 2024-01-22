@@ -62,6 +62,7 @@ public class PeaccyRequest implements SwerveRequest {
     public double RotationalRate = 0;
     public double Heading = 0; //will hold both the target heading when explicitly set, and the current heading when holding the heading
     public double RotationalDeadband = 0;
+    public double LockHeadingVelocity = 0;
 
     public boolean HoldHeading = false; //keeps the robot facing Heading unless RotationalRate is over the RotationalDeadband
     public boolean LockHeading = false; //HoldHeading but way faster and more aggressive
@@ -282,6 +283,11 @@ public class PeaccyRequest implements SwerveRequest {
         return this;
     }
 
+    public PeaccyRequest withLockHeadingVelocity(double lockHeadingVelocity) {
+        this.LockHeadingVelocity = lockHeadingVelocity;
+        return this;
+    }
+
     /**
      * Set whether or not to scale the heading correction by the allowed total drive current.
      * Also, this will enable heading correction even if HoldHeading is false,
@@ -377,7 +383,11 @@ public class PeaccyRequest implements SwerveRequest {
 
         
         //calculate the correction
-        var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + parameters.updatePeriod);
+        var target = headingTrajectory.calculate(holdHeadingTrajectoryTimer.get() + (parameters.updatePeriod*1.5));
+        if (LockHeading) {
+            target.position = Heading;
+            target.velocity = LockHeadingVelocity;
+        }
         var error = target.position - currentHeading;
 
         var acceleration = (target.velocity - getChassisSpeeds.get().omegaRadiansPerSecond);

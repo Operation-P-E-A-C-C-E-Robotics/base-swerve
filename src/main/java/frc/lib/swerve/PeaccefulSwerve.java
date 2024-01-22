@@ -60,7 +60,9 @@ public class PeaccefulSwerve extends SwerveDrivetrain {
      * @return the chassis speeds
      */
     public ChassisSpeeds getChassisSpeeds() {
-        return m_kinematics.toChassisSpeeds(getState().ModuleStates);
+        var moduleStates = getState().ModuleStates;
+        if (moduleStates == null) return new ChassisSpeeds();
+        return m_kinematics.toChassisSpeeds(moduleStates);
     }
 
     /**
