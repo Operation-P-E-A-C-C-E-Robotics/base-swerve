@@ -7,6 +7,8 @@ public class LinearInterpolate {
 
     /**
      * simple linear interpolation between points
+     * with increasing x values.
+     * Not fancy, but for aiming this is all we need :)
      * It's on you to make sure the x values are in order
      * and there are the same number of x and y values, good luck
      * @param x array with x function values

@@ -73,7 +73,6 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
             simSwerveStateChooser.addOption("Lock In", SwerveState.LOCK_IN);
             simSwerveStateChooser.addOption("Aim", SwerveState.AIM);
             SmartDashboard.putData("Swerve State", simSwerveStateChooser);
-
         }
     }
 

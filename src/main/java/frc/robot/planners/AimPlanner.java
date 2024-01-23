@@ -126,7 +126,7 @@ public class AimPlanner {
     }
 
     private double exitVelocityToRPS(double exitVelocity) {
-        return exitVelocity / (Constants.Shooter.flywheelDiameter * Math.PI) / Constants.Shooter.flywheelGearRatio;
+        return (exitVelocity / (Constants.Shooter.flywheelDiameter * Math.PI) / Constants.Shooter.flywheelGearRatio) * Constants.Shooter.flywheelEfficiency;
     }
 
     public static class ShotAngle {

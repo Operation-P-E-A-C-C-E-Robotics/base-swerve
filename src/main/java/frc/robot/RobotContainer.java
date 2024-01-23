@@ -1,7 +1,6 @@
 package frc.robot;
 
 import frc.robot.subsystems.Swerve;
-import frc.robot.RobotStatemachine.RobotState;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.IntakeMotionPlanner;
 import frc.robot.planners.StageAvoidancePlanner;
@@ -20,6 +19,10 @@ import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.TriggerIntake;
 
+/**
+ * The container for all the subsystems and state machines of the robot.
+ * This is where the bulk of the robot logic is stored and updated.
+ */
 public class RobotContainer {
     private static RobotContainer instance = null;
 
@@ -76,16 +79,17 @@ public class RobotContainer {
         return robotStatemachine;
     }
 
+    /**
+     * The main update loop of the robot.
+     * This is called periodically by the main robot class.
+     * It updates the supersystem state, planners, and state machines.
+     */
     public void run() {
         if(edu.wpi.first.wpilibj.RobotState.isTeleop()) updateTeleopControls();
         intakeMotionPlanner.update();
         aimPlanner.update();
         stageAvoidancePlanner.update();
         robotStatemachine.update();
-    }
-
-    public void requestState(RobotState state) {
-        robotStatemachine.requestState(state);
     }
 
     private void updateTeleopControls () {

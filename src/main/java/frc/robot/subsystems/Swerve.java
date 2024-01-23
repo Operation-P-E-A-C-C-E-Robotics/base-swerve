@@ -20,7 +20,6 @@ import frc.lib.telemetry.LimelightTelemetry;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
-import frc.robot.Robot;
 
 import static frc.robot.Constants.Swerve.*;
 

@@ -26,11 +26,11 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
      * e.g. AIM to REST when a gamepiece is fired
      */
     private void updateState(){
-        //don't crash into the stage
-        if((state == PivotState.AIM || state == PivotState.AMP) && stageAvoidancePlanner.shouldStow()) state = PivotState.REST;
-
         //don't crash into the intake
         if(state == PivotState.INTAKE && !intakeMotionPlanner.canFlattenPivot()) state = PivotState.REST;
+
+        //don't crash into the stage
+        if((state == PivotState.AIM || state == PivotState.AMP) && stageAvoidancePlanner.shouldStow()) state = PivotState.REST;
     }
 
     /**

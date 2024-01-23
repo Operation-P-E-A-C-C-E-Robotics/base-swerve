@@ -41,6 +41,8 @@ public final class Constants {
     public static final double flywheelControlEffort = 0;
     public static final double flywheelErrorTolerance = 0;
 
+    public static final double flywheelEfficiency = 1; // percentage of flywheel surface speed to exit velocity
+
     public static final double triggerMetersPerRotation = 0;
     public static final double triggerKp = 0;
   }
