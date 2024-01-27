@@ -2,6 +2,7 @@ package frc.robot.statemachines;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.AimPlanner;
 import frc.robot.subsystems.Shooter;
@@ -39,10 +40,10 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
                 break;
         }
         if (
-              state == ShooterState.AIM
+              (state == ShooterState.AIM
             ||state == ShooterState.NEAR_SPEAKER_SETPOINT
             ||state == ShooterState.PROTECTED_SETPOINT
-            ||state == ShooterState.CENTERLINE_SETPOINT
+            ||state == ShooterState.CENTERLINE_SETPOINT)
             && alignedToShoot.getAsBoolean() 
             && shooter.flywheelAtTargetVelocity()
         ) {
@@ -68,6 +69,9 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     @Override
     public void update(){
         updateState();
+
+        SmartDashboard.putString("Shooter State", state.name());
+
         if(state == ShooterState.AIM) {
             shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
             return;

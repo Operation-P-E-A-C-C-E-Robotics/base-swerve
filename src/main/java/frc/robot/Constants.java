@@ -42,6 +42,7 @@ public final class Constants {
     public static final double flywheelErrorTolerance = 0;
 
     public static final double flywheelEfficiency = 1; // percentage of flywheel surface speed to exit velocity
+    public static final double flywheelTolerance = 0; //how close to the target velocity the flywheel needs to be considered ready
 
     public static final double triggerMetersPerRotation = 0;
     public static final double triggerKp = 0;
@@ -54,6 +55,9 @@ public final class Constants {
     public static final double flywheelIntakeDeployKp = 0;
     public static final double flywheelIntakeDeployKi = 0;
     public static final double flywheelIntakeDeployKd = 0;
+
+    public static final double flywheelIntakeDeployGearing = 1;
+    public static final double flywheelIntakeDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
   }
 
   public static final class TriggerIntake {
@@ -63,6 +67,9 @@ public final class Constants {
     public static final double triggerIntakeDeployKp = 0;
     public static final double triggerIntakeDeployKi = 0;
     public static final double triggerIntakeDeployKd = 0;
+
+    public static final double triggerIntakeDeployGearing = 1;
+    public static final double triggerIntakeDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
   }
 
   public static final class Pivot {
@@ -70,6 +77,9 @@ public final class Constants {
 
     public static final double pivotMinAngle = 0;
     public static final double pivotMaxAngle = 0;
+
+    public static final double pivotGearRatio = 1;
+    public static final double pivotTolerance = 0; //how close to the target position the pivot needs to be considered ready
     
     public static final double pivotKp = 0;
     public static final double pivotKi = 0;
@@ -86,6 +96,11 @@ public final class Constants {
     public static final int diverterMotorId = 0;
     public static final int diverterDeployMotorId = 0;
 
+    public static final double diverterDeployGearRatio = 1;
+    public static final double diverterDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
+
+    public static final double maxDiverterExtension = 0; //in meters
+
     public static final double diverterDeployKp = 0;
     public static final double diverterDeployKi = 0;
     public static final double diverterDeployKd = 0;
@@ -100,6 +115,10 @@ public final class Constants {
   public static final class Climber {
     public static final int climberLeftMotorId = 0;
     public static final int climberRightMotorId = 0;
+
+    public static final double climberGearRatio = 1;
+
+    public static final double climberTolerance = 0; //how close to the target position the climber needs to be considered ready
 
     public static final double climberDeployKp = 0;
     public static final double climberDeployKi = 0;

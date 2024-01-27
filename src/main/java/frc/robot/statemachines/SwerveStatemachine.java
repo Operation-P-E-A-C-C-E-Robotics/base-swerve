@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.state.StateMachine;
 import frc.lib.swerve.PeaccyRequest;
@@ -139,6 +140,9 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
     public void update() {
         driveTrain.periodic();
         updateState();
+
+        SmartDashboard.putString("Swerve State", state.name());
+
         if(Robot.isSimulation()) driveTrain.simulationPeriodic();
         /* PATH FOLLOWING */
         if(state.isFollowingPath() || state.isPathFinding()){

@@ -9,6 +9,7 @@ import java.util.function.DoubleSupplier;
 public class IntakeMotionPlanner {
     private final DoubleSupplier pivotAngle;
     private final DoubleSupplier flywheelIntakeExtension;
+    private final DoubleSupplier xVelocity;
 
     //TODO
     private final double interferenceLowerPivotAngle = 0.0; //threshold for the flywheel intake to avoid the pivot
@@ -21,9 +22,10 @@ public class IntakeMotionPlanner {
     private boolean shouldTriggerIntakeAvoid = false;
     private boolean readyToIntake = false;
 
-    public IntakeMotionPlanner (DoubleSupplier pivotAngle, DoubleSupplier flywheelIntakeExtension) {
+    public IntakeMotionPlanner (DoubleSupplier pivotAngle, DoubleSupplier flywheelIntakeExtension, DoubleSupplier xVelocity) {
         this.pivotAngle = pivotAngle;
         this.flywheelIntakeExtension = flywheelIntakeExtension;
+        this.xVelocity = xVelocity;
     }
 
     public void update() {
@@ -47,5 +49,13 @@ public class IntakeMotionPlanner {
 
     public boolean readyToIntake() {
         return readyToIntake;
+    }
+
+    public boolean shouldTransitionToFront() {
+        return xVelocity.getAsDouble() > 0.5;
+    }
+
+    public boolean shouldTransitionToBack() {
+        return xVelocity.getAsDouble() < -0.5;
     }
 }

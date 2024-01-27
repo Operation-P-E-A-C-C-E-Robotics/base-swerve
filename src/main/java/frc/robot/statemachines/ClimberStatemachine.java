@@ -2,6 +2,7 @@ package frc.robot.statemachines;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.subsystems.Climber;
 
@@ -32,6 +33,7 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
 
     @Override
     public void update(){
+        SmartDashboard.putString("Climber State", state.name());
         if(!state.isBalance()){
             climber.setClimberPosition(state.getPosition());
             return;
@@ -39,6 +41,7 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
         
         balanceOffset += robotRollSupplier.getAsDouble() * balanceOffsestGain;
         climber.setClimberPosition(state.getPosition() + balanceOffset, state.getPosition() - balanceOffset);
+
     }
 
     @Override

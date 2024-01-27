@@ -87,11 +87,10 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     DataLogManager.logNetworkTables(true);
+    RobotContainer.getInstance().initTestDashboard();
     System.out.println("Robot Test");
     System.out.println("ok but what are yall doing i don't even know why you'd be running in test mode");
   }
-  @Override
-  public void testPeriodic() {}
   
   @Override
   public void simulationInit() {

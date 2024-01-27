@@ -1,5 +1,6 @@
 package frc.robot.statemachines;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.IntakeMotionPlanner;
@@ -50,6 +51,8 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
     @Override
     public void update(){
         updateState();
+
+        SmartDashboard.putString("Pivot State", state.name());
         
         if(state == PivotState.AIM) {
             pivot.setPivotPosition(aimPlanner.getTargetPivotAngle().getRotations());

@@ -2,6 +2,7 @@ package frc.robot.statemachines;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.IntakeMotionPlanner;
 import frc.robot.subsystems.TriggerIntake;
@@ -49,6 +50,9 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
     @Override
     public void update(){
         updateState();
+
+        SmartDashboard.putString("Trigger Intake State", state.name());
+
         triggerIntake.setDeploymentAngle(state.deployAngle);
         triggerIntake.setRollerSpeed(state.speed);
     }

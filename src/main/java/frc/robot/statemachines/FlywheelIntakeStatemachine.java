@@ -2,6 +2,7 @@ package frc.robot.statemachines;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.IntakeMotionPlanner;
 import frc.robot.subsystems.FlywheelIntake;
@@ -41,6 +42,8 @@ public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeState
         updateState();
         flywheelIntake.setDeploymentAngle(state.deployAngle);
         flywheelIntake.setRollerSpeed(state.speed);
+
+        SmartDashboard.putString("Flywheel Intake State", state.name());
     }
 
     @Override

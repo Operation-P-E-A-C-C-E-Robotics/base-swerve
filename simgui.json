@@ -9,19 +9,55 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Climber State Chooser": "String Chooser",
+      "/SmartDashboard/Diverter State Chooser": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Flywheel Intake State Chooser": "String Chooser",
       "/SmartDashboard/POSE SEED": "String Chooser",
+      "/SmartDashboard/Pivot State Chooser": "String Chooser",
+      "/SmartDashboard/Robot State (chooser test)": "String Chooser",
+      "/SmartDashboard/Robot State Chooser": "String Chooser",
+      "/SmartDashboard/Shooter State Chooser": "String Chooser",
       "/SmartDashboard/Supersystem State": "String Chooser",
       "/SmartDashboard/Swerve Mech": "Mechanism2d",
-      "/SmartDashboard/Swerve State": "String Chooser"
+      "/SmartDashboard/Swerve State": "String Chooser",
+      "/SmartDashboard/Swerve State Chooser": "String Chooser",
+      "/SmartDashboard/Trigger Intake State Chooser": "String Chooser"
     },
     "windows": {
-      "/SmartDashboard/Field": {
+      "/SmartDashboard/Climber State Chooser": {
         "window": {
           "visible": true
         }
       },
-      "/SmartDashboard/Supersystem State": {
+      "/SmartDashboard/Diverter State Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "bottom": 544,
+        "builtin": "2024 Crescendo",
+        "height": 8.013679504394531,
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Pivot State Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Robot State Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Shooter State Chooser": {
         "window": {
           "visible": true
         }
@@ -31,7 +67,7 @@
           "visible": true
         }
       },
-      "/SmartDashboard/Swerve State": {
+      "/SmartDashboard/Swerve State Chooser": {
         "window": {
           "visible": true
         }

@@ -3,6 +3,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
+import frc.robot.planners.AimPlanner;
+import frc.robot.planners.IntakeMotionPlanner;
+import frc.robot.planners.StageAvoidancePlanner;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.DiverterStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine;
@@ -31,9 +34,10 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
     private final PivotStatemachine pivotStatemachine;
     private final DiverterStatemachine diverterStatemachine;
     private final ClimberStatemachine climberStatemachine;
-    
-    private final SendableChooser<RobotState> simStateChooser = new SendableChooser<>();
-    private final SendableChooser<SwerveState> simSwerveStateChooser = new SendableChooser<>();
+
+    private final IntakeMotionPlanner intakeMotionPlanner;
+    private final AimPlanner aimPlanner;
+    private final StageAvoidancePlanner stageAvoidancePlanner;
 
     public RobotStatemachine (SwerveStatemachine swerveStatemachine, 
                             FlywheelIntakeStatemachine flywheelIntakeStatemachine, 
@@ -41,7 +45,10 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
                             ShooterStatemachine shooterStatemachine, 
                             PivotStatemachine pivotStatemachine, 
                             DiverterStatemachine diverterStatemachine, 
-                            ClimberStatemachine climberStatemachine) {
+                            ClimberStatemachine climberStatemachine,
+                            IntakeMotionPlanner intakeMotionPlanner,
+                            AimPlanner aimPlanner,
+                            StageAvoidancePlanner stageAvoidancePlanner) {
         this.swerveStatemachine = swerveStatemachine;
         this.flywheelIntakeStatemachine = flywheelIntakeStatemachine;
         this.triggerIntakeStatemachine = triggerIntakeStatemachine;
@@ -49,31 +56,9 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
         this.pivotStatemachine = pivotStatemachine;
         this.diverterStatemachine = diverterStatemachine;
         this.climberStatemachine = climberStatemachine;
-
-        if(Robot.isSimulation()) {
-            simStateChooser.setDefaultOption("Rest Without Gamepiece", RobotState.REST_WITHOUT_GAMEPIECE);
-            simStateChooser.addOption("Rest With Gamepiece", RobotState.REST_WITH_GAMEPIECE);
-            simStateChooser.addOption("Intake Flywheel", RobotState.INTAKE_FLYWHEEL);
-            simStateChooser.addOption("Intake Trigger", RobotState.INTAKE_TRIGGER);
-            simStateChooser.addOption("Aim", RobotState.AIM);
-            simStateChooser.addOption("Shoot", RobotState.SHOOT);
-            simStateChooser.addOption("Align Amp", RobotState.ALIGN_AMP);
-            simStateChooser.addOption("Place Amp", RobotState.PLACE_AMP);
-            simStateChooser.addOption("Pre Climb", RobotState.PRE_CLIMB);
-            simStateChooser.addOption("Climb Extend", RobotState.CLIMB_EXTEND);
-            simStateChooser.addOption("Climb Retract", RobotState.CLIMB_RETRACT);
-            simStateChooser.addOption("Handoff", RobotState.HANDOFF);
-            simStateChooser.addOption("Align Trap", RobotState.ALIGN_TRAP);
-            simStateChooser.addOption("Place Trap", RobotState.PLACE_TRAP);
-            SmartDashboard.putData("Supersystem State", simStateChooser);
-
-            simSwerveStateChooser.setDefaultOption("Open Loop", SwerveState.OPEN_LOOP_TELEOP);
-            simSwerveStateChooser.addOption("Closed Loop", SwerveState.CLOSED_LOOP_TELEOP);
-            simSwerveStateChooser.addOption("Robot Centric", SwerveState.ROBOT_CENTRIC);
-            simSwerveStateChooser.addOption("Lock In", SwerveState.LOCK_IN);
-            simSwerveStateChooser.addOption("Aim", SwerveState.AIM);
-            SmartDashboard.putData("Swerve State", simSwerveStateChooser);
-        }
+        this.intakeMotionPlanner = intakeMotionPlanner;
+        this.aimPlanner = aimPlanner;
+        this.stageAvoidancePlanner = stageAvoidancePlanner;
     }
 
     /**
@@ -84,23 +69,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
      */
     @Override
     public void requestState(RobotState state){
-        //Conditional state transitions:
-        switch (this.state) {
-            default:
-                break;
-        }
-
-        //Automatic state transitions:
-        switch (this.state) {
-            default:
-                break;
-        }
-
-        //illegal state transitions:
-        switch (this.state) {
-            default:
-                break;
-        }
+        this.state = state;
     }
 
     /**
@@ -117,10 +86,15 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
      * changes direction
      */
     private void updateState(){
-        switch (state) {
-            default:
-                break;
-        }
+        if (state == RobotState.INTAKE_FLYWHEEL && intakeMotionPlanner.shouldTransitionToBack()) state = RobotState.INTAKE_TRIGGER;
+        if (state == RobotState.INTAKE_TRIGGER && intakeMotionPlanner.shouldTransitionToFront()) state = RobotState.INTAKE_FLYWHEEL;
+
+        if ((state == RobotState.INTAKE_FLYWHEEL || state == RobotState.INTAKE_TRIGGER) && RobotContainer.getInstance().hasNote()) state = RobotState.REST_WITH_GAMEPIECE;
+        if (state == RobotState.REST_WITH_GAMEPIECE && !RobotContainer.getInstance().hasNote()) state = RobotState.REST_WITHOUT_GAMEPIECE;
+        if (state == RobotState.REST_WITHOUT_GAMEPIECE && RobotContainer.getInstance().hasNote()) state = RobotState.REST_WITH_GAMEPIECE;
+
+        if (state == RobotState.AIM && aimPlanner.readyToShoot()) state = RobotState.SHOOT;
+        if (state == RobotState.SHOOT && !aimPlanner.readyToShoot()) state = RobotState.AIM;
     }
 
     /**
@@ -128,11 +102,14 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
      */
     @Override
     public void update(){
-        if(Robot.isSimulation()) {
-            requestState(simStateChooser.getSelected());
-            requestSwerveState(simSwerveStateChooser.getSelected());
-        }
         updateState();
+
+        SmartDashboard.putString("Robot State", state.name());
+
+        if (state == RobotState.AIM || state == RobotState.SHOOT) {
+            swerveStatemachine.requestState(SwerveState.AIM);
+        }
+
         swerveStatemachine.update();
         flywheelIntakeStatemachine.updateWithState(state.getFlywheelIntakeState());
         triggerIntakeStatemachine.updateWithState(state.getTriggerIntakeState());
@@ -164,7 +141,6 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
         if(!climberStatemachine.isDone()) return false;
         if(!swerveStatemachine.isDone()) return false;
         return true;
-        
     }
     
 

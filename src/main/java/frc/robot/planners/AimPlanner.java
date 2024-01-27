@@ -20,8 +20,8 @@ import frc.robot.Constants;
  */
 public class AimPlanner {
     private final Supplier<Pose2d> robotPoseSupplier;
-    private final Supplier<ChassisSpeeds> robotVelocitySupplier;
-    private final boolean shootWhileMoving; // enable correction for drivetrain velocity
+    private final Supplier<ChassisSpeeds> robotRelativeChassisSpeeds;
+    private final Supplier<Boolean> shootWhileMoving; // enable correction for drivetrain velocity
 
     private final Translation2d targetCenterTranslation = new Translation2d(0, 0);
 
@@ -44,9 +44,9 @@ public class AimPlanner {
     private double pivotAngularVelocity = 0;
     private double shooterAngularAcceleration = 0;
 
-    public AimPlanner (Supplier<Pose2d> robotPoseSupplier, Supplier<ChassisSpeeds> robotVelocitySupplier, boolean shootWhileMoving) {
+    public AimPlanner (Supplier<Pose2d> robotPoseSupplier, Supplier<ChassisSpeeds> robotRelativeChassisSpeeds, Supplier<Boolean> shootWhileMoving) {
         this.robotPoseSupplier = robotPoseSupplier;
-        this.robotVelocitySupplier = robotVelocitySupplier;
+        this.robotRelativeChassisSpeeds = robotRelativeChassisSpeeds;
         this.shootWhileMoving = shootWhileMoving;
     }
 
@@ -64,7 +64,7 @@ public class AimPlanner {
         SmartDashboard.putNumber("Pivot Angle", pivotAngle.getDegrees());
         SmartDashboard.putNumber("Exit Velocity", exitVelocity);
 
-        if(!shootWhileMoving) {
+        if(!shootWhileMoving.get()) {
             drivetrainAngularVelocity = 0;
             pivotAngularVelocity = 0;
             shooterAngularAcceleration = 0;
@@ -74,7 +74,7 @@ public class AimPlanner {
             return;
         }
 
-        ChassisSpeeds robotVelocity = robotVelocitySupplier.get();
+        ChassisSpeeds robotVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds.get(), blueOriginPose.getRotation());
         ShotAngle uncorrectedShotAngle = new ShotAngle(angleToTarget, pivotAngle, exitVelocity);
         ShotAngle correctedShotAngle = ShotAngle.correctFromChassisSpeeds(uncorrectedShotAngle, robotVelocity, blueOriginPose.getRotation());
         this.pivotAngle = correctedShotAngle.getPivotAngle();
@@ -181,5 +181,10 @@ public class AimPlanner {
         public String toString () {
             return String.format("Drivetrain Angle: %f, Pivot Angle: %f, Exit Velocity: %f", drivetrainAngle.getDegrees(), pivotAngle.getDegrees(), exitVelocity);
         }
+    }
+
+    public boolean readyToShoot() {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

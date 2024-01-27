@@ -15,8 +15,8 @@ public class StageAvoidancePlanner {
     //TODO
     private final double DANGER_TOP_LEFT_X = 0;
     private final double DANGER_TOP_LEFT_Y = 0;
-    private final double DANGER_BOTTOM_RIGHT_X = 0;
-    private final double DANGER_BOTTOM_RIGHT_Y = 0;
+    private final double DANGER_BOTTOM_RIGHT_X = 1;
+    private final double DANGER_BOTTOM_RIGHT_Y = 1;
 
     boolean shouldStow = false;
 

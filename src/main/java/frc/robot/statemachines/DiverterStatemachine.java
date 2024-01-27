@@ -1,5 +1,6 @@
 package frc.robot.statemachines;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.StageAvoidancePlanner;
 import frc.robot.subsystems.Diverter;
@@ -69,6 +70,7 @@ public class DiverterStatemachine extends StateMachine<DiverterStatemachine.Dive
     @Override
     public void update(){
         updateState();
+        SmartDashboard.putString("Diverter State", state.name());
         diverter.setDiverterExtension(state.getPosition());
         diverter.setDiverterRoller(state.getSpeed());
     }
