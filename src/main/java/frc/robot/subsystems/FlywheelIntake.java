@@ -27,7 +27,7 @@ public class FlywheelIntake {
         deployCAN.setSoftLimit(SoftLimitDirection.kForward, 0.02f);
         deployCAN.enableSoftLimit(SoftLimitDirection.kForward, true);
 
-        deployPIDController.setP(flywheelIntakeDeployKp);
+        deployPIDController.setP(flywheelIntakeDeployKp);   //Hehe, thats funny, it spells PID..... WAIT
         deployPIDController.setI(flywheelIntakeDeployKi);
         deployPIDController.setD(flywheelIntakeDeployKd);
         //see https://github.com/REVrobotics/SPARK-MAX-Examples/blob/master/Java/Position%20Closed%20Loop%20Control/src/main/java/frc/robot/Robot.java
