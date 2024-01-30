@@ -67,7 +67,7 @@ public final class Constants {
   }
 
   public static final class TriggerIntake {
-    public static final int triggerIntakeMotorId = 0;
+    public static final int triggerIntakeRollerMotorId = 0;
     public static final int triggerIntakeDeployMotorId = 0;
 
     public static final double triggerIntakeDeployKp = 0;
@@ -76,6 +76,12 @@ public final class Constants {
 
     public static final double triggerIntakeDeployGearing = 1;
     public static final double triggerIntakeDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
+
+    public static final double triggerIntakeDeployMinAngle = 0;
+    public static final double triggerIntakeDeployMaxAngle = 360;
+
+    public static final boolean triggerIntakeDeployMotorInverted = false;
+    public static final boolean triggerIntakeRollerMotorInverted = false;
   }
 
   public static final class Pivot {
