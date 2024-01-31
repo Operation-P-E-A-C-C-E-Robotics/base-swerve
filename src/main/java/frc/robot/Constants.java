@@ -56,8 +56,8 @@ public final class Constants {
     public static final double flywheelIntakeDeployKi = 0;
     public static final double flywheelIntakeDeployKd = 0;
 
-    public static final double flywheelIntakeDeployMinAngle = 0;
-    public static final double flywheelIntakeDeployMaxAngle = 360;
+    public static final float flywheelIntakeDeployMinAngle = 0.0f;
+    public static final float flywheelIntakeDeployMaxAngle = 360.0f;
 
     public static final double flywheelIntakeDeployGearing = 1;
     public static final double flywheelIntakeDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
@@ -77,8 +77,8 @@ public final class Constants {
     public static final double triggerIntakeDeployGearing = 1;
     public static final double triggerIntakeDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
 
-    public static final double triggerIntakeDeployMinAngle = 0;
-    public static final double triggerIntakeDeployMaxAngle = 360;
+    public static final float triggerIntakeDeployMinAngle = 0.0f;
+    public static final float triggerIntakeDeployMaxAngle = 360.0f;
 
     public static final boolean triggerIntakeDeployMotorInverted = false;
     public static final boolean triggerIntakeRollerMotorInverted = false;

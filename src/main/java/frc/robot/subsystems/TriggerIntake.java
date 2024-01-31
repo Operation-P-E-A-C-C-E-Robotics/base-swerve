@@ -26,7 +26,7 @@ public class TriggerIntake {
         rollerCAN.setInverted(triggerIntakeRollerMotorInverted);
         deployCAN.setInverted(triggerIntakeDeployMotorInverted);
         
-        deployCAN.setSoftLimit(SoftLimitDirection.kForward, 0.02f);
+
         deployCAN.enableSoftLimit(SoftLimitDirection.kForward, true);
 
         deployController.setP(triggerIntakeDeployKp);
@@ -37,12 +37,11 @@ public class TriggerIntake {
     }
 
     public void setDeploymentAngle (double angle) {
-        if(angle >= triggerIntakeDeployMinAngle && angle <= triggerIntakeDeployMaxAngle)
-        {
-            return;   //insert error code... code here
-        }
-        targetRotation = angle; 
+        //you can change your soft limits by changing deploy soft limits in constants.
+        deployCAN.setSoftLimit(SoftLimitDirection.kForward, triggerIntakeDeployMaxAngle);
+        deployCAN.setSoftLimit(SoftLimitDirection.kForward, triggerIntakeDeployMinAngle);
 
+        targetRotation = angle; 
         deployController.setReference(angle, CANSparkMax.ControlType.kPosition);
     }
 

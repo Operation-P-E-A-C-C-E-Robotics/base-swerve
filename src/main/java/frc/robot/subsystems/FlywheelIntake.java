@@ -24,7 +24,7 @@ public class FlywheelIntake {
         rollerCAN.setInverted(flywheelIntakeRollerMotorInverted);
         deployCAN.setInverted(flywheelIntakeDeployMotorInverted);
 
-        deployCAN.setSoftLimit(SoftLimitDirection.kForward, 0.02f);
+
         deployCAN.enableSoftLimit(SoftLimitDirection.kForward, true);
 
         deployPIDController.setP(flywheelIntakeDeployKp);   //Hehe, thats funny, it spells PID.... WAIT
@@ -40,12 +40,12 @@ public class FlywheelIntake {
      * set the target angle for the intake to deploy to, in rotations
      */
     public void setDeploymentAngle (double angle) {
-        if(angle >= flywheelIntakeDeployMinAngle && angle <= flywheelIntakeDeployMaxAngle)
-        {
-            return;   //insert error code... code here
-        }
-        targetRotations = angle; 
+        //«««Warning»»» : dont let stretch interact with this code by any means. It has so much hatred 
+        //for this code that it will break its own neck without warning
+        deployCAN.setSoftLimit(SoftLimitDirection.kForward, flywheelIntakeDeployMaxAngle);
+        deployCAN.setSoftLimit(SoftLimitDirection.kForward, flywheelIntakeDeployMinAngle);
         
+        targetRotations = angle; 
         deployPIDController.setReference(angle, CANSparkMax.ControlType.kPosition);
 
     //use the flywheelIntakeDeployGearing constant for gearing to convert to motor rotations
