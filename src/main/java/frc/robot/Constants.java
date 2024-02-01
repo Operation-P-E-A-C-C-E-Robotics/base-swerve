@@ -130,7 +130,7 @@ public final class Constants {
 
     public static final double climberGearRatio = 1;
 
-    public static final double climberTolerance = 0; //how close to the target position the climber needs to be considered ready
+    public static final double climberTolerance = 0; //-⁂Stupid Questions With Parker⁂-: could i also name this climberError? or is error reserved for something else
 
     public static final double climberDeployKp = 0;
     public static final double climberDeployKi = 0;
@@ -141,6 +141,10 @@ public final class Constants {
     public static final double climberDeployCruiseVelocity = 0;
     public static final double climberDeployMotionMagicExpoKv = climberDeployKv;
     public static final double climberDeployMotionMagicExpoKa = climberDeployKa;
+
+    public static final boolean climberLeftMotorIsInverted = true;
+    public static final boolean climberRightMotorIsInverted = true;
+    // delete this comment when sure the booleans are what we want
   }
   public static final class Swerve {
     /* TELEOP */

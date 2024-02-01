@@ -170,28 +170,28 @@ public class RobotContainer {
 
         robotStatemachine.update();
 
-        if(SmartDashboard.getBoolean("Override Flywheel Intake State", false)) {
-            flywheelIntakeStatemachine.updateWithState(flywheelIntakeStateChooser.getSelected());
-        }
+        //if(SmartDashboard.getBoolean("Override Flywheel Intake State", false)) {
+        //    flywheelIntakeStatemachine.updateWithState(flywheelIntakeStateChooser.getSelected());
+        //}
 
-        if(SmartDashboard.getBoolean("Override Trigger Intake State", false)) {
-            triggerIntakeStatemachine.updateWithState(triggerIntakeStateChooser.getSelected());
-        }
+        //if(SmartDashboard.getBoolean("Override Trigger Intake State", false)) {
+        //    triggerIntakeStatemachine.updateWithState(triggerIntakeStateChooser.getSelected());
+        //}
 
-        if(SmartDashboard.getBoolean("Override Pivot State", false)) {
-            pivotStatemachine.updateWithState(pivotStateChooser.getSelected());
-        }
+        //if(SmartDashboard.getBoolean("Override Pivot State", false)) {
+        //    pivotStatemachine.updateWithState(pivotStateChooser.getSelected());
+        //}
 
-        if(SmartDashboard.getBoolean("Override Shooter State", false)) {
-            shooterStatemachine.updateWithState(shooterStateChooser.getSelected());
-        }
+        //if(SmartDashboard.getBoolean("Override Shooter State", false)) {
+        //    shooterStatemachine.updateWithState(shooterStateChooser.getSelected());
+        //}
 
-        if(SmartDashboard.getBoolean("Override Diverter State", false)) {
-            diverterStatemachine.updateWithState(diverterStateChooser.getSelected());
-        }
+        // if(SmartDashboard.getBoolean("Override Diverter State", false)) {
+        //     diverterStatemachine.updateWithState(diverterStateChooser.getSelected());
+        // }
 
-        if(SmartDashboard.getBoolean("Override Climber State", false)) {
-            climberStatemachine.updateWithState(climberStateChooser.getSelected());
-        }
+        // if(SmartDashboard.getBoolean("Override Climber State", false)) {
+        //     climberStatemachine.updateWithState(climberStateChooser.getSelected());
+        // }
     }
 }
