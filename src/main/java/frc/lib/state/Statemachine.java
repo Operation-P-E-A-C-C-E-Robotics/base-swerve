@@ -9,7 +9,7 @@ package frc.lib.state;
  * This class takes a generic type T that is an enum, which should
  * be used to hold the states of the state machine.
  */
-public abstract class Statemachine <T extends Enum<T>> {
+public abstract class StateMachine <T extends Enum<T>> {
     /**
      * This is the method that is called every loop to update the state machine.
      * The state machine will handle any automatic state transitions and
