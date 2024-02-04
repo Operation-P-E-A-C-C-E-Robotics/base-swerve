@@ -1,14 +1,6 @@
 package frc.robot;
 
 import frc.robot.subsystems.Swerve;
-
-import org.ejml.simple.SimpleOperations;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.EnumSendableChooser;
 import frc.robot.RobotStatemachine.RobotState;
@@ -39,13 +31,13 @@ public class RobotContainer {
     private static RobotContainer instance = null;
 
     /* SUBSYSTEMS */
-    private final Swerve swerve = new Swerve();
-    private final FlywheelIntake flywheelIntake = new FlywheelIntake();
-    private final TriggerIntake triggerIntake = new TriggerIntake();
-    private final Pivot pivot = new Pivot();
-    private final Shooter shooter = new Shooter();
-    private final Diverter diverter = new Diverter();
-    private final Climber climber = new Climber();
+    private final Swerve swerve = Swerve.getInstance();
+    private final FlywheelIntake flywheelIntake = FlywheelIntake.getInstance();
+    private final TriggerIntake triggerIntake = TriggerIntake.getInstance();
+    private final Pivot pivot = Pivot.getInstance();
+    private final Shooter shooter = Shooter.getInstance();
+    private final Diverter diverter = Diverter.getInstance();
+    private final Climber climber = Climber.getInstance();
 
     /* PLANNERS */
     private final IntakeMotionPlanner intakeMotionPlanner = new IntakeMotionPlanner(

@@ -32,7 +32,7 @@ public class Swerve extends SubsystemBase {
 
     // private LimelightHelper limelight;
 
-    public Swerve() {
+    private Swerve() {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
             frontLeftIDs, 
@@ -185,6 +185,11 @@ public class Swerve extends SubsystemBase {
 
     public void register(Joystick j){
         Inspiration.fullPeacce(j);
+    }
+
+    private static final Swerve instance = new Swerve();
+    public static Swerve getInstance(){
+        return instance;
     }
 }
 

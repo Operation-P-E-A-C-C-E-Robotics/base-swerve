@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 public class Shooter {
-    public Shooter () {
+    private Shooter () {
 
     }
 
@@ -34,5 +34,10 @@ public class Shooter {
 
     public boolean shotDetected() {
         return false;
+    }
+
+    private static final Shooter instance = new Shooter();
+    public static Shooter getInstance(){
+        return instance;
     }
 }

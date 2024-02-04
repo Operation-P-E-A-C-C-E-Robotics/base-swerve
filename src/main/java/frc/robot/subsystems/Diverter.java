@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 public class Diverter {
-    public Diverter () {
+
+    private Diverter () {
 
     }
 
@@ -22,5 +23,10 @@ public class Diverter {
 
     public boolean detectsNote () {
         return false;
+    }
+
+    private static final Diverter instance = new Diverter();
+    public static Diverter getInstance(){
+        return instance;
     }
 }

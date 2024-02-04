@@ -2,30 +2,23 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.Climber.*;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import frc.lib.util.Util;
 
 public class Climber {
     private TalonFX leftMotor = new TalonFX(climberLeftMotorId);
     private TalonFX rightMotor = new TalonFX(climberRightMotorId);
     //declare two TalonFXs, one for the left climber, one for the right climber
 
-    private TalonFXConfiguration rightMotorConfigs = new TalonFXConfiguration();
-    private TalonFXConfiguration leftMotorConfigs = new TalonFXConfiguration();
+    private double setpoint = 0.0;
 
-    private double climberSetpoint = 0.0d;
+    private Climber () {
+        leftMotor.getConfigurator().apply(climberConfigs);
+        rightMotor.getConfigurator().apply(climberConfigs);
 
-    private double leftMotorClimberPos = 0.0d;
-    private double rightMotorClimberPos = 0.0d;
-
-    public Climber () {
         leftMotor.setInverted(climberLeftMotorIsInverted);
         rightMotor.setInverted(climberRightMotorIsInverted);
-        leftMotor.getConfigurator().apply(leftMotorConfigs);
-        rightMotor.getConfigurator().apply(rightMotorConfigs);
-        
-        //see https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/motion-magic.html
-        //use MotionMagicExpo.
     }
 
     /**
@@ -42,25 +35,25 @@ public class Climber {
      * @param right the position of the right side of the climber
      */
     public void setClimberPosition (double left, double right) {
-
-        //use the climberGearing constant for gearing to convert to motor rotations
-        leftMotor.setPosition(left);                                       //ask sean  if this is ok :|
+        setpoint = (left + right) / 2;
+        leftMotor.setPosition(left);                                       //ask sean  if this is ok :| sean: it's not ok, it's aok
         rightMotor.setPosition(right);
     }
 
     //i changed this from a double to void so i could grab both values and store them in different variables.
     public double getClimberPosition(){
-        return 0; //leftMotorClimberPos = leftMotor.getPosition().getValue();   //unable to finish this in time due to statemachine tomfoolery
-        //rightMotorClimberPos = rightMotor.getPosition().getValue(); 
+        return (leftMotor.getPosition().getValue() + rightMotor.getPosition().getValue()) / 2;
     }
 
     /**
      * get whether the climber is at its setpoint
      */
     public boolean atSetpoint () {
-        //unfinished btw
-        getClimberPosition();                              //below line checks BOTH climber motors
-        return (leftMotorClimberPos >= (climberSetpoint - climberTolerance) && leftMotorClimberPos <= (climberSetpoint + climberTolerance)
-                && rightMotorClimberPos >= (climberSetpoint - climberTolerance) && rightMotorClimberPos <= (climberSetpoint + climberTolerance));   //this seems stupid long, lmk if this is too much
+         return Util.inRange(getClimberPosition() - setpoint, climberTolerance);
+    }
+
+    private static Climber instance = new Climber();
+    public static Climber getInstance(){
+        return instance;
     }
 }

@@ -6,6 +6,9 @@ package frc.robot;
 
 import java.util.function.DoubleFunction;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -40,6 +43,15 @@ public final class Constants {
     public static final double flywheelEncoderStDev = 0;
     public static final double flywheelControlEffort = 0;
     public static final double flywheelErrorTolerance = 0;
+
+    public static final TalonFXConfiguration flywheelConfigs = new TalonFXConfiguration();
+    static {
+      flywheelConfigs.CurrentLimits.StatorCurrentLimit = 20;
+      flywheelConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+      flywheelConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+      flywheelConfigs.Feedback.SensorToMechanismRatio = flywheelGearRatio;
+    }
 
     public static final double flywheelEfficiency = 1; // percentage of flywheel surface speed to exit velocity
     public static final double flywheelTolerance = 0; //how close to the target velocity the flywheel needs to be considered ready
@@ -85,23 +97,38 @@ public final class Constants {
   }
 
   public static final class Pivot {
-    public static final int pivotMotorId = 0;
+    public static final int pivotMasterID = 0;
+    public static final int pivotSlaveID = 0;
+    public static final int pivotCANCoderID = 0;
 
     public static final double pivotMinAngle = 0;
     public static final double pivotMaxAngle = 0;
 
-    public static final double pivotGearRatio = 1;
+    public static final double pivotGearRatio = 1; // pivot rotations per motor rotation
     public static final double pivotTolerance = 0; //how close to the target position the pivot needs to be considered ready
-    
-    public static final double pivotKp = 0;
-    public static final double pivotKi = 0;
-    public static final double pivotKd = 0;
-    public static final double pivotKs = 0;
-    public static final double pivotKv = 0;
-    public static final double pivotKa = 0;
-    public static final double pivotCruiseVelocity = 0;
-    public static final double pivotMotionMagicExpoKv = pivotKv;
-    public static final double pivotMotionMagicExpoKa = pivotKa;
+
+    public static final TalonFXConfiguration pivotConfigs = new TalonFXConfiguration();
+    static {
+      pivotConfigs.CurrentLimits.StatorCurrentLimit = 20;
+      pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+      pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+      pivotConfigs.Slot0.kP = 0;
+      pivotConfigs.Slot0.kI = 0;
+      pivotConfigs.Slot0.kD = 0;
+      pivotConfigs.Slot0.kS = 0;
+      pivotConfigs.Slot0.kV = 0;
+      pivotConfigs.Slot0.kA = 0;
+
+      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 0;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 0;
+      pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
+
+      pivotConfigs.Feedback.FeedbackRemoteSensorID = pivotCANCoderID;
+      pivotConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+      pivotConfigs.Feedback.FeedbackRotorOffset = 0;
+      pivotConfigs.Feedback.RotorToSensorRatio = pivotGearRatio;
+    }
   }
 
   public static final class Diverter {
@@ -113,15 +140,23 @@ public final class Constants {
 
     public static final double maxDiverterExtension = 0; //in meters
 
-    public static final double diverterDeployKp = 0;
-    public static final double diverterDeployKi = 0;
-    public static final double diverterDeployKd = 0;
-    public static final double diverterDeployKs = 0;
-    public static final double diverterDeployKv = 0;
-    public static final double diverterDeployKa = 0;
-    public static final double diverterDeployCruiseVelocity = 0;
-    public static final double diverterDeployMotionMagicExpoKv = diverterDeployKv;
-    public static final double diverterDeployMotionMagicExpoKa = diverterDeployKa;
+    public static final TalonFXConfiguration diverterDeployConfigs = new TalonFXConfiguration();
+    static {
+      diverterDeployConfigs.CurrentLimits.StatorCurrentLimit = 20;
+      diverterDeployConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+      diverterDeployConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+      diverterDeployConfigs.Slot0.kP = 0;
+      diverterDeployConfigs.Slot0.kI = 0;
+      diverterDeployConfigs.Slot0.kD = 0;
+      diverterDeployConfigs.Slot0.kS = 0;
+      diverterDeployConfigs.Slot0.kV = 0;
+      diverterDeployConfigs.Slot0.kA = 0;
+
+      diverterDeployConfigs.MotionMagic.MotionMagicExpo_kA = 0;
+      diverterDeployConfigs.MotionMagic.MotionMagicExpo_kV = 0;
+      diverterDeployConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
+    }
   }
 
   public static final class Climber {
@@ -132,19 +167,27 @@ public final class Constants {
 
     public static final double climberTolerance = 0; //-⁂Stupid Questions With Parker⁂-: could i also name this climberError? or is error reserved for something else
 
-    public static final double climberDeployKp = 0;
-    public static final double climberDeployKi = 0;
-    public static final double climberDeployKd = 0;
-    public static final double climberDeployKs = 0;
-    public static final double climberDeployKv = 0;
-    public static final double climberDeployKa = 0;
-    public static final double climberDeployCruiseVelocity = 0;
-    public static final double climberDeployMotionMagicExpoKv = climberDeployKv;
-    public static final double climberDeployMotionMagicExpoKa = climberDeployKa;
+    public static final TalonFXConfiguration climberConfigs = new TalonFXConfiguration();
+    static {
+      climberConfigs.CurrentLimits.StatorCurrentLimit = 20;
+      climberConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+      climberConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    public static final boolean climberLeftMotorIsInverted = true;
-    public static final boolean climberRightMotorIsInverted = true;
-    // delete this comment when sure the booleans are what we want
+      climberConfigs.Slot0.kP = 0;
+      climberConfigs.Slot0.kI = 0;
+      climberConfigs.Slot0.kD = 0;
+      climberConfigs.Slot0.kS = 0;
+      climberConfigs.Slot0.kV = 0;
+      climberConfigs.Slot0.kA = 0;
+
+      climberConfigs.MotionMagic.MotionMagicExpo_kA = 0;
+      climberConfigs.MotionMagic.MotionMagicExpo_kV = 0;
+      climberConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
+    }
+
+    public static final boolean climberLeftMotorIsInverted = false;
+    public static final boolean climberRightMotorIsInverted = false;
+    // todo delete this comment when sure the booleans are what we want
   }
   public static final class Swerve {
     /* TELEOP */

@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 public class Pivot {
-    public Pivot () {
+    private Pivot () {
 
     }
 
@@ -14,5 +14,10 @@ public class Pivot {
 
     public boolean atSetpoint () {
         return false;
+    }
+
+    private static final Pivot instance = new Pivot();
+    public static Pivot getInstance(){
+        return instance;
     }
 }

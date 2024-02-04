@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.AimPlanner;
@@ -20,12 +19,9 @@ import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.statemachines.PivotStatemachine.PivotState;
 import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
-import frc.robot.subsystems.FlywheelIntake;
 
 public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState>{
     private RobotState state = RobotState.REST_WITHOUT_GAMEPIECE;
-
-    public static FlywheelIntake flywheelIntake = new FlywheelIntake();
     
     private final SwerveStatemachine swerveStatemachine;
     private final FlywheelIntakeStatemachine flywheelIntakeStatemachine;
@@ -37,7 +33,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
 
     private final IntakeMotionPlanner intakeMotionPlanner;
     private final AimPlanner aimPlanner;
-    private final StageAvoidancePlanner stageAvoidancePlanner;
+    //private final StageAvoidancePlanner stageAvoidancePlanner;
 
     public RobotStatemachine (SwerveStatemachine swerveStatemachine, 
                             FlywheelIntakeStatemachine flywheelIntakeStatemachine, 
@@ -58,7 +54,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
         this.climberStatemachine = climberStatemachine;
         this.intakeMotionPlanner = intakeMotionPlanner;
         this.aimPlanner = aimPlanner;
-        this.stageAvoidancePlanner = stageAvoidancePlanner;
+        // this.stageAvoidancePlanner = stageAvoidancePlanner;
     }
 
     /**

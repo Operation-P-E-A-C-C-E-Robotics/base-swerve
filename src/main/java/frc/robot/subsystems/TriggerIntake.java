@@ -4,30 +4,32 @@ import static frc.robot.Constants.TriggerIntake.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import frc.lib.util.Util;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
 
 public class TriggerIntake {
 
-    private CANSparkMax deployCAN = new CANSparkMax(triggerIntakeDeployMotorId, MotorType.kBrushless);
-    private CANSparkMax rollerCAN = new CANSparkMax(triggerIntakeRollerMotorId, MotorType.kBrushless);
+    private CANSparkMax deployMotor = new CANSparkMax(triggerIntakeDeployMotorId, MotorType.kBrushless);
+    private CANSparkMax rollerMotor = new CANSparkMax(triggerIntakeRollerMotorId, MotorType.kBrushless);
 
-    private RelativeEncoder deployEncoder = deployCAN.getEncoder();
+    private RelativeEncoder deployEncoder = deployMotor.getEncoder();
 
-    private SparkPIDController deployController = deployCAN.getPIDController();
+    private SparkPIDController deployController = deployMotor.getPIDController();
 
     private double targetRotation = 0.0;
 
-
-
-    public TriggerIntake () {
-
-        rollerCAN.setInverted(triggerIntakeRollerMotorInverted);
-        deployCAN.setInverted(triggerIntakeDeployMotorInverted);
+    private TriggerIntake () {
+        rollerMotor.setInverted(triggerIntakeRollerMotorInverted);
+        deployMotor.setInverted(triggerIntakeDeployMotorInverted);
         
-
-        deployCAN.enableSoftLimit(SoftLimitDirection.kForward, true);
+        deployMotor.setSoftLimit(SoftLimitDirection.kForward, triggerIntakeDeployMaxAngle);
+        deployMotor.setSoftLimit(SoftLimitDirection.kReverse, triggerIntakeDeployMinAngle);
+        deployMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+        deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
         deployController.setP(triggerIntakeDeployKp);
         deployController.setI(triggerIntakeDeployKi);
@@ -37,25 +39,24 @@ public class TriggerIntake {
     }
 
     public void setDeploymentAngle (double angle) {
-        //you can change your soft limits by changing deploy soft limits in constants.
-        deployCAN.setSoftLimit(SoftLimitDirection.kForward, triggerIntakeDeployMaxAngle);
-        deployCAN.setSoftLimit(SoftLimitDirection.kForward, triggerIntakeDeployMinAngle);
-
         targetRotation = angle; 
         deployController.setReference(angle, CANSparkMax.ControlType.kPosition);
     }
 
     public void setRollerSpeed (double speed) {
-        rollerCAN.set(speed);
+        rollerMotor.set(speed);
     }
 
     public double getDeploymentAngle () {
-
         return deployEncoder.getPosition();
     }
 
     public boolean deployedToSetpoint () {
-        return (targetRotation >= (getDeploymentAngle() - triggerIntakeDeployTolerance) &&
-         targetRotation <= (getDeploymentAngle() - triggerIntakeDeployTolerance));
+        return Util.inRange(getDeploymentAngle() - targetRotation, triggerIntakeDeployTolerance);
+    }
+
+    private static final TriggerIntake instance = new TriggerIntake();
+    public static TriggerIntake getInstance(){
+        return instance;
     }
 }
