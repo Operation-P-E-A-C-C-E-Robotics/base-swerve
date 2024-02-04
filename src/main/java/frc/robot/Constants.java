@@ -34,6 +34,9 @@ public final class Constants {
     public static final int lowerFlywheelMotorId = 0;
     public static final int triggerMotorId = 0;
 
+    public static final int flywheelSwitchId = 0;
+    public static final int triggerSwitchId = 0;
+
     public static final double flywheelMaxControllableVelocity = 0; //rotations per second
     public static final double flywheelGearRatio = 1;
     public static final double flywheelDiameter = Units.inchesToMeters(5);
@@ -43,6 +46,10 @@ public final class Constants {
     public static final double flywheelEncoderStDev = 0;
     public static final double flywheelControlEffort = 0;
     public static final double flywheelErrorTolerance = 0;
+
+    public static final double shotDetectionAccelerationThreshold = 0;
+    public static final double shotDetectionTimeThreshold = 0;
+    public static final double shotDetectionMinVelocity = 0;
 
     public static final TalonFXConfiguration flywheelConfigs = new TalonFXConfiguration();
     static {
@@ -101,11 +108,15 @@ public final class Constants {
     public static final int pivotSlaveID = 0;
     public static final int pivotCANCoderID = 0;
 
+    public static final double restingAngle = 0; //rotations
+
     public static final double pivotMinAngle = 0;
     public static final double pivotMaxAngle = 0;
 
     public static final double pivotGearRatio = 1; // pivot rotations per motor rotation
     public static final double pivotTolerance = 0; //how close to the target position the pivot needs to be considered ready
+
+    public static final double gravityFeedforwardkG = 0;
 
     public static final TalonFXConfiguration pivotConfigs = new TalonFXConfiguration();
     static {
@@ -132,7 +143,7 @@ public final class Constants {
   }
 
   public static final class Diverter {
-    public static final int diverterMotorId = 0;
+    public static final int diverterRollerMotorId = 0;
     public static final int diverterDeployMotorId = 0;
 
     public static final double diverterDeployGearRatio = 1;
