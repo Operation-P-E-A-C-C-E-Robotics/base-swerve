@@ -3,17 +3,16 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.AimPlanner;
-import frc.robot.planners.IntakeMotionPlanner;
-import frc.robot.planners.StageAvoidancePlanner;
+import frc.robot.planners.CollisionAvoidancePlanner;
 import frc.robot.statemachines.ClimberStatemachine;
-import frc.robot.statemachines.DiverterStatemachine;
+import frc.robot.statemachines.FlipperStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine;
 import frc.robot.statemachines.PivotStatemachine;
 import frc.robot.statemachines.ShooterStatemachine;
 import frc.robot.statemachines.SwerveStatemachine;
 import frc.robot.statemachines.TriggerIntakeStatemachine;
 import frc.robot.statemachines.ClimberStatemachine.ClimberState;
-import frc.robot.statemachines.DiverterStatemachine.DiverterState;
+import frc.robot.statemachines.FlipperStatemachine.FlipperState;
 import frc.robot.statemachines.FlywheelIntakeStatemachine.FlywheelIntakeState;
 import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.statemachines.PivotStatemachine.PivotState;
@@ -21,17 +20,17 @@ import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 
 public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState>{
-    private RobotState state = RobotState.REST_WITHOUT_GAMEPIECE;
+    private RobotState state = RobotState.REST;
     
     private final SwerveStatemachine swerveStatemachine;
     private final FlywheelIntakeStatemachine flywheelIntakeStatemachine;
     private final TriggerIntakeStatemachine triggerIntakeStatemachine;
     private final ShooterStatemachine shooterStatemachine;
     private final PivotStatemachine pivotStatemachine;
-    private final DiverterStatemachine diverterStatemachine;
+    private final FlipperStatemachine diverterStatemachine;
     private final ClimberStatemachine climberStatemachine;
 
-    private final IntakeMotionPlanner intakeMotionPlanner;
+    private final CollisionAvoidancePlanner intakeMotionPlanner;
     private final AimPlanner aimPlanner;
     //private final StageAvoidancePlanner stageAvoidancePlanner;
 
@@ -40,11 +39,10 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
                             TriggerIntakeStatemachine triggerIntakeStatemachine, 
                             ShooterStatemachine shooterStatemachine, 
                             PivotStatemachine pivotStatemachine, 
-                            DiverterStatemachine diverterStatemachine, 
+                            FlipperStatemachine diverterStatemachine, 
                             ClimberStatemachine climberStatemachine,
-                            IntakeMotionPlanner intakeMotionPlanner,
-                            AimPlanner aimPlanner,
-                            StageAvoidancePlanner stageAvoidancePlanner) {
+                            CollisionAvoidancePlanner intakeMotionPlanner,
+                            AimPlanner aimPlanner) {
         this.swerveStatemachine = swerveStatemachine;
         this.flywheelIntakeStatemachine = flywheelIntakeStatemachine;
         this.triggerIntakeStatemachine = triggerIntakeStatemachine;
@@ -82,15 +80,6 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
      * changes direction
      */
     private void updateState(){
-        if (state == RobotState.INTAKE_FLYWHEEL && intakeMotionPlanner.shouldTransitionToBack()) state = RobotState.INTAKE_TRIGGER;
-        if (state == RobotState.INTAKE_TRIGGER && intakeMotionPlanner.shouldTransitionToFront()) state = RobotState.INTAKE_FLYWHEEL;
-
-        if ((state == RobotState.INTAKE_FLYWHEEL || state == RobotState.INTAKE_TRIGGER) && RobotContainer.getInstance().hasNote()) state = RobotState.REST_WITH_GAMEPIECE;
-        if (state == RobotState.REST_WITH_GAMEPIECE && !RobotContainer.getInstance().hasNote()) state = RobotState.REST_WITHOUT_GAMEPIECE;
-        if (state == RobotState.REST_WITHOUT_GAMEPIECE && RobotContainer.getInstance().hasNote()) state = RobotState.REST_WITH_GAMEPIECE;
-
-        if (state == RobotState.AIM && aimPlanner.readyToShoot()) state = RobotState.SHOOT;
-        if (state == RobotState.SHOOT && !aimPlanner.readyToShoot()) state = RobotState.AIM;
     }
 
     /**
@@ -102,7 +91,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
 
         SmartDashboard.putString("Robot State", state.name());
 
-        if (state == RobotState.AIM || state == RobotState.SHOOT) {
+        if (state == RobotState.AUTO_AIM || state == RobotState.SHOOT) {
             swerveStatemachine.requestState(SwerveState.AIM);
         }
 
@@ -141,51 +130,59 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
     
 
     public enum RobotState {
-        REST_WITHOUT_GAMEPIECE,
-        REST_WITH_GAMEPIECE,
+        REST,
+        INTAKE,
         INTAKE_FLYWHEEL (
             FlywheelIntakeState.INTAKE,
             TriggerIntakeState.RETRACT,
-            ShooterState.INTAKE
+            ShooterState.INTAKE,
+            PivotState.INTAKE
         ),
         INTAKE_TRIGGER (
             FlywheelIntakeState.RETRACT,
             TriggerIntakeState.INTAKE,
             ShooterState.INTAKE
         ),
-        AIM(
-            ShooterState.AIM,
-            PivotState.AIM
+        AIM_LAYUP (
+            ShooterState.AIM_LAYUP,
+            PivotState.AIM_LAYUP
+        ),
+        AIM_PROTECTED (
+            ShooterState.AIM_PROTECTED,
+            PivotState.AIM_PROTECTED
+        ),
+        AUTO_AIM(
+            ShooterState.AUTO_AIM,
+            PivotState.AUTO_AIM
         ),
         SHOOT(
             ShooterState.SHOOT,
-            PivotState.AIM
+            PivotState.AUTO_AIM
         ),
-        //ADD SETPOINTS
         ALIGN_AMP(
-            ShooterState.REST,
+            ShooterState.RAMP_DOWN,
             PivotState.AMP,
-            DiverterState.ALIGN_AMP
+            FlipperState.ALIGN_AMP
         ),
         PLACE_AMP(
-            ShooterState.REST,
+            ShooterState.RAMP_DOWN,
             PivotState.AMP,
-            DiverterState.PLACE_AMP
+            FlipperState.PLACE_AMP
         ),
         PRE_CLIMB(
-            ShooterState.REST,
+            ShooterState.RAMP_DOWN,
             PivotState.PRE_CLIMB
         ),
         CLIMB_EXTEND(
             TriggerIntakeState.AVOID,
             PivotState.CLIMB,
-            DiverterState.RETRACT, //possible climb state
+            FlipperState.RETRACT, //possible climb state
             ClimberState.EXTEND
         ),
         CLIMB_RETRACT(
             TriggerIntakeState.AVOID,
             PivotState.CLIMB,
-            DiverterState.RETRACT,
+            FlipperState.RETRACT,
             ClimberState.RETRACT
         ),
         HANDOFF(
@@ -193,26 +190,26 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
             TriggerIntakeState.AVOID, 
             ShooterState.HANDOFF, 
             PivotState.CLIMB, 
-            DiverterState.HANDOFF, 
+            FlipperState.HANDOFF, 
             ClimberState.RETRACT
         ),
         ALIGN_TRAP(
             TriggerIntakeState.AVOID,
             PivotState.CLIMB,
-            DiverterState.ALIGN_TRAP,
+            FlipperState.ALIGN_TRAP,
             ClimberState.RETRACT
         ),
         PLACE_TRAP(
-            ShooterState.REST,
+            ShooterState.RAMP_DOWN,
             PivotState.CLIMB,
-            DiverterState.PLACE_TRAP
+            FlipperState.PLACE_TRAP
         );
 
         private FlywheelIntakeState flywheelIntakeState;
         private TriggerIntakeState triggerIntakeState;
         private ShooterState shooterState;
         private PivotState pivotState;
-        private DiverterState diverterState;
+        private FlipperState diverterState;
         private ClimberState climberState;
 
         public FlywheelIntakeState getFlywheelIntakeState() {
@@ -231,7 +228,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
             return pivotState;
         }
 
-        public DiverterState getDiverterState(){
+        public FlipperState getDiverterState(){
             return diverterState;
         }
 
@@ -243,7 +240,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState,
                                 PivotState pivotState,
-                                DiverterState diverterState,
+                                FlipperState diverterState,
                                 ClimberState climberState){
             this.flywheelIntakeState = flywheelIntakeState;
             this.triggerIntakeState = triggerIntakeState;
@@ -256,23 +253,30 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
         private RobotState(FlywheelIntakeState flywheelIntakeState,
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState) {
-            this(flywheelIntakeState, triggerIntakeState, shooterState, PivotState.REST, DiverterState.RETRACT, ClimberState.RETRACT);
+            this(flywheelIntakeState, triggerIntakeState, shooterState, PivotState.REST, FlipperState.RETRACT, ClimberState.RETRACT);
+        }
+
+        private RobotState(FlywheelIntakeState flywheelIntakeState,
+                                TriggerIntakeState triggerIntakeState,
+                                ShooterState shooterState,
+                                PivotState pivotState) {
+            this(flywheelIntakeState, triggerIntakeState, shooterState, pivotState, FlipperState.RETRACT, ClimberState.RETRACT);
         }
 
         private RobotState(ShooterState shooterState, PivotState pivotState){
-            this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, DiverterState.RETRACT, ClimberState.RETRACT);
+            this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, FlipperState.RETRACT, ClimberState.RETRACT);
         }
 
-        private RobotState(ShooterState shooterState, PivotState pivotState, DiverterState diverterState){
+        private RobotState(ShooterState shooterState, PivotState pivotState, FlipperState diverterState){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, diverterState, ClimberState.RETRACT);
         }
 
-        private RobotState(TriggerIntakeState triggerIntakeState, PivotState pivotState, DiverterState diverterState, ClimberState climberState){
-            this(FlywheelIntakeState.RETRACT, triggerIntakeState, ShooterState.REST, pivotState, diverterState, climberState);
+        private RobotState(TriggerIntakeState triggerIntakeState, PivotState pivotState, FlipperState diverterState, ClimberState climberState){
+            this(FlywheelIntakeState.RETRACT, triggerIntakeState, ShooterState.RAMP_DOWN, pivotState, diverterState, climberState);
         }
 
         private RobotState(){
-            this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, ShooterState.REST, PivotState.REST, DiverterState.RETRACT, ClimberState.RETRACT);
+            this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, ShooterState.RAMP_DOWN, PivotState.REST, FlipperState.RETRACT, ClimberState.RETRACT);
         }
     }
 }

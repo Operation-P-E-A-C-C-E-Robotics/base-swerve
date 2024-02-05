@@ -2,18 +2,23 @@ package frc.lib.telemetry;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.IntegerLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import frc.lib.util.Util;
 
 public class BuildTelemetry {
     public static NetworkTable buildTable = NetworkTableInstance.getDefault().getTable("Build");
+    private static final DataLog log = DataLogManager.getLog();
     static {
-        buildTable.getStringTopic("Project Name").publish().accept(BuildConstants.MAVEN_NAME);
-        buildTable.getStringTopic("Build Date").publish().accept(BuildConstants.BUILD_DATE);
-        buildTable.getStringTopic("Build Git Branch").publish().accept(BuildConstants.GIT_BRANCH);
-        buildTable.getStringTopic("Build Git SHA").publish().accept(BuildConstants.GIT_SHA);
-        buildTable.getStringTopic("Build Git Date").publish().accept(BuildConstants.GIT_DATE);
-        buildTable.getIntegerTopic("Build Git Revision").publish().accept(BuildConstants.GIT_REVISION);
-        buildTable.getStringTopic("Author").publish().accept("Sean lol (who else)");
+        new StringLogEntry(log, "Build/Project Name").append(BuildConstants.MAVEN_NAME);
+        new StringLogEntry(log, "Build/Build Date").append(BuildConstants.BUILD_DATE);
+        new StringLogEntry(log, "Build/Build Git Branch").append(BuildConstants.GIT_BRANCH);
+        new StringLogEntry(log, "Build/Build Git SHA").append(BuildConstants.GIT_SHA);
+        new StringLogEntry(log, "Build/Build Git Date").append(BuildConstants.GIT_DATE);
+        new IntegerLogEntry(log, "Build/Build Git Revision").append(BuildConstants.GIT_REVISION);
+        new StringLogEntry(log, "Build/Author").append("Sean lol (who else)");
         Util.commentsAreForCommoners("what kind of moron would put comments in their software???");
     }
 }

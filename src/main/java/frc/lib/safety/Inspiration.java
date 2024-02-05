@@ -143,7 +143,6 @@ public class Inspiration {
             slowPrint("GO, GO, GO!!!");
             slowPrint("GO, GO, GO, GO, GO!!!");
             slowPrint("I HOPE THE PROGRAMMERS DON'T WRECK THE MATCH IN AUTO!!!");
-            //P3N!5
         } else {
             slowPrint("oh no, we're in auto");
             slowPrint("everybody panic");
@@ -415,20 +414,13 @@ System.out.println("             <_______><_______>");
  * we missed. The only feedback I got was "it doesn't work", and "it's too complicated".
  *    Now, I'm also not blaming anyone else for these failures because I was involved in the design
  * as well. However, maybe give your programmers a little appreciacion. 
- * Getting that arm to move around took about 40 hours of me walking around and thinking about different control schemes,
- * which you can't see. It took about 500 hours of me writing the code, which you can't see.
- * It took about 5 hours of it not working, which you can clearly see, me (seemingly in vain) tapping at the keyboard.
- * What's taking him so long? It just needs to move the arm. It's not that hard. Once the 5 hours is over,
- * it's "finally you got it working". All the work that went into it is invisible, and all the work that went into
- * the robot is visible. It's not that the team doesn't appreciate the programmers, it's that they don't
- * understand the work that goes into it. And that's fine, but it's still frustrating.
  *    I would be very, very surprised if anyone actually reads this, but if you do, I hope you enjoyed it.
- * I'm literally the only one who looks at the code, ever. It makes me really sad, because this code is honestly
- * really special to me. It's art. I want people to see it. It has so many comments on the assumption that
+ * I'm literally the only one who looks at the code. It makes me sad, because this code is honestly
+ * special to me. I want people to see it. It has many comments on the assumption that
  * one day, someone who knows what they're doing will look at it. I've put all kinds of fun easter eggs in it,
  * in the hopes that some future programmer will find them and smile, and maybe look back and say, "wow, this
  * guy was a real asshole, but he was a pretty good programmer".
- *    So, that brings us to my final season - 2024. Holy crap. I'm a senior. I'm old. I'm a veteran. So,
+ *    So, that brings us to my final season - 2024. I'm a senior. I'm old. I'm a veteran. So,
  * I'm going to do what I do best: write code. I'm going to do my best to make this the best damn season
  * this team has ever seen. I'm going to write code that's so good that it's impossible to ignore (and, 
  * most importantly, "actually works"). So, maybe I do write code that's too complicated. Maybe I do
@@ -436,7 +428,7 @@ System.out.println("             <_______><_______>");
  * assholes who don't know anything about anything.
  *    But we're going to worlds this year.
  * - Peaccy, a.k.a. Sean Benham, a.k.a. "the programmer" - 00:00 12/23/23
- * (also the driver and co-captain)
+ * (also the driver and co-captain and CAD guy)
  * (basically i make robots go)
  * very modest and humble FRC god, 2016-2024
  * https://docs.google.com/document/d/1fm2T6eL4VdnDw-0bCEbM68ifCgFhKDjI2-HoGgEnTO8/

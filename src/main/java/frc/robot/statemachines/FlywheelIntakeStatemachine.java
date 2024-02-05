@@ -4,17 +4,17 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
-import frc.robot.planners.IntakeMotionPlanner;
+import frc.robot.planners.CollisionAvoidancePlanner;
 import frc.robot.subsystems.FlywheelIntake;
 
 public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeStatemachine.FlywheelIntakeState>{
     private FlywheelIntakeState state = FlywheelIntakeState.RETRACT;
 
     private final FlywheelIntake flywheelIntake;
-    private final IntakeMotionPlanner intakeMotionPlanner;
+    private final CollisionAvoidancePlanner intakeMotionPlanner;
     private final BooleanSupplier hasNote;
 
-    public FlywheelIntakeStatemachine(FlywheelIntake flywheelIntake, IntakeMotionPlanner intakeMotionPlanner, BooleanSupplier hasNote){
+    public FlywheelIntakeStatemachine(FlywheelIntake flywheelIntake, CollisionAvoidancePlanner intakeMotionPlanner, BooleanSupplier hasNote){
         this.flywheelIntake = flywheelIntake;
         this.intakeMotionPlanner = intakeMotionPlanner;
         this.hasNote = hasNote;

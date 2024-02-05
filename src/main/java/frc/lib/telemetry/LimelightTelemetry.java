@@ -3,10 +3,10 @@ package frc.lib.telemetry;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StructArrayLogEntry;
+import edu.wpi.first.util.datalog.StructLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import frc.lib.vision.LimelightHelpers;
 import frc.robot.Robot;
 
@@ -25,10 +25,10 @@ import frc.robot.Robot;
  * I LEGINTIMATELY HAVE NO IDEA WHAT I'M DOING
  */
 public class LimelightTelemetry {
-    private static final NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("Limelight");
-    private static final StructArrayPublisher<Pose3d> tagPosePublisher = limelightTable.getStructArrayTopic("Tag Poses From Robot", Pose3d.struct).publish();
-    private static final StructArrayPublisher<Pose3d> tagPoseFromFieldPublisher = limelightTable.getStructArrayTopic("Tag Poses From Field", Pose3d.struct).publish();
-    private static final StructPublisher<Pose3d> rawBotPosePublisher = limelightTable.getStructTopic("Raw BotPose", Pose3d.struct).publish();
+    private static final DataLog log = DataLogManager.getLog();
+    private static final StructArrayLogEntry<Pose3d> tagPosePublisher = StructArrayLogEntry.create(log, "Limelight/Tag Poses", Pose3d.struct);
+    private static final StructArrayLogEntry<Pose3d> tagPoseFromFieldPublisher = StructArrayLogEntry.create(log, "Limelight/Tag Poses From Field", Pose3d.struct);
+    private static final StructLogEntry<Pose3d> rawBotPosePublisher = StructLogEntry.create(log, "Limelight/Bot Pose", Pose3d.struct);
 
     public static void update (String llName, Pose3d robotPose){
         var results = LimelightHelpers.getLatestResults(llName).targetingResults;
@@ -39,20 +39,20 @@ public class LimelightTelemetry {
             tagPosesFromRobot[i] = robotPose.plus(new Transform3d(tagPosesFromField[i].getTranslation(), tagPosesFromField[i].getRotation()));
         }
         
-        tagPosePublisher.accept(tagPosesFromRobot);
-        tagPoseFromFieldPublisher.accept(tagPosesFromField);
+        tagPosePublisher.append(tagPosesFromRobot);
+        tagPoseFromFieldPublisher.append(tagPosesFromField);
         if(results.botpose.length == 6){
-            rawBotPosePublisher.accept(robotPose);
+            rawBotPosePublisher.append(robotPose);
         }
 
         if(Robot.isSimulation()){
-            tagPoseFromFieldPublisher.accept(new Pose3d[] {
+            tagPoseFromFieldPublisher.append(new Pose3d[] {
                 new Pose3d(0, 0, 1, new Rotation3d(0, 0, 0)),
                 new Pose3d(2, 2, 1, new Rotation3d(0, 0, 0)),
                 new Pose3d(2, 0, 0.4, new Rotation3d(1, 0, 0)),
             });
 
-            rawBotPosePublisher.accept(new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)));
+            rawBotPosePublisher.append(new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)));
         }
     }
 }

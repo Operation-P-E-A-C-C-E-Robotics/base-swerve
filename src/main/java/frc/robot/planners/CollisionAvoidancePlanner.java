@@ -6,7 +6,7 @@ import java.util.function.DoubleSupplier;
  * In charge of calculating whether the pivot and flywheel can
  * be flattened and retracted, respectively.
  */
-public class IntakeMotionPlanner {
+public class CollisionAvoidancePlanner {
     private final DoubleSupplier pivotAngle;
     private final DoubleSupplier flywheelIntakeExtension;
     private final DoubleSupplier xVelocity;
@@ -22,7 +22,7 @@ public class IntakeMotionPlanner {
     private boolean shouldTriggerIntakeAvoid = false;
     private boolean readyToIntake = false;
 
-    public IntakeMotionPlanner (DoubleSupplier pivotAngle, DoubleSupplier flywheelIntakeExtension, DoubleSupplier xVelocity) {
+    public CollisionAvoidancePlanner (DoubleSupplier pivotAngle, DoubleSupplier flywheelIntakeExtension, DoubleSupplier xVelocity) {
         this.pivotAngle = pivotAngle;
         this.flywheelIntakeExtension = flywheelIntakeExtension;
         this.xVelocity = xVelocity;

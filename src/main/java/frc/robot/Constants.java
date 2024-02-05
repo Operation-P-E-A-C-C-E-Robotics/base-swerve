@@ -30,22 +30,22 @@ public final class Constants {
   public static final double period = 0.01;
 
   public static final class Shooter {
-    public static final int upperFlywheelMotorId = 0;
-    public static final int lowerFlywheelMotorId = 0;
-    public static final int triggerMotorId = 0;
+    public static final int upperFlywheelMotorId = 50; //will be 13 once swerve ids fixed
+    public static final int lowerFlywheelMotorId = 14;
+    public static final int triggerMotorId = 15;
 
     public static final int flywheelSwitchId = 0;
-    public static final int triggerSwitchId = 0;
+    public static final int triggerSwitchId = 1;
 
     public static final double flywheelMaxControllableVelocity = 0; //rotations per second
     public static final double flywheelGearRatio = 1;
     public static final double flywheelDiameter = Units.inchesToMeters(5);
-    public static final double flywheelKv = 0;
-    public static final double flywheelKa = 0;
-    public static final double flywheelModelStDev = 0;
-    public static final double flywheelEncoderStDev = 0;
-    public static final double flywheelControlEffort = 0;
-    public static final double flywheelErrorTolerance = 0;
+    public static final double flywheelKv = 1;
+    public static final double flywheelKa = 1;
+    public static final double flywheelModelStDev = 3;
+    public static final double flywheelEncoderStDev = 0.01;
+    public static final double flywheelControlEffort = 12;
+    public static final double flywheelErrorTolerance = 8;
 
     public static final double shotDetectionAccelerationThreshold = 0;
     public static final double shotDetectionTimeThreshold = 0;
@@ -68,8 +68,8 @@ public final class Constants {
   }
 
   public static final class FlywheelIntake {
-    public static final int flywheelIntakeDeployMotorId = 0;
-    public static final int flywheelIntakeRollerMotorId = 0;
+    public static final int flywheelIntakeDeployMotorId = 16;
+    public static final int flywheelIntakeRollerMotorId = 17;
 
     public static final double flywheelIntakeDeployKp = 0;
     public static final double flywheelIntakeDeployKi = 0;
@@ -86,8 +86,8 @@ public final class Constants {
   }
 
   public static final class TriggerIntake {
-    public static final int triggerIntakeRollerMotorId = 0;
-    public static final int triggerIntakeDeployMotorId = 0;
+    public static final int triggerIntakeRollerMotorId = 18;
+    public static final int triggerIntakeDeployMotorId = 19;
 
     public static final double triggerIntakeDeployKp = 0;
     public static final double triggerIntakeDeployKi = 0;
@@ -104,8 +104,8 @@ public final class Constants {
   }
 
   public static final class Pivot {
-    public static final int pivotMasterID = 0;
-    public static final int pivotSlaveID = 0;
+    public static final int pivotMasterID = 20;
+    public static final int pivotSlaveID = 21;
     public static final int pivotCANCoderID = 0;
 
     public static final double restingAngle = 0; //rotations
@@ -124,12 +124,12 @@ public final class Constants {
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      pivotConfigs.Slot0.kP = 0;
+      pivotConfigs.Slot0.kP = 1;
       pivotConfigs.Slot0.kI = 0;
       pivotConfigs.Slot0.kD = 0;
       pivotConfigs.Slot0.kS = 0;
-      pivotConfigs.Slot0.kV = 0;
-      pivotConfigs.Slot0.kA = 0;
+      pivotConfigs.Slot0.kV = 1;
+      pivotConfigs.Slot0.kA = 1;
 
       pivotConfigs.MotionMagic.MotionMagicExpo_kA = 0;
       pivotConfigs.MotionMagic.MotionMagicExpo_kV = 0;
@@ -143,8 +143,8 @@ public final class Constants {
   }
 
   public static final class Diverter {
-    public static final int diverterRollerMotorId = 0;
-    public static final int diverterDeployMotorId = 0;
+    public static final int diverterRollerMotorId = 22;
+    public static final int diverterDeployMotorId = 23;
 
     public static final double diverterDeployGearRatio = 1;
     public static final double diverterDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
@@ -171,8 +171,8 @@ public final class Constants {
   }
 
   public static final class Climber {
-    public static final int climberLeftMotorId = 0;
-    public static final int climberRightMotorId = 0;
+    public static final int climberLeftMotorId = 24;
+    public static final int climberRightMotorId = 25;
 
     public static final double climberGearRatio = 1;
 

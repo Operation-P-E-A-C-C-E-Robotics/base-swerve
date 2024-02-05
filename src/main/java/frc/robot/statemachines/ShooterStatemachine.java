@@ -8,9 +8,9 @@ import frc.robot.planners.AimPlanner;
 import frc.robot.subsystems.Shooter;
 
 public class ShooterStatemachine extends StateMachine<ShooterStatemachine.ShooterState> {
-    private ShooterState state = ShooterState.REST;
+    private ShooterState state = ShooterState.RAMP_DOWN;
 
-    private ShooterState lastAimingState = ShooterState.AIM;
+    private ShooterState lastAimingState = ShooterState.AUTO_AIM;
 
     private final Shooter shooter;
     private final AimPlanner aimPlanner;
@@ -28,22 +28,21 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
      */
     private void updateState(){
         switch (state) {
-            case REST:
-                if(shooter.hasNote() && !(shooter.flywheelBeamBroken() && shooter.triggerBeamBroken())) state = ShooterState.INDEX;
+            case RAMP_DOWN:
+                if(shooter.hasNote() && !(shooter.flywheelSwitchTripped() && shooter.triggerSwitchTripped())) state = ShooterState.INDEX;
             case INTAKE:
-                if(shooter.flywheelBeamBroken()) state = ShooterState.INDEX;
+                if(shooter.flywheelSwitchTripped()) state = ShooterState.INDEX;
             case SHOOT:
                 if(!alignedToShoot.getAsBoolean()) state = lastAimingState;
             case INDEX:
-                if(shooter.triggerBeamBroken() && shooter.flywheelBeamBroken()) state = ShooterState.REST;
+                if(shooter.triggerSwitchTripped() && shooter.flywheelSwitchTripped()) state = ShooterState.RAMP_DOWN;
             default:
                 break;
         }
         if (
-              (state == ShooterState.AIM
-            ||state == ShooterState.NEAR_SPEAKER_SETPOINT
-            ||state == ShooterState.PROTECTED_SETPOINT
-            ||state == ShooterState.CENTERLINE_SETPOINT)
+              (state == ShooterState.AUTO_AIM
+            ||state == ShooterState.AIM_LAYUP
+            ||state == ShooterState.AIM_PROTECTED)
             && alignedToShoot.getAsBoolean() 
             && shooter.flywheelAtTargetVelocity()
         ) {
@@ -72,21 +71,21 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
 
         SmartDashboard.putString("Shooter State", state.name());
 
-        if(state == ShooterState.AIM) {
+        if(state == ShooterState.AUTO_AIM) {
             shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
             return;
         }
 
         if(state == ShooterState.SHOOT) {
-            if(lastAimingState == ShooterState.AIM) shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
+            if(lastAimingState == ShooterState.AUTO_AIM) shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
             else shooter.setFlywheelVelocity(lastAimingState.getFlywheelVelocity());
             shooter.setTrigerPercent(state.getTriggerPercent());
             return;
         }
 
         if(state == ShooterState.INDEX){
-            if(shooter.flywheelBeamBroken() && !shooter.triggerBeamBroken()) shooter.setTrigerPercent(-state.getTriggerPercent());
-            else if (shooter.triggerBeamBroken() && !shooter.flywheelBeamBroken()) shooter.setTrigerPercent(state.getTriggerPercent());
+            if(shooter.flywheelSwitchTripped() && !shooter.triggerSwitchTripped()) shooter.setTrigerPercent(-state.getTriggerPercent());
+            else if (shooter.triggerSwitchTripped() && !shooter.flywheelSwitchTripped()) shooter.setTrigerPercent(state.getTriggerPercent());
             else shooter.setTrigerPercent(0.0);
         }
 
@@ -110,14 +109,13 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     }
 
     public enum ShooterState{
-        REST(0.0,0.0),
+        RAMP_DOWN(0.0,0.0),
         INTAKE(0.0,0.0), //NOTE: this should fold flat if the flywheel-side intake is out
         INDEX(0.0,0.2),
         HANDOFF(0.0,0.0), //to diverter
-        NEAR_SPEAKER_SETPOINT(0.0,0.0),
-        PROTECTED_SETPOINT(0.0,0.0),
-        CENTERLINE_SETPOINT(0.0,0.0),
-        AIM(0.0,0.0),
+        AIM_LAYUP(0.0,0.0),
+        AIM_PROTECTED(0.0,0.0),
+        AUTO_AIM(0.0,0.0),
         SHOOT(0.0,1.0);
 
         private Double flywheelVelocity, triggerPercent;

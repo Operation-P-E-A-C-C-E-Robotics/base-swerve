@@ -22,7 +22,8 @@
       "/SmartDashboard/Swerve Mech": "Mechanism2d",
       "/SmartDashboard/Swerve State": "String Chooser",
       "/SmartDashboard/Swerve State Chooser": "String Chooser",
-      "/SmartDashboard/Trigger Intake State Chooser": "String Chooser"
+      "/SmartDashboard/Trigger Intake State Chooser": "String Chooser",
+      "/SmartDashboard/pivot mech": "Mechanism2d"
     },
     "windows": {
       "/SmartDashboard/Climber State Chooser": {
@@ -36,12 +37,11 @@
         }
       },
       "/SmartDashboard/Field": {
-        "bottom": 544,
-        "builtin": "2024 Crescendo",
-        "height": 8.013679504394531,
-        "left": 46,
-        "right": 1088,
-        "top": 36,
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
         "width": 16.541748046875,
         "window": {
           "visible": true
@@ -71,6 +71,11 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/pivot mech": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -82,7 +87,13 @@
     },
     "transitory": {
       "SmartDashboard": {
-        "open": true
+        "open": true,
+        "pivot mech": {
+          "open": true,
+          "pivot": {
+            "open": true
+          }
+        }
       },
       "Swerve": {
         "Auto Heading": {

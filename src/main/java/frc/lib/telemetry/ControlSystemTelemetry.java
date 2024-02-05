@@ -5,6 +5,10 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.PneumaticsBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -14,6 +18,8 @@ public class ControlSystemTelemetry {
     private static final NetworkTable roboRIOTable = controlSystemTable.getSubTable("RoboRIO");
     private static final NetworkTable pneumaticsTable = controlSystemTable.getSubTable("Pneumatics");
     private static final NetworkTable canTable = controlSystemTable.getSubTable("CAN");
+
+    private static final DataLog log = DataLogManager.getLog();
     
     //rio
     private static final DoublePublisher loopTimePublisher = roboRIOTable.getDoubleTopic("RIO Loop Time").publish();
@@ -23,15 +29,15 @@ public class ControlSystemTelemetry {
     private static final DoublePublisher brownoutVoltagePublisher = roboRIOTable.getDoubleTopic("Brownout Voltage").publish();  
     private static final DoublePublisher inputVoltagePublisher = roboRIOTable.getDoubleTopic("Input Voltage").publish();
     private static final DoublePublisher inputCurrentPublisher = roboRIOTable.getDoubleTopic("Input Current").publish();
-    private static final DoublePublisher v3_3FaultsPublisher = roboRIOTable.getDoubleTopic("3.3v Rail Faults").publish();
-    private static final DoublePublisher v3_3CurrentPublisher = roboRIOTable.getDoubleTopic("3.3v Rail Current").publish();
-    private static final DoublePublisher v5FaultsPublisher = roboRIOTable.getDoubleTopic("5v Rail Faults").publish();
-    private static final DoublePublisher v5CurrentPublisher = roboRIOTable.getDoubleTopic("5v Rail Current").publish();
-    private static final DoublePublisher v6FaultsPublisher = roboRIOTable.getDoubleTopic("6v Rail Faults").publish();
-    private static final DoublePublisher v6CurrentPublisher = roboRIOTable.getDoubleTopic("6v Rail Current").publish();
-    private static final DoublePublisher cpuTemp = roboRIOTable.getDoubleTopic("CPU Temperature").publish();
+    private static final DoubleLogEntry v3_3FaultsLog = new DoubleLogEntry(log, "Control System/RoboRIO/3.3v Rail Faults");
+    private static final DoubleLogEntry v3_3CurrentLog = new DoubleLogEntry(log, "Control System/RoboRIO/3.3v Rail Current");
+    private static final DoubleLogEntry v5FaultsLog = new DoubleLogEntry(log, "Control System/RoboRIO/5v Rail Faults");
+    private static final DoubleLogEntry v5CurrentLog = new DoubleLogEntry(log, "Control System/RoboRIO/5v Rail Current");
+    private static final DoubleLogEntry v6FaultsLog = new DoubleLogEntry(log, "Control System/RoboRIO/6v Rail Faults");
+    private static final DoubleLogEntry v6CurrentLog = new DoubleLogEntry(log, "Control System/RoboRIO/6v Rail Current");
+    private static final DoubleLogEntry cpuTempLog = new DoubleLogEntry(log, "Control System/RoboRIO/CPU Temperature");
    
-    private static final BooleanPublisher outputsEnabled = roboRIOTable.getBooleanTopic("Outputs Enabled").publish();
+    private static final BooleanLogEntry outputsEnabledLog = new BooleanLogEntry(log, "Control System/RoboRIO/Outputs Enabled");
 
     //can
     private static final DoublePublisher canBusUtilization = canTable.getDoubleTopic("Bus Utilization").publish();
@@ -58,15 +64,15 @@ public class ControlSystemTelemetry {
         brownoutVoltagePublisher.accept(RobotController.getBrownoutVoltage());
         inputVoltagePublisher.accept(RobotController.getInputVoltage());
         inputCurrentPublisher.accept(RobotController.getInputCurrent());
-        v3_3FaultsPublisher.accept(RobotController.getFaultCount3V3());
-        v3_3CurrentPublisher.accept(RobotController.getVoltage3V3());
-        v5FaultsPublisher.accept(RobotController.getFaultCount5V());
-        v5CurrentPublisher.accept(RobotController.getVoltage5V());
-        v6FaultsPublisher.accept(RobotController.getFaultCount6V());
-        v6CurrentPublisher.accept(RobotController.getVoltage6V());
-        cpuTemp.accept(RobotController.getCPUTemp());
+        v3_3FaultsLog.append(RobotController.getFaultCount3V3());
+        v3_3CurrentLog.append(RobotController.getVoltage3V3());
+        v5FaultsLog.append(RobotController.getFaultCount5V());
+        v5CurrentLog.append(RobotController.getVoltage5V());
+        v6FaultsLog.append(RobotController.getFaultCount6V());
+        v6CurrentLog.append(RobotController.getVoltage6V());
+        cpuTempLog.append(RobotController.getCPUTemp());
 
-        outputsEnabled.accept(RobotController.isSysActive());
+        outputsEnabledLog.append(RobotController.isSysActive());
 
         var canStatus = RobotController.getCANStatus();
 

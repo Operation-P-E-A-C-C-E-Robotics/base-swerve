@@ -124,11 +124,11 @@ public class Shooter {
         return Util.inRange(topFlywheelLoop.getError(0), flywheelTolerance) && Util.inRange(bottomFlywheelLoop.getError(0), flywheelTolerance);
     }
 
-    public boolean flywheelBeamBroken () {
+    public boolean flywheelSwitchTripped () {
         return flywheelSwitch.get();
     }
 
-    public boolean triggerBeamBroken () {
+    public boolean triggerSwitchTripped () {
         return triggerSwitch.get();
     }
 
