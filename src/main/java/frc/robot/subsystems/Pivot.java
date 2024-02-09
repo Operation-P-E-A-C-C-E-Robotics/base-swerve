@@ -2,33 +2,28 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.sim.TalonFXSimState;
-
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.Util;
-import frc.robot.Constants;
+import frc.robot.Robot;
 
 import static frc.robot.Constants.Pivot.*;
 
 public class Pivot {
     private final TalonFX pivotMaster = new TalonFX(pivotMasterID);
     private final TalonFX pivotSlave = new TalonFX(pivotSlaveID);
+    private final CANcoder pivotEncoder = new CANcoder(pivotConfigs.Feedback.FeedbackRemoteSensorID);
 
     private final MotionMagicExpoVoltage pivotControl = new MotionMagicExpoVoltage(restingAngle);
     private final ArmFeedforward gravityFeedforward = new ArmFeedforward(0, gravityFeedforwardkG, 0); 
 
     private final Mechanism2d pivotMech = new Mechanism2d(100, 100);
-    private final MechanismLigament2d pivotLigament = pivotMech.getRoot("pivot", 0, 50).append(new MechanismLigament2d("pivot", 0, 50));
+    private final MechanismLigament2d pivotLigament = pivotMech.getRoot("pivot", 50, 50).append(new MechanismLigament2d("pivot", 30, 0));
 
 
     private Pivot () {
@@ -40,43 +35,21 @@ public class Pivot {
         SmartDashboard.putData("pivot mech", pivotMech);
     }
 
-    public void setPivotPosition (double position) {
-        var gravity = gravityFeedforward.calculate(getPivotPosition(), 0);
-        pivotMaster.setControl(pivotControl.withFeedForward(gravity).withPosition(position));
+    public void setPivotPosition (Rotation2d position) {
+        var gravity = gravityFeedforward.calculate(getPivotPosition().getRadians(), 0);
+        pivotMaster.setControl(pivotControl.withFeedForward(gravity).withPosition(position.getRotations()));
+        if(Robot.isSimulation()) {
+            pivotEncoder.getSimState().setRawPosition(position.getRotations());
+            pivotLigament.setAngle(getPivotPosition());
+        }
     }
 
-    public double getPivotPosition () {
-        return pivotMaster.getPosition().getValue();
+    public Rotation2d getPivotPosition () {
+        return Rotation2d.fromRotations(pivotMaster.getPosition().getValue());
     }
 
     public boolean atSetpoint () {
         return Util.inRange(pivotMaster.getClosedLoopError().getValue(), pivotTolerance);
-    }
-
-    private final SingleJointedArmSim pivotSim = new SingleJointedArmSim(
-        DCMotor.getFalcon500(2).withReduction(pivotGearRatio), 
-        pivotGearRatio, 
-        0.618, 
-        Units.inchesToMeters(12), 
-        pivotMinAngle, 
-        pivotMaxAngle, 
-        true, 
-        0
-    );
-
-
-    private final TalonFXSimState pivotMasterSim = pivotMaster.getSimState();
-
-    public void simulationPeriodic() {
-        pivotSim.setInput(pivotMasterSim.getMotorVoltage());
-        pivotSim.update(Constants.period);
-
-        pivotMasterSim.setRawRotorPosition(Units.radiansToRotations(pivotSim.getAngleRads()));
-        pivotMasterSim.setRotorVelocity(Units.radiansToRotations(pivotSim.getVelocityRadPerSec()));
-
-        pivotLigament.setAngle(new Rotation2d(pivotSim.getAngleRads()));
-
-        RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(pivotMasterSim.getSupplyCurrent()));
     }
 
     private static final Pivot instance = new Pivot();

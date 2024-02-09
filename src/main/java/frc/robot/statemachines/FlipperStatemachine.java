@@ -2,15 +2,18 @@ package frc.robot.statemachines;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
+import frc.robot.planners.MotionPlanner;
 import frc.robot.subsystems.Diverter;
 
 public class FlipperStatemachine extends StateMachine<FlipperStatemachine.FlipperState> {
     private FlipperState state = FlipperState.RETRACT;
 
     private final Diverter diverter;
+    private final MotionPlanner planner;
 
-    public FlipperStatemachine(Diverter diverter){
+    public FlipperStatemachine(Diverter diverter, MotionPlanner planner){
         this.diverter = diverter;
+        this.planner = planner;
     }
 
     @Override
@@ -25,14 +28,16 @@ public class FlipperStatemachine extends StateMachine<FlipperStatemachine.Flippe
 
     @Override
     public void update(){
+        if(!planner.canDiverterExtend() && state != FlipperState.HANDOFF) state = FlipperState.RETRACT;
+
         SmartDashboard.putString("Diverter State", state.name());
         diverter.setDiverterExtension(state.getPosition());
         diverter.setDiverterRoller(state.getSpeed());
     }
 
     @Override
-    public boolean isDone(){
-        return diverter.atSetpoint();
+    public boolean transitioning(){
+        return !diverter.atSetpoint();
     }
 
     @Override
@@ -46,8 +51,8 @@ public class FlipperStatemachine extends StateMachine<FlipperStatemachine.Flippe
         ALIGN_AMP(0.0,0.0),
         ALIGN_TRAP(0.0,0.0),
         PLACE_AMP(0.0,1.0),
-        PLACE_TRAP(0.0,1.0),
-        CLIMB(0.0,0.0);
+        CLIMB(0.0,0.0),
+        PLACE_TRAP(0.0,1.0);
 
         private Double position, speed;
 

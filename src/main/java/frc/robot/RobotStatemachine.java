@@ -3,7 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.AimPlanner;
-import frc.robot.planners.CollisionAvoidancePlanner;
+import frc.robot.planners.MotionPlanner;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.FlipperStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine;
@@ -30,7 +30,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
     private final FlipperStatemachine diverterStatemachine;
     private final ClimberStatemachine climberStatemachine;
 
-    private final CollisionAvoidancePlanner intakeMotionPlanner;
+    private final MotionPlanner intakeMotionPlanner;
     private final AimPlanner aimPlanner;
     //private final StageAvoidancePlanner stageAvoidancePlanner;
 
@@ -41,7 +41,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
                             PivotStatemachine pivotStatemachine, 
                             FlipperStatemachine diverterStatemachine, 
                             ClimberStatemachine climberStatemachine,
-                            CollisionAvoidancePlanner intakeMotionPlanner,
+                            MotionPlanner intakeMotionPlanner,
                             AimPlanner aimPlanner) {
         this.swerveStatemachine = swerveStatemachine;
         this.flywheelIntakeStatemachine = flywheelIntakeStatemachine;
@@ -117,14 +117,14 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
      * Check if the robot has finished attaining the desired state
      */
     @Override
-    public boolean isDone(){
-        if(!flywheelIntakeStatemachine.isDone()) return false;
-        if(!triggerIntakeStatemachine.isDone()) return false;
-        if(!shooterStatemachine.isDone()) return false;
-        if(!pivotStatemachine.isDone()) return false;
-        if(!diverterStatemachine.isDone()) return false;
-        if(!climberStatemachine.isDone()) return false;
-        if(!swerveStatemachine.isDone()) return false;
+    public boolean transitioning(){
+        if(!flywheelIntakeStatemachine.transitioning()) return false;
+        if(!triggerIntakeStatemachine.transitioning()) return false;
+        if(!shooterStatemachine.transitioning()) return false;
+        if(!pivotStatemachine.transitioning()) return false;
+        if(!diverterStatemachine.transitioning()) return false;
+        if(!climberStatemachine.transitioning()) return false;
+        if(!swerveStatemachine.transitioning()) return false;
         return true;
     }
     

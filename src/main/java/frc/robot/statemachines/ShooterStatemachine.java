@@ -16,6 +16,8 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     private final AimPlanner aimPlanner;
     private final BooleanSupplier alignedToShoot;
 
+    private boolean hasNote = false;
+
     public ShooterStatemachine(Shooter shooter, AimPlanner aimPlanner, BooleanSupplier alignedToShoot){
         this.shooter = shooter;
         this.aimPlanner = aimPlanner;
@@ -29,13 +31,13 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     private void updateState(){
         switch (state) {
             case RAMP_DOWN:
-                if(shooter.hasNote() && !(shooter.flywheelSwitchTripped() && shooter.triggerSwitchTripped())) state = ShooterState.INDEX;
+                if(shooter.flywheelSwitchTripped() || shooter.triggerSwitchTripped()) state = ShooterState.INDEX;
             case INTAKE:
                 if(shooter.flywheelSwitchTripped()) state = ShooterState.INDEX;
             case SHOOT:
                 if(!alignedToShoot.getAsBoolean()) state = lastAimingState;
             case INDEX:
-                if(shooter.triggerSwitchTripped() && shooter.flywheelSwitchTripped()) state = ShooterState.RAMP_DOWN;
+                if(!(shooter.triggerSwitchTripped() || shooter.flywheelSwitchTripped())) state = ShooterState.RAMP_DOWN;
             default:
                 break;
         }
@@ -68,8 +70,10 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     @Override
     public void update(){
         updateState();
-
         SmartDashboard.putString("Shooter State", state.name());
+
+        if(shooter.triggerSwitchTripped() || shooter.flywheelSwitchTripped()) hasNote = true;
+        if(shooter.shotDetected()) hasNote = false;
 
         if(state == ShooterState.AUTO_AIM) {
             shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
@@ -99,13 +103,17 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     }
 
     @Override
-    public boolean isDone(){
-        return shooter.flywheelAtTargetVelocity();
+    public boolean transitioning(){
+        return !shooter.flywheelAtTargetVelocity();
     }
 
     @Override
     public boolean isDynamic() {
         return true;
+    }
+
+    public boolean hasNote(){
+        return hasNote;
     }
 
     public enum ShooterState{

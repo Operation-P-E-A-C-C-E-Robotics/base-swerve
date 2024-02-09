@@ -1,23 +1,20 @@
 package frc.robot.statemachines;
 
-import java.util.function.BooleanSupplier;
-
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
-import frc.robot.planners.CollisionAvoidancePlanner;
+import frc.robot.planners.MotionPlanner;
 import frc.robot.subsystems.TriggerIntake;
 
 public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatemachine.TriggerIntakeState>{
     private final TriggerIntake triggerIntake;
-    private final CollisionAvoidancePlanner intakeMotionPlanner;
+    private final MotionPlanner intakeMotionPlanner;
     
     private TriggerIntakeState state = TriggerIntakeState.RETRACT;
-    private BooleanSupplier hasNote;
 
-    public TriggerIntakeStatemachine(TriggerIntake triggerIntake, CollisionAvoidancePlanner intakeMotionPlanner, BooleanSupplier hasNote){
+    public TriggerIntakeStatemachine(TriggerIntake triggerIntake, MotionPlanner intakeMotionPlanner){
         this.triggerIntake = triggerIntake;
         this.intakeMotionPlanner = intakeMotionPlanner;
-        this.hasNote = hasNote;
     }
 
     /**
@@ -29,9 +26,6 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
         //don't allow the shooter to hit the intake
         if(state == TriggerIntakeState.RETRACT && intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = TriggerIntakeState.AVOID;
         if(state == TriggerIntakeState.AVOID && !intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = TriggerIntakeState.RETRACT;
-
-        //automatically transition to retracting the intake once we have detected a note
-        if(state == TriggerIntakeState.INTAKE && hasNote.getAsBoolean()) state = TriggerIntakeState.RETRACT; //TODO make sure this isn't prone to sensor failure / noise
     }
 
     /**
@@ -63,27 +57,27 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
     }
 
     @Override
-    public boolean isDone(){
-        return triggerIntake.deployedToSetpoint();
+    public boolean transitioning(){
+        return !triggerIntake.deployedToSetpoint();
     }
 
     @Override
     public boolean isDynamic() {
-        return true;
+        return state == TriggerIntakeState.RETRACT || state == TriggerIntakeState.AVOID;
     }
 
     public enum TriggerIntakeState{
         //TODO
-        RETRACT(0.0,0.0),
-        EXTEND(0.0,0.0),
-        INTAKE(0.0,0.0),
-        AVOID(0.0,0.0),
-        EJECT(0.0,0.0);
+        RETRACT(Rotation2d.fromDegrees(0),0.0),
+        EXTEND(Rotation2d.fromDegrees(0),0.0),
+        INTAKE(Rotation2d.fromDegrees(0),0.0),
+        AVOID(Rotation2d.fromDegrees(0),0.0),
+        EJECT(Rotation2d.fromDegrees(0),0.0);
         
-        private Double deployAngle;
+        private Rotation2d deployAngle;
         private Double speed;
 
-        public Double getDeployAngle(){
+        public Rotation2d getDeployAngle(){
             return deployAngle;
         }
 
@@ -91,7 +85,7 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
             return speed;
         }
 
-        private TriggerIntakeState (Double deployAngle, Double speed){
+        private TriggerIntakeState (Rotation2d deployAngle, Double speed){
             this.deployAngle = deployAngle;
             this.speed = speed;
         }

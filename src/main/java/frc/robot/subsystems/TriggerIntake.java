@@ -5,6 +5,7 @@ import static frc.robot.Constants.TriggerIntake.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.util.Util;
 
 import com.revrobotics.RelativeEncoder;
@@ -38,21 +39,21 @@ public class TriggerIntake {
         deployEncoder.setPositionConversionFactor(triggerIntakeDeployGearing);
     }
 
-    public void setDeploymentAngle (double angle) {
-        targetRotation = angle; 
-        deployController.setReference(angle, CANSparkMax.ControlType.kPosition);
+    public void setDeploymentAngle (Rotation2d angle) {
+        targetRotation = angle.getRotations(); 
+        deployController.setReference(angle.getRotations(), CANSparkMax.ControlType.kPosition);
     }
 
     public void setRollerSpeed (double speed) {
         rollerMotor.set(speed);
     }
 
-    public double getDeploymentAngle () {
-        return deployEncoder.getPosition();
+    public Rotation2d getDeploymentAngle () {
+        return Rotation2d.fromRotations(deployEncoder.getPosition());
     }
 
     public boolean deployedToSetpoint () {
-        return Util.inRange(getDeploymentAngle() - targetRotation, triggerIntakeDeployTolerance);
+        return Util.inRange(getDeploymentAngle().getRotations() - targetRotation, triggerIntakeDeployTolerance);
     }
 
     private static final TriggerIntake instance = new TriggerIntake();

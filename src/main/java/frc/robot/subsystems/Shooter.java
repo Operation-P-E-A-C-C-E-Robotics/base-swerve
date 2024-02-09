@@ -132,10 +132,6 @@ public class Shooter {
         return triggerSwitch.get();
     }
 
-    public boolean hasNote () {
-        return false;
-    }
-
     public boolean shotDetected() {
         if (getFlywheelVelocity() > shotDetectionMinVelocity && getFlywheelAcceleration() < shotDetectionAccelerationThreshold) {
             shotTimer.start();

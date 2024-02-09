@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.state.StateMachine;
 import frc.lib.swerve.PeaccyRequest;
 import frc.lib.telemetry.SwerveTelemetry;
+import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.Robot;
@@ -100,6 +101,12 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
                 Math.abs(angularVelocitySup.getAsDouble()) > Constants.Swerve.teleopAngularVelocityDeadband){
                 return;
             }
+        }
+
+        if (state == SwerveState.ALIGN_INTAKING) {
+            LimelightHelpers.setPipelineIndex(Constants.Cameras.rearLimelight, Constants.Cameras.noteDectionPipeline);
+        } else {
+            LimelightHelpers.setPipelineIndex(Constants.Cameras.rearLimelight, Constants.Cameras.apriltagPipeline);
         }
 
         //handle command end function
@@ -235,6 +242,15 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             request.withLockHeadingVelocity(Units.degreesToRadians(aimPlanner.getDrivetrainAngularVelocity()));
         }
 
+        if(state == SwerveState.ALIGN_INTAKING){
+            var results = LimelightHelpers.getLatestResults(Constants.Cameras.rearLimelight).targetingResults.targets_Detector;
+            if(results.length > 0){
+                request.withHeading(Swerve.getInstance().getPose().getRotation().getRadians() + Units.degreesToRadians(results[0].tx));
+                request.withLockHeading(true);
+                request.withLockHeadingVelocity(0);
+            }
+        }
+
         //yay peaccyrequest,
         //(my beautiful swerve request),
         //will handle the rest :D,
@@ -248,14 +264,14 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
     }
 
     @Override
-    public boolean isDone(){
+    public boolean transitioning(){
         if(state.isFollowingPath() || state.isPathFinding()){
-            return pathFinished;
+            return !pathFinished;
         }
         if(state == SwerveState.AIM) {
-            return false; //TODO
+            return true; //TODO
         }
-        return true;
+        return false;
     }
 
     /**
@@ -337,11 +353,12 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
     }
     
     public enum SwerveState{
+        OPEN_LOOP_TELEOP,
         CLOSED_LOOP_TELEOP  (false, false, false, true),
-        OPEN_LOOP_TELEOP    (true, false, false, true),
         ROBOT_CENTRIC       (true, true, false, false),
         LOCK_IN             (true, false, true, false),
-        AIM                 (true, false, false, true),
+        AIM,
+        ALIGN_INTAKING, //align to the note with vision
         TEST_PATH("Example Path"),
         TEST_PATHFIND(new Pose2d());
 
@@ -369,6 +386,15 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         private SwerveState(Pose2d target){
             pathFindingTarget = target;
             pathFinding = true;
+        }
+
+        private SwerveState() {
+            followingPath = false;
+            pathFinding = false;
+            openLoop = true;
+            robotCentric = false;
+            lockIn = false;
+            holdHeading = true;
         }
 
         public PathPlannerPath getPath(){

@@ -31,9 +31,9 @@ public abstract class StateMachine <T extends Enum<T>> {
 
     /**
      * check if the state machine is in a stable state
-     * @return true if the subsystem is in the desired state
+     * @return true if the subsystem is in between states
      */
-    public boolean isDone() {
+    public boolean transitioning() {
         return false;
     }
 
@@ -68,7 +68,7 @@ public abstract class StateMachine <T extends Enum<T>> {
             update();
             return;
         }
-        if(isDynamic() || !isDone()){
+        if(isDynamic() || transitioning()){
             update();
         }
     }

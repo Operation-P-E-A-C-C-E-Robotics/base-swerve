@@ -36,6 +36,7 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
         SmartDashboard.putString("Climber State", state.name());
         if(!state.isBalance()){
             climber.setClimberPosition(state.getPosition());
+            balanceOffset = 0.0;
             return;
         }
         
@@ -50,11 +51,11 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
     }
 
     @Override
-    public boolean isDone(){
+    public boolean transitioning(){
         //done when we are at the desired position and the robot is balanced or we are not balancing
         var atPosition = Math.abs(climber.getClimberPosition() - state.getPosition()) < extensionTolerance;
         var balanced = Math.abs(robotRollSupplier.getAsDouble()) < balanceTolerance;
-        return atPosition && (balanced || !state.isBalance());
+        return !atPosition || !(balanced || !state.isBalance());
     }
 
     @Override

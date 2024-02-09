@@ -29,6 +29,13 @@ import frc.lib.util.JoystickCurves;
 public final class Constants {
   public static final double period = 0.01;
 
+  public static final class Cameras {
+    public static final String frontLimelight = "limelight-front";
+    public static final String rearLimelight = "limelight-rear";
+    public static final int apriltagPipeline = 0;
+    public static final int noteDectionPipeline = 1;
+  }
+
   public static final class Shooter {
     public static final int upperFlywheelMotorId = 50; //will be 13 once swerve ids fixed
     public static final int lowerFlywheelMotorId = 14;
@@ -111,9 +118,9 @@ public final class Constants {
     public static final double restingAngle = 0; //rotations
 
     public static final double pivotMinAngle = 0;
-    public static final double pivotMaxAngle = 0;
+    public static final double pivotMaxAngle = 1000;
 
-    public static final double pivotGearRatio = 1; // pivot rotations per motor rotation
+    public static final double pivotGearRatio = 100; // pivot rotations per motor rotation
     public static final double pivotTolerance = 0; //how close to the target position the pivot needs to be considered ready
 
     public static final double gravityFeedforwardkG = 0;
@@ -124,15 +131,15 @@ public final class Constants {
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      pivotConfigs.Slot0.kP = 1;
+      pivotConfigs.Slot0.kP = 100;
       pivotConfigs.Slot0.kI = 0;
       pivotConfigs.Slot0.kD = 0;
       pivotConfigs.Slot0.kS = 0;
       pivotConfigs.Slot0.kV = 1;
       pivotConfigs.Slot0.kA = 1;
 
-      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 0;
-      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 0;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 1;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 1;
       pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
 
       pivotConfigs.Feedback.FeedbackRemoteSensorID = pivotCANCoderID;
@@ -291,8 +298,6 @@ public final class Constants {
       new ReplanningConfig(true, true),
       period
     );
-
-    public static final String primaryLLName = "limelight";
   }
 
   public static final class ControlSystem {

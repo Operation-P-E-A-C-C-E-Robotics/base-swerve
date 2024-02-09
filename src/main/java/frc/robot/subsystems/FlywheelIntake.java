@@ -5,6 +5,7 @@ import static frc.robot.Constants.FlywheelIntake.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.util.Util;
 
 import com.revrobotics.RelativeEncoder;
@@ -44,9 +45,9 @@ public class FlywheelIntake {
     /**
      * set the target angle for the intake to deploy to, in rotations
      */
-    public void setDeploymentAngle (double angle) {
-        targetRotations = angle; 
-        deployPIDController.setReference(angle, CANSparkMax.ControlType.kPosition); //might need to divide by gearing, not sure.
+    public void setDeploymentAngle (Rotation2d angle) {
+        targetRotations = angle.getRotations(); 
+        deployPIDController.setReference(angle.getRotations(), CANSparkMax.ControlType.kPosition); //might need to divide by gearing, not sure.
     }
 
     /**
@@ -59,15 +60,15 @@ public class FlywheelIntake {
     /**
      * get the current angle of the intake, in rotations
      */
-    public double getDeploymentAngle(){
-        return deployEncoder.getPosition();
+    public Rotation2d getDeploymentAngle(){
+        return Rotation2d.fromRotations(deployEncoder.getPosition());
     }
     /**
      * get whether the deploy motor is at its setpoint
      */
 
     public boolean deployedToSetpoint () {
-        return Util.inRange(getDeploymentAngle() - targetRotations, flywheelIntakeDeployTolerance);
+        return Util.inRange(getDeploymentAngle().getRotations() - targetRotations, flywheelIntakeDeployTolerance);
     }
 
     private static FlywheelIntake instance = new FlywheelIntake();

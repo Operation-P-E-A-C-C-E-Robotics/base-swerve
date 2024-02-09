@@ -169,13 +169,18 @@ public class Swerve extends SubsystemBase {
         }
 
         //update odometry from limelight
-        var results = LimelightHelpers.getLatestResults(Constants.Swerve.primaryLLName).targetingResults;
-        if(results.botpose.length == 6) {
-            Pose2d pose = results.getBotPose2d_wpiBlue();
-            swerve.addVisionMeasurement(pose, results.timestamp_RIOFPGA_capture); //todo right timestamp?
+        var frontResults = LimelightHelpers.getLatestResults(Constants.Cameras.frontLimelight).targetingResults;
+        var rearResults = LimelightHelpers.getLatestResults(Constants.Cameras.rearLimelight).targetingResults;
+        if(frontResults.botpose.length == 6) {
+            Pose2d pose = frontResults.getBotPose2d_wpiBlue();
+            swerve.addVisionMeasurement(pose, frontResults.timestamp_RIOFPGA_capture); //todo right timestamp?
+        }
+        if(rearResults.botpose.length == 6) {
+            Pose2d pose = rearResults.getBotPose2d_wpiBlue();
+            swerve.addVisionMeasurement(pose, rearResults.timestamp_RIOFPGA_capture); //todo right timestamp?
         }
 
-        LimelightTelemetry.update(primaryLLName, swerve.getPose3d());
+        LimelightTelemetry.update(Constants.Cameras.frontLimelight, swerve.getPose3d());
     }
 
     @Override

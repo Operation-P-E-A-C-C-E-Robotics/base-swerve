@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.EnumSendableChooser;
 import frc.robot.RobotStatemachine.RobotState;
 import frc.robot.planners.AimPlanner;
-import frc.robot.planners.CollisionAvoidancePlanner;
+import frc.robot.planners.MotionPlanner;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.FlipperStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine;
@@ -39,7 +39,7 @@ public class RobotContainer {
     private final Climber climber = Climber.getInstance();
 
     /* PLANNERS */
-    private final CollisionAvoidancePlanner intakeMotionPlanner = new CollisionAvoidancePlanner(
+    private final MotionPlanner motionPlanner = new MotionPlanner(
         pivot::getPivotPosition,
         flywheelIntake::getDeploymentAngle,
         () -> swerve.getChassisSpeeds().vxMetersPerSecond
@@ -53,11 +53,11 @@ public class RobotContainer {
 
     /* STATE MACHINES */
     private final SwerveStatemachine swerveStatemachine = new SwerveStatemachine(swerve, aimPlanner);
-    private final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine(flywheelIntake, intakeMotionPlanner, shooter::hasNote);
-    private final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine(triggerIntake, intakeMotionPlanner, shooter::hasNote);
-    private final PivotStatemachine pivotStatemachine = new PivotStatemachine(pivot, aimPlanner, intakeMotionPlanner);
+    private final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine(flywheelIntake, motionPlanner);
+    private final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine(triggerIntake, motionPlanner);
+    private final PivotStatemachine pivotStatemachine = new PivotStatemachine(pivot, aimPlanner, motionPlanner);
     private final ShooterStatemachine shooterStatemachine = new ShooterStatemachine(shooter, aimPlanner, () -> false); //TODO
-    private final FlipperStatemachine diverterStatemachine = new FlipperStatemachine(diverter);
+    private final FlipperStatemachine diverterStatemachine = new FlipperStatemachine(diverter, motionPlanner);
     private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber, () -> swerve.getGyroAngle().getX());
 
     private final RobotStatemachine robotStatemachine = new RobotStatemachine(
@@ -68,7 +68,7 @@ public class RobotContainer {
         pivotStatemachine,
         diverterStatemachine,
         climberStatemachine,
-        intakeMotionPlanner,
+        motionPlanner,
         aimPlanner
     );
 
@@ -81,17 +81,13 @@ public class RobotContainer {
         return robotStatemachine;
     }
 
-    public boolean hasNote() {
-        return shooter.hasNote();
-    }
-
     /**
      * The main update loop of the robot.
      * This is called periodically by the main robot class.
      * It updates the supersystem state, planners, and state machines.
      */
     public void run() {
-        intakeMotionPlanner.update();
+        motionPlanner.update();
         aimPlanner.update();
         if(edu.wpi.first.wpilibj.RobotState.isTeleop()) updateTeleopControls();
         if(edu.wpi.first.wpilibj.RobotState.isTest()) {

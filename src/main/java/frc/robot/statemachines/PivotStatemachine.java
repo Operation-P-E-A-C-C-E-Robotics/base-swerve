@@ -1,9 +1,10 @@
 package frc.robot.statemachines;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
-import frc.robot.Robot;
 import frc.robot.planners.AimPlanner;
-import frc.robot.planners.CollisionAvoidancePlanner;
+import frc.robot.planners.MotionPlanner;
 import frc.robot.subsystems.Pivot;
 
 public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState> {
@@ -11,19 +12,14 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
 
     private final Pivot pivot;
     private final AimPlanner aimPlanner;
-    private final CollisionAvoidancePlanner intakeMotionPlanner;
+    private final MotionPlanner intakeMotionPlanner;
 
-    public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner, CollisionAvoidancePlanner intakeMotionPlanner){
+    public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner, MotionPlanner intakeMotionPlanner){
         this.pivot = pivot;
         this.aimPlanner = aimPlanner;
         this.intakeMotionPlanner = intakeMotionPlanner;
-    }
 
-    /**
-     * Handle automatic state transitions
-     * e.g. AIM to REST when a gamepiece is fired
-     */
-    private void updateState(){
+        SmartDashboard.putNumber("pivot sim debug", 0);
     }
 
     /**
@@ -42,11 +38,19 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
      */
     @Override
     public void update(){
-        updateState();
+        if (state == PivotState.INTAKE && !intakeMotionPlanner.canFlattenPivot()) state = PivotState.REST;
 
-        if(Robot.isSimulation()) {
-            pivot.simulationPeriodic();
+        if(state == PivotState.AUTO_AIM) {
+            var angle = aimPlanner.getTargetPivotAngle();
+            if(angle.getRadians() > MotionPlanner.interferenceLowerPivotAngle.getRadians() || intakeMotionPlanner.canFlattenPivot()) {
+                pivot.setPivotPosition(angle);
+                return;
+            } else {
+                state = PivotState.REST;
+            }
         }
+
+        pivot.setPivotPosition(state.getAngle());
     }
 
     @Override
@@ -55,32 +59,32 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
     }
     
     @Override
-    public boolean isDone() {
-       return pivot.atSetpoint();
+    public boolean transitioning() {
+       return !pivot.atSetpoint();
     }
 
     @Override
     public boolean isDynamic() {
-        return true;
+        return state == PivotState.INTAKE || state == PivotState.AUTO_AIM;
     }
 
     public enum PivotState {
-        REST(0.0),
-        INTAKE(1.0),
-        AMP(0.0),
-        PRE_CLIMB(0.0),
-        CLIMB(0.0),
-        AIM_LAYUP(0.0),
-        AIM_PROTECTED(0.0),
-        AUTO_AIM(0.0);
+        REST(Rotation2d.fromDegrees(0)),
+        INTAKE(Rotation2d.fromDegrees(0)),
+        AMP(Rotation2d.fromDegrees(0)),
+        PRE_CLIMB(Rotation2d.fromDegrees(0)),
+        CLIMB(Rotation2d.fromDegrees(0)),
+        AIM_LAYUP(Rotation2d.fromDegrees(0)),
+        AIM_PROTECTED(Rotation2d.fromDegrees(0)),
+        AUTO_AIM(Rotation2d.fromDegrees(0));
 
-        private Double angle;
+        private Rotation2d angle;
 
-        public Double getAngle(){
+        public Rotation2d getAngle(){
             return angle;
         }
 
-        private PivotState (Double angle){
+        private PivotState (Rotation2d angle){
             this.angle = angle;
         }
     }

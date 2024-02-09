@@ -1,11 +1,4 @@
 {
-  "HALProvider": {
-    "Other Devices": {
-      "window": {
-        "visible": false
-      }
-    }
-  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -91,7 +84,10 @@
         "pivot mech": {
           "open": true,
           "pivot": {
-            "open": true
+            "open": true,
+            "pivot": {
+              "open": true
+            }
           }
         }
       },
@@ -101,8 +97,7 @@
         },
         "Command": {
           "open": true
-        },
-        "open": true
+        }
       }
     }
   },

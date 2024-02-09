@@ -1,23 +1,20 @@
 package frc.robot.statemachines;
 
-import java.util.function.BooleanSupplier;
-
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
-import frc.robot.planners.CollisionAvoidancePlanner;
+import frc.robot.planners.MotionPlanner;
 import frc.robot.subsystems.FlywheelIntake;
 
 public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeStatemachine.FlywheelIntakeState>{
     private FlywheelIntakeState state = FlywheelIntakeState.RETRACT;
 
     private final FlywheelIntake flywheelIntake;
-    private final CollisionAvoidancePlanner intakeMotionPlanner;
-    private final BooleanSupplier hasNote;
+    private final MotionPlanner intakeMotionPlanner;
 
-    public FlywheelIntakeStatemachine(FlywheelIntake flywheelIntake, CollisionAvoidancePlanner intakeMotionPlanner, BooleanSupplier hasNote){
+    public FlywheelIntakeStatemachine(FlywheelIntake flywheelIntake, MotionPlanner intakeMotionPlanner){
         this.flywheelIntake = flywheelIntake;
         this.intakeMotionPlanner = intakeMotionPlanner;
-        this.hasNote = hasNote;
     }
 
     private void updateState(){
@@ -27,9 +24,6 @@ public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeState
         //don't allow the shooter to hit the intake
         if(state == FlywheelIntakeState.RETRACT && intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = FlywheelIntakeState.AVOID;
         if(state == FlywheelIntakeState.AVOID && !intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = FlywheelIntakeState.RETRACT;
-
-        //automatically transition to retracting the intake once we have detected a note
-        if(state == FlywheelIntakeState.INTAKE && hasNote.getAsBoolean()) state = FlywheelIntakeState.RETRACT; //TODO make sure this isn't prone to sensor failure / noise
     }
 
     @Override
@@ -52,8 +46,8 @@ public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeState
     }
 
     @Override
-    public boolean isDone(){
-        return flywheelIntake.deployedToSetpoint();
+    public boolean transitioning(){
+        return !flywheelIntake.deployedToSetpoint();
     }
 
     @Override
@@ -63,16 +57,16 @@ public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeState
 
     public enum FlywheelIntakeState{
         //TODO
-        RETRACT(0.0,0.0),
-        EXTEND(0.0,0.0),
-        INTAKE(0.0,0.0),
-        AVOID(0.0,0.0),
-        EJECT(0.0,0.0);
+        RETRACT(Rotation2d.fromDegrees(0),0.0),
+        EXTEND(Rotation2d.fromDegrees(0),0.0),
+        INTAKE(Rotation2d.fromDegrees(0),1.0),
+        AVOID(Rotation2d.fromDegrees(0),0.0),
+        EJECT(Rotation2d.fromDegrees(0),-1.0);
         
-        private Double deployAngle;
+        private Rotation2d deployAngle;
         private Double speed;
 
-        public Double getDeployAngle(){
+        public Rotation2d getDeployAngle(){
             return deployAngle;
         }
 
@@ -80,7 +74,7 @@ public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeState
             return speed;
         }
 
-        private FlywheelIntakeState (Double deployAngle, Double speed){
+        private FlywheelIntakeState (Rotation2d deployAngle, Double speed){
             this.deployAngle = deployAngle;
             this.speed = speed;
         }
