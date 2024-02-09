@@ -62,7 +62,7 @@ public final class Constants {
     static {
       flywheelConfigs.CurrentLimits.StatorCurrentLimit = 20;
       flywheelConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
-      flywheelConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+      flywheelConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast; //needs to be coast because we can override this to brake but not the other way around
 
       flywheelConfigs.Feedback.SensorToMechanismRatio = flywheelGearRatio;
     }

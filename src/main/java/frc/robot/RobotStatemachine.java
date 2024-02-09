@@ -189,7 +189,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
             FlywheelIntakeState.RETRACT, 
             TriggerIntakeState.AVOID, 
             ShooterState.HANDOFF, 
-            PivotState.CLIMB, 
+            PivotState.REST, 
             FlipperState.HANDOFF, 
             ClimberState.RETRACT
         ),

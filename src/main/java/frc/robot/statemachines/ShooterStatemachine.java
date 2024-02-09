@@ -91,6 +91,21 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
             if(shooter.flywheelSwitchTripped() && !shooter.triggerSwitchTripped()) shooter.setTrigerPercent(-state.getTriggerPercent());
             else if (shooter.triggerSwitchTripped() && !shooter.flywheelSwitchTripped()) shooter.setTrigerPercent(state.getTriggerPercent());
             else shooter.setTrigerPercent(0.0);
+
+            shooter.brakeFlywheel();
+            return;
+        }
+
+        if (state == ShooterState.COAST) {
+            shooter.coastFlywheel();
+            shooter.setTrigerPercent(0.0);
+            return;
+        }
+
+        if (state == ShooterState.RAMP_DOWN) {
+            shooter.brakeFlywheel();
+            shooter.setTrigerPercent(0.0);
+            return;
         }
 
         shooter.setFlywheelVelocity(state.getFlywheelVelocity());
@@ -118,6 +133,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
 
     public enum ShooterState{
         RAMP_DOWN(0.0,0.0),
+        COAST (0.0, 0.0),
         INTAKE(0.0,0.0), //NOTE: this should fold flat if the flywheel-side intake is out
         INDEX(0.0,0.2),
         HANDOFF(0.0,0.0), //to diverter

@@ -97,8 +97,8 @@ public class Shooter {
         topControl.withOutput(topFlywheelLoop.getU(0));
         bottomControl.withOutput(bottomFlywheelLoop.getU(0));
 
-        topFlywheelMotor.setControl(topControl);
-        bottomFlywheelMotor.setControl(bottomControl);
+        topFlywheelMotor.setControl(topControl.withOverrideBrakeDurNeutral(true));
+        bottomFlywheelMotor.setControl(bottomControl.withOverrideBrakeDurNeutral(true));
     }
 
     public void setFlywheelPercent (double percent) {
@@ -106,6 +106,16 @@ public class Shooter {
         bottomFlywheelMotor.set(percent);
         topFlywheelLoop.reset(VecBuilder.fill(topFlywheelMotor.getVelocity().getValue()));
         bottomFlywheelLoop.reset(VecBuilder.fill(bottomFlywheelMotor.getVelocity().getValue()));
+    }
+
+    public void coastFlywheel () {
+        topFlywheelMotor.setControl(topControl.withOutput(0).withOverrideBrakeDurNeutral(false));
+        bottomFlywheelMotor.setControl(topControl.withOutput(0).withOverrideBrakeDurNeutral(false));
+    }
+
+    public void brakeFlywheel () {
+        topFlywheelMotor.setControl(topControl.withOutput(0).withOverrideBrakeDurNeutral(true));
+        bottomFlywheelMotor.setControl(topControl.withOutput(0).withOverrideBrakeDurNeutral(true));
     }
 
     public void setTrigerPercent (double percent) {
