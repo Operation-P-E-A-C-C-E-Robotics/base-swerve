@@ -3,6 +3,9 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import frc.lib.util.Reporter;
+
 import static frc.robot.Constants.Diverter.*;
 
 public class Diverter {
@@ -14,12 +17,12 @@ public class Diverter {
     private final PositionVoltage rollerPositionControl = new PositionVoltage(0);
 
     private Diverter () {
-        deployMotor.getConfigurator().apply(diverterDeployConfigs);
-        rollerMotor.getConfigurator().apply(diverterRollerConfigs);
+        Reporter.report(deployMotor.getConfigurator().apply(diverterDeployConfigs), "Couldn't configure diverter deploy motor");
+        Reporter.report(rollerMotor.getConfigurator().apply(diverterRollerConfigs), "Couldn't configure diverter roller motor");
     }
 
     public void setDiverterExtension (double position) {
-        deployMotor.setControl(deployControl.withPosition(position));
+        Reporter.log(deployMotor.setControl(deployControl.withPosition(position)), "set diverter extension");
     }
 
     public void setDiverterRoller (double speed) {
@@ -28,7 +31,7 @@ public class Diverter {
 
     public void lockRollerPosition () {
         rollerPositionControl.withPosition(rollerMotor.getPosition().getValue());
-        rollerMotor.setControl(rollerPositionControl);
+        Reporter.log(rollerMotor.setControl(rollerPositionControl), "lock diverter roller position");
     }
 
     public double getDiverterExtension () {

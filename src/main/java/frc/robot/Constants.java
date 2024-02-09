@@ -196,13 +196,12 @@ public final class Constants {
 
     public static final double climberGearRatio = 1;
 
-    public static final double climberTolerance = 0; //-⁂Stupid Questions With Parker⁂-: could i also name this climberError? or is error reserved for something else
+    public static final double climberTolerance = 0; //-Stupid Questions With Parker-: could i also name this climberError? or is error reserved for something else
 
     public static final TalonFXConfiguration climberConfigs = new TalonFXConfiguration();
     static {
       climberConfigs.CurrentLimits.StatorCurrentLimit = 20;
       climberConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
-      climberConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
       climberConfigs.Slot0.kP = 0;
       climberConfigs.Slot0.kI = 0;
@@ -216,8 +215,8 @@ public final class Constants {
       climberConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
     }
 
-    public static final boolean climberLeftMotorIsInverted = false;
-    public static final boolean climberRightMotorIsInverted = false;
+    public static final InvertedValue climberLeftMotorIsInverted = InvertedValue.CounterClockwise_Positive;
+    public static final InvertedValue climberRightMotorIsInverted = InvertedValue.CounterClockwise_Positive;
     // todo delete this comment when sure the booleans are what we want
   }
   public static final class Swerve {

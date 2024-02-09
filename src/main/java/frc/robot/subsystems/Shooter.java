@@ -15,6 +15,7 @@ import edu.wpi.first.math.system.LinearSystemLoop;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import frc.lib.util.Reporter;
 import frc.lib.util.Util;
 import frc.robot.Constants;
 
@@ -73,8 +74,8 @@ public class Shooter {
     private final Timer shotTimer = new Timer();
 
     private Shooter () {
-        topFlywheelMotor.getConfigurator().apply(flywheelConfigs);
-        bottomFlywheelMotor.getConfigurator().apply(flywheelConfigs);
+        Reporter.report(topFlywheelMotor.getConfigurator().apply(flywheelConfigs), "Couldn't configure top flywheel motor");
+        Reporter.report(bottomFlywheelMotor.getConfigurator().apply(flywheelConfigs), "Couldn't configure bottom flywheel motor");
 
         topFlywheelMotor.setInverted(false);
         bottomFlywheelMotor.setInverted(false);

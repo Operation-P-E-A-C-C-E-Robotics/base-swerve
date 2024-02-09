@@ -2,8 +2,10 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.Climber.*;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
-
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import frc.lib.util.Reporter;
 import frc.lib.util.Util;
 
 public class Climber {
@@ -14,11 +16,22 @@ public class Climber {
     private double setpoint = 0.0;
 
     private Climber () {
-        leftMotor.getConfigurator().apply(climberConfigs);
-        rightMotor.getConfigurator().apply(climberConfigs);
+        var leftInversionConfig = new MotorOutputConfigs();
+        leftInversionConfig.Inverted = climberLeftMotorIsInverted;
+        leftInversionConfig.NeutralMode = NeutralModeValue.Brake;
 
-        leftMotor.setInverted(climberLeftMotorIsInverted);
-        rightMotor.setInverted(climberRightMotorIsInverted);
+        var rightInversionConfig = new MotorOutputConfigs();
+        rightInversionConfig.Inverted = climberRightMotorIsInverted;
+        rightInversionConfig.NeutralMode = NeutralModeValue.Brake;
+
+        Reporter.report(
+            leftMotor.getConfigurator().apply(climberConfigs.withMotorOutput(leftInversionConfig)),
+            "climber left motor config failed"
+        );
+        Reporter.report(
+            rightMotor.getConfigurator().apply(climberConfigs.withMotorOutput(rightInversionConfig)), 
+            "climber right motor config failed"
+        );
     }
 
     /**
@@ -36,8 +49,8 @@ public class Climber {
      */
     public void setClimberPosition (double left, double right) {
         setpoint = (left + right) / 2;
-        leftMotor.setPosition(left);                                       //ask sean  if this is ok :| sean: it's not ok, it's aok
-        rightMotor.setPosition(right);
+        Reporter.log(leftMotor.setPosition(left), "setting left climber position");                                 //ask sean  if this is ok :| sean: it's not ok, it's aok
+        Reporter.log(rightMotor.setPosition(right), "setting right climber position");
     }
 
     //i changed this from a double to void so i could grab both values and store them in different variables.

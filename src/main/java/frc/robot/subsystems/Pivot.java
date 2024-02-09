@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.util.Reporter;
 import frc.lib.util.Util;
 import frc.robot.Robot;
 
@@ -27,17 +28,17 @@ public class Pivot {
 
 
     private Pivot () {
-        pivotMaster.getConfigurator().apply(pivotConfigs);
+        Reporter.report(pivotMaster.getConfigurator().apply(pivotConfigs), "Couldn't configure pivot master");
         pivotMaster.setInverted(false);
 
-        pivotSlave.setControl(new Follower(pivotMasterID, false));
+        Reporter.report(pivotSlave.setControl(new Follower(pivotMasterID, false)), "Couldn't configure pivot slave");
 
         SmartDashboard.putData("pivot mech", pivotMech);
     }
 
     public void setPivotPosition (Rotation2d position) {
         var gravity = gravityFeedforward.calculate(getPivotPosition().getRadians(), 0);
-        pivotMaster.setControl(pivotControl.withFeedForward(gravity).withPosition(position.getRotations()));
+        Reporter.log(pivotMaster.setControl(pivotControl.withFeedForward(gravity).withPosition(position.getRotations())), "couldn't set pivot position");
         if(Robot.isSimulation()) {
             pivotEncoder.getSimState().setRawPosition(position.getRotations());
             pivotLigament.setAngle(getPivotPosition());

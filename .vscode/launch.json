@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Util",
+      "request": "launch",
+      "mainClass": "frc.lib.util.Util",
+      "projectName": "frc-2024"
+    },
+    {
+      "type": "java",
       "name": "LinearInterpolate",
       "request": "launch",
       "mainClass": "frc.lib.util.LinearInterpolate",
