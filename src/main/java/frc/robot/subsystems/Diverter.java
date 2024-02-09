@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import static frc.robot.Constants.Diverter.*;
 
@@ -10,9 +11,11 @@ public class Diverter {
 
     private final MotionMagicExpoVoltage deployControl = new MotionMagicExpoVoltage(0);
 
+    private final PositionVoltage rollerPositionControl = new PositionVoltage(0);
+
     private Diverter () {
         deployMotor.getConfigurator().apply(diverterDeployConfigs);
-        rollerMotor.setInverted(false);
+        rollerMotor.getConfigurator().apply(diverterRollerConfigs);
     }
 
     public void setDiverterExtension (double position) {
@@ -21,6 +24,11 @@ public class Diverter {
 
     public void setDiverterRoller (double speed) {
         rollerMotor.set(speed);
+    }
+
+    public void lockRollerPosition () {
+        rollerPositionControl.withPosition(rollerMotor.getPosition().getValue());
+        rollerMotor.setControl(rollerPositionControl);
     }
 
     public double getDiverterExtension () {

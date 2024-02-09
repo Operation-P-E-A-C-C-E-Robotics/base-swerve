@@ -8,6 +8,7 @@ import java.util.function.DoubleFunction;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -57,6 +58,7 @@ public final class Constants {
     public static final double shotDetectionAccelerationThreshold = 0;
     public static final double shotDetectionTimeThreshold = 0;
     public static final double shotDetectionMinVelocity = 0;
+    public static final double shotDetectionResetTime = 0;
 
     public static final TalonFXConfiguration flywheelConfigs = new TalonFXConfiguration();
     static {
@@ -160,20 +162,31 @@ public final class Constants {
 
     public static final TalonFXConfiguration diverterDeployConfigs = new TalonFXConfiguration();
     static {
+      diverterDeployConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
       diverterDeployConfigs.CurrentLimits.StatorCurrentLimit = 20;
       diverterDeployConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       diverterDeployConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
+      
       diverterDeployConfigs.Slot0.kP = 0;
       diverterDeployConfigs.Slot0.kI = 0;
       diverterDeployConfigs.Slot0.kD = 0;
       diverterDeployConfigs.Slot0.kS = 0;
       diverterDeployConfigs.Slot0.kV = 0;
       diverterDeployConfigs.Slot0.kA = 0;
-
+      
       diverterDeployConfigs.MotionMagic.MotionMagicExpo_kA = 0;
       diverterDeployConfigs.MotionMagic.MotionMagicExpo_kV = 0;
       diverterDeployConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
+    }
+
+    public static final TalonFXConfiguration diverterRollerConfigs = new TalonFXConfiguration();
+    static {
+      diverterRollerConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+      diverterRollerConfigs.CurrentLimits.StatorCurrentLimit = 20;
+      diverterRollerConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
+      diverterRollerConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+
+      diverterRollerConfigs.Slot0.kP = 0; //for holding position
     }
   }
 

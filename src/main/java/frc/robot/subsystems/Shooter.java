@@ -146,9 +146,11 @@ public class Shooter {
         if (getFlywheelVelocity() > shotDetectionMinVelocity && getFlywheelAcceleration() < shotDetectionAccelerationThreshold) {
             shotTimer.start();
         } 
-        if (shotTimer.hasElapsed(shotDetectionTimeThreshold)) {
+        if (shotTimer.hasElapsed(shotDetectionResetTime)) {
             shotTimer.stop();
             shotTimer.reset();
+        }
+        if (shotTimer.hasElapsed(shotDetectionTimeThreshold)) {
             return true;
         }
         return false;

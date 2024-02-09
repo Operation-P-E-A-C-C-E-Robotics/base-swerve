@@ -30,12 +30,12 @@ import frc.robot.subsystems.Swerve;
  */
 public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveState> {
     /* Initialize the suppliers to default values */
-    private DoubleSupplier xVelocitySup = OI.DriveTrain.translation,
-                           yVelocitySup = OI.DriveTrain.strafe, 
-                           angularVelocitySup = OI.DriveTrain.rotation, 
-                           autoHeadingAngleSup = OI.DriveTrain.heading;
-    private BooleanSupplier isZeroOdometrySup = OI.DriveTrain.isZeroOdometry,
-                            useHeadingSup = OI.DriveTrain.useHeading;
+    private DoubleSupplier xVelocitySup = OI.Swerve.translation,
+                           yVelocitySup = OI.Swerve.strafe, 
+                           angularVelocitySup = OI.Swerve.rotation, 
+                           autoHeadingAngleSup = OI.Swerve.heading;
+    private BooleanSupplier isZeroOdometrySup = OI.Swerve.isZeroOdometry,
+                            useHeadingSup = OI.Swerve.useHeading;
 
     private Swerve driveTrain;
 

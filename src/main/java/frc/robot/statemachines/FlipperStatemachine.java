@@ -31,8 +31,10 @@ public class FlipperStatemachine extends StateMachine<FlipperStatemachine.Flippe
         if(!planner.canDiverterExtend() && state != FlipperState.HANDOFF) state = FlipperState.RETRACT;
 
         SmartDashboard.putString("Diverter State", state.name());
-        diverter.setDiverterExtension(state.getPosition());
-        diverter.setDiverterRoller(state.getSpeed());
+        diverter.setDiverterExtension(state.getExtension());
+        
+        if(state != FlipperState.HANDOFF && state.rollerSpeed == 0.0) diverter.lockRollerPosition();
+        else diverter.setDiverterRoller(state.getRollerSpeed());
     }
 
     @Override
@@ -54,19 +56,19 @@ public class FlipperStatemachine extends StateMachine<FlipperStatemachine.Flippe
         CLIMB(0.0,0.0),
         PLACE_TRAP(0.0,1.0);
 
-        private Double position, speed;
+        private Double extension, rollerSpeed;
 
-        public Double getPosition(){
-            return position;
+        public Double getExtension(){
+            return extension;
         }
 
-        public Double getSpeed(){
-            return speed;
+        public Double getRollerSpeed(){
+            return rollerSpeed;
         }
 
-        private FlipperState(Double position, Double speed){
-            this.position = position;
-            this.speed = speed;
+        private FlipperState(Double extension, Double rollerSpeed){
+            this.extension = extension;
+            this.rollerSpeed = rollerSpeed;
         }
     }
 }

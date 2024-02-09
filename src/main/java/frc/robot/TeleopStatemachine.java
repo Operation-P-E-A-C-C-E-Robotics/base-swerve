@@ -19,8 +19,8 @@ import frc.robot.statemachines.PivotStatemachine.PivotState;
 import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 
-public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState>{
-    private RobotState state = RobotState.REST;
+public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopState>{
+    private TeleopState state = TeleopState.REST;
     
     private final SwerveStatemachine swerveStatemachine;
     private final FlywheelIntakeStatemachine flywheelIntakeStatemachine;
@@ -34,7 +34,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
     private final AimPlanner aimPlanner;
     //private final StageAvoidancePlanner stageAvoidancePlanner;
 
-    public RobotStatemachine (SwerveStatemachine swerveStatemachine, 
+    public TeleopStatemachine (SwerveStatemachine swerveStatemachine, 
                             FlywheelIntakeStatemachine flywheelIntakeStatemachine, 
                             TriggerIntakeStatemachine triggerIntakeStatemachine, 
                             ShooterStatemachine shooterStatemachine, 
@@ -62,7 +62,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
      * @param state
      */
     @Override
-    public void requestState(RobotState state){
+    public void requestState(TeleopState state){
         this.state = state;
     }
 
@@ -91,7 +91,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
 
         SmartDashboard.putString("Robot State", state.name());
 
-        if (state == RobotState.AUTO_AIM || state == RobotState.SHOOT) {
+        if (state == TeleopState.AUTO_AIM || state == TeleopState.SHOOT) {
             swerveStatemachine.requestState(SwerveState.AIM);
         }
 
@@ -109,7 +109,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
      * requested by the state machine
      */
     @Override
-    public RobotState getState(){
+    public TeleopState getState(){
         return state;
     }
 
@@ -129,7 +129,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
     }
     
 
-    public enum RobotState {
+    public enum TeleopState {
         REST,
         INTAKE,
         INTAKE_FLYWHEEL (
@@ -203,6 +203,12 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
             ShooterState.RAMP_DOWN,
             PivotState.CLIMB,
             FlipperState.PLACE_TRAP
+        ),
+        INTAKE_AND_AIM( // intake with the trigger intake while the shooter and pivot are aiming
+            FlywheelIntakeState.AVOID,
+            TriggerIntakeState.INTAKE,
+            ShooterState.AUTO_AIM, // TODO needs it's own state
+            PivotState.AUTO_AIM
         );
 
         private FlywheelIntakeState flywheelIntakeState;
@@ -236,7 +242,7 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
             return climberState;
         }
 
-        private RobotState (FlywheelIntakeState flywheelIntakeState,
+        private TeleopState (FlywheelIntakeState flywheelIntakeState,
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState,
                                 PivotState pivotState,
@@ -250,32 +256,32 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.RobotState
             this.climberState = climberState;
         }
 
-        private RobotState(FlywheelIntakeState flywheelIntakeState,
+        private TeleopState(FlywheelIntakeState flywheelIntakeState,
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState) {
             this(flywheelIntakeState, triggerIntakeState, shooterState, PivotState.REST, FlipperState.RETRACT, ClimberState.RETRACT);
         }
 
-        private RobotState(FlywheelIntakeState flywheelIntakeState,
+        private TeleopState(FlywheelIntakeState flywheelIntakeState,
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState,
                                 PivotState pivotState) {
             this(flywheelIntakeState, triggerIntakeState, shooterState, pivotState, FlipperState.RETRACT, ClimberState.RETRACT);
         }
 
-        private RobotState(ShooterState shooterState, PivotState pivotState){
+        private TeleopState(ShooterState shooterState, PivotState pivotState){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, FlipperState.RETRACT, ClimberState.RETRACT);
         }
 
-        private RobotState(ShooterState shooterState, PivotState pivotState, FlipperState diverterState){
+        private TeleopState(ShooterState shooterState, PivotState pivotState, FlipperState diverterState){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, diverterState, ClimberState.RETRACT);
         }
 
-        private RobotState(TriggerIntakeState triggerIntakeState, PivotState pivotState, FlipperState diverterState, ClimberState climberState){
+        private TeleopState(TriggerIntakeState triggerIntakeState, PivotState pivotState, FlipperState diverterState, ClimberState climberState){
             this(FlywheelIntakeState.RETRACT, triggerIntakeState, ShooterState.RAMP_DOWN, pivotState, diverterState, climberState);
         }
 
-        private RobotState(){
+        private TeleopState(){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, ShooterState.RAMP_DOWN, PivotState.REST, FlipperState.RETRACT, ClimberState.RETRACT);
         }
     }

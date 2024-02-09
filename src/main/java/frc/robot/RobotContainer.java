@@ -1,9 +1,10 @@
 package frc.robot;
 
 import frc.robot.subsystems.Swerve;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.EnumSendableChooser;
-import frc.robot.RobotStatemachine.RobotState;
+import frc.robot.TeleopStatemachine.TeleopState;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
 import frc.robot.statemachines.ClimberStatemachine;
@@ -60,7 +61,7 @@ public class RobotContainer {
     private final FlipperStatemachine diverterStatemachine = new FlipperStatemachine(diverter, motionPlanner);
     private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber, () -> swerve.getGyroAngle().getX());
 
-    private final RobotStatemachine robotStatemachine = new RobotStatemachine(
+    private final TeleopStatemachine teleopStatemachine = new TeleopStatemachine(
         swerveStatemachine,
         flywheelIntakeStatemachine,
         triggerIntakeStatemachine,
@@ -77,8 +78,8 @@ public class RobotContainer {
         return instance;
     }
 
-    public RobotStatemachine getRobotStatemachine() {
-        return robotStatemachine;
+    public TeleopStatemachine getTeleopStatemachine() {
+        return teleopStatemachine;
     }
 
     /**
@@ -89,28 +90,53 @@ public class RobotContainer {
     public void run() {
         motionPlanner.update();
         aimPlanner.update();
-        if(edu.wpi.first.wpilibj.RobotState.isTeleop()) updateTeleopControls();
-        if(edu.wpi.first.wpilibj.RobotState.isTest()) {
+
+        if(RobotState.isTest()) {
             runTestDashboard();
             return;
         }
-        robotStatemachine.update();
+        if(RobotState.isTeleop()) {
+            updateWantedTeleopState();
+            teleopStatemachine.update();
+
+            updateTeleopStateOverrides();
+            flywheelIntakeStatemachine.update();
+            triggerIntakeStatemachine.update();
+            pivotStatemachine.update();
+            shooterStatemachine.update();
+            diverterStatemachine.update();
+            climberStatemachine.update();
+        }
+        if(RobotState.isAutonomous()) {
+            //autoStatemachine.update();
+        }
     }
 
-    private void updateTeleopControls () {
-        //EXAMPLE BUTTON:
-        if(OI.DriveTrain.isLockIn.getAsBoolean()) {
-            robotStatemachine.requestSwerveState(SwerveState.LOCK_IN);
+    private void updateWantedTeleopState () {
+        //swerve state
+        if(OI.Swerve.isLockIn.getAsBoolean()) {
+            teleopStatemachine.requestSwerveState(SwerveState.LOCK_IN);
         }
-        else if(!OI.DriveTrain.isFieldRelative.getAsBoolean()) {
-            robotStatemachine.requestSwerveState(SwerveState.ROBOT_CENTRIC);
+        else if(!OI.Swerve.isFieldRelative.getAsBoolean()) {
+            teleopStatemachine.requestSwerveState(SwerveState.ROBOT_CENTRIC);
         }
         else {
-            robotStatemachine.requestSwerveState(OI.DriveTrain.isOpenLoop.getAsBoolean() ? SwerveState.OPEN_LOOP_TELEOP : SwerveState.CLOSED_LOOP_TELEOP);
+            teleopStatemachine.requestSwerveState(OI.Swerve.isOpenLoop.getAsBoolean() ? SwerveState.OPEN_LOOP_TELEOP : SwerveState.CLOSED_LOOP_TELEOP);
         }
     }
 
-    EnumSendableChooser<RobotStatemachine.RobotState> robotStateChooser = new EnumSendableChooser<>(RobotState.values());
+    private void updateTeleopStateOverrides () {
+        if(OI.Overrides.forceHandoff.getAsBoolean()) {
+            shooterStatemachine.requestState(ShooterStatemachine.ShooterState.HANDOFF);
+            diverterStatemachine.requestState(FlipperStatemachine.FlipperState.HANDOFF);
+        }
+        if(OI.Overrides.forceAmp.getAsBoolean()) {
+            pivotStatemachine.requestState(PivotStatemachine.PivotState.AMP);
+            diverterStatemachine.requestState(FlipperStatemachine.FlipperState.ALIGN_AMP);
+        }
+    }
+
+    EnumSendableChooser<TeleopStatemachine.TeleopState> robotStateChooser = new EnumSendableChooser<>(TeleopState.values());
     EnumSendableChooser<SwerveState> swerveStateChooser = new EnumSendableChooser<>(SwerveState.values());
     EnumSendableChooser<FlywheelIntakeState> flywheelIntakeStateChooser = new EnumSendableChooser<>(FlywheelIntakeState.values());
     EnumSendableChooser<TriggerIntakeStatemachine.TriggerIntakeState> triggerIntakeStateChooser = new EnumSendableChooser<>(TriggerIntakeStatemachine.TriggerIntakeState.values());
@@ -142,14 +168,14 @@ public class RobotContainer {
 
     public void runTestDashboard () {
         if(SmartDashboard.getBoolean("Override Robot State", false)) {
-            robotStatemachine.requestState(robotStateChooser.getSelected());
+            teleopStatemachine.requestState(robotStateChooser.getSelected());
         } 
 
         if(SmartDashboard.getBoolean("Override Swerve State", false)) {
-            robotStatemachine.requestSwerveState(swerveStateChooser.getSelected());
+            teleopStatemachine.requestSwerveState(swerveStateChooser.getSelected());
         }
 
-        robotStatemachine.update();
+        teleopStatemachine.update();
 
         if(SmartDashboard.getBoolean("Override Flywheel Intake State", false)) {
             flywheelIntakeStatemachine.updateWithState(flywheelIntakeStateChooser.getSelected());
