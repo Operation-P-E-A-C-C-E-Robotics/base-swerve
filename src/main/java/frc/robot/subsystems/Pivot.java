@@ -46,7 +46,12 @@ public class Pivot {
     }
 
     public Rotation2d getPivotPosition () {
+        Reporter.report(pivotEncoder.getPosition().getStatus(), "Couldn't read pivot position");
         return Rotation2d.fromRotations(pivotMaster.getPosition().getValue());
+    }
+
+    public void engageBrake () {
+        //TODO
     }
 
     public boolean atSetpoint () {

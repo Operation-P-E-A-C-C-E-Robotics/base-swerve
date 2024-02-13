@@ -53,9 +53,10 @@ public class ClimberStatemachine extends StateMachine<ClimberStatemachine.Climbe
     @Override
     public boolean transitioning(){
         //done when we are at the desired position and the robot is balanced or we are not balancing
-        var atPosition = Math.abs(climber.getClimberPosition() - state.getPosition()) < extensionTolerance;
-        var balanced = Math.abs(robotRollSupplier.getAsDouble()) < balanceTolerance;
-        return !atPosition || !(balanced || !state.isBalance());
+        // var atPosition = Math.abs(climber.getClimberPosition() - state.getPosition()) < extensionTolerance;
+        // var balanced = Math.abs(robotRollSupplier.getAsDouble()) < balanceTolerance;
+        // return !atPosition || !(balanced || !state.isBalance());
+        return false;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Tracer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.AimPlanner;
@@ -82,11 +83,13 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
     private void updateState(){
     }
 
+    Tracer wut = new Tracer();
     /**
      * Make the robot attain the desired state
      */
     @Override
     public void update(){
+        wut.addEpoch("TeleopStatemachine.update(): start");
         updateState();
 
         SmartDashboard.putString("Robot State", state.name());
@@ -94,14 +97,14 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
         if (state == TeleopState.AUTO_AIM || state == TeleopState.SHOOT) {
             swerveStatemachine.requestState(SwerveState.AIM);
         }
-
-        swerveStatemachine.update();
-        flywheelIntakeStatemachine.updateWithState(state.getFlywheelIntakeState());
-        triggerIntakeStatemachine.updateWithState(state.getTriggerIntakeState());
-        shooterStatemachine.updateWithState(state.getShooterState());
-        pivotStatemachine.updateWithState(state.getPivotState());
-        diverterStatemachine.updateWithState(state.getDiverterState());
-        climberStatemachine.updateWithState(state.getClimberState());
+        flywheelIntakeStatemachine.requestState(state.getFlywheelIntakeState());
+        triggerIntakeStatemachine.requestState(state.getTriggerIntakeState());
+        shooterStatemachine.requestState(state.getShooterState());
+        pivotStatemachine.requestState(state.getPivotState());
+        diverterStatemachine.requestState(state.getDiverterState());
+        climberStatemachine.requestState(state.getClimberState());
+        wut.addEpoch("TeleopStatemachine.update(): states requested");
+        wut.printEpochs();
     }
 
     /**
@@ -118,14 +121,12 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
      */
     @Override
     public boolean transitioning(){
-        if(!flywheelIntakeStatemachine.transitioning()) return false;
-        if(!triggerIntakeStatemachine.transitioning()) return false;
-        if(!shooterStatemachine.transitioning()) return false;
-        if(!pivotStatemachine.transitioning()) return false;
-        if(!diverterStatemachine.transitioning()) return false;
-        if(!climberStatemachine.transitioning()) return false;
-        if(!swerveStatemachine.transitioning()) return false;
-        return true;
+        return flywheelIntakeStatemachine.transitioning() ||
+                triggerIntakeStatemachine.transitioning() ||
+                shooterStatemachine.transitioning() ||
+                pivotStatemachine.transitioning() ||
+                diverterStatemachine.transitioning() ||
+                climberStatemachine.transitioning();
     }
     
 

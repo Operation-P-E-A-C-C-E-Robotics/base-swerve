@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.Climber.*;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.lib.util.Reporter;
@@ -12,6 +13,9 @@ public class Climber {
     private TalonFX leftMotor = new TalonFX(climberLeftMotorId);
     private TalonFX rightMotor = new TalonFX(climberRightMotorId);
     //declare two TalonFXs, one for the left climber, one for the right climber
+
+    private PositionVoltage leftControl = new PositionVoltage(0);
+    private PositionVoltage rightControl = new PositionVoltage(0);
 
     private double setpoint = 0.0;
 
@@ -49,8 +53,9 @@ public class Climber {
      */
     public void setClimberPosition (double left, double right) {
         setpoint = (left + right) / 2;
-        Reporter.log(leftMotor.setPosition(left), "setting left climber position");                                 //ask sean  if this is ok :| sean: it's not ok, it's aok
-        Reporter.log(rightMotor.setPosition(right), "setting right climber position");
+
+        Reporter.log(leftMotor.setControl(leftControl.withPosition(left)), "setting left climber position");                                 //ask sean  if this is ok :| sean: it's not ok, it's aok
+        Reporter.log(rightMotor.setControl(rightControl.withPosition(right)), "setting right climber position");
     }
 
     //i changed this from a double to void so i could grab both values and store them in different variables.

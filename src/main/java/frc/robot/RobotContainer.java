@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Tracer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.EnumSendableChooser;
 import frc.robot.TeleopStatemachine.TeleopState;
@@ -82,34 +83,51 @@ public class RobotContainer {
         return teleopStatemachine;
     }
 
+    Tracer tracer = new Tracer();
+
     /**
      * The main update loop of the robot.
      * This is called periodically by the main robot class.
      * It updates the supersystem state, planners, and state machines.
      */
     public void run() {
+        tracer.addEpoch("RobotContainer.run(): start");
         motionPlanner.update();
+        tracer.addEpoch("motionPlanner.update()");
         aimPlanner.update();
+        tracer.addEpoch("aimPlanner.update()");
 
         if(RobotState.isTest()) {
             runTestDashboard();
+            tracer.addEpoch("runTestDashboard()");
             return;
         }
         if(RobotState.isTeleop()) {
             updateWantedTeleopState();
             teleopStatemachine.update();
+            tracer.addEpoch("teleopStatemachine.update()");
 
             updateTeleopStateOverrides();
+            tracer.addEpoch("updateTeleopStateOverrides()");
+            swerveStatemachine.update();
+            tracer.addEpoch("swerveStatemachine.update()");
             flywheelIntakeStatemachine.update();
+            tracer.addEpoch("flywheelIntakeStatemachine.update()");
             triggerIntakeStatemachine.update();
+            tracer.addEpoch("triggerIntakeStatemachine.update()");
             pivotStatemachine.update();
+            tracer.addEpoch("pivotStatemachine.update()");
             shooterStatemachine.update();
+            tracer.addEpoch("shooterStatemachine.update()");
             diverterStatemachine.update();
+            tracer.addEpoch("diverterStatemachine.update()");
             climberStatemachine.update();
+            tracer.addEpoch("climberStatemachine.update()");
         }
         if(RobotState.isAutonomous()) {
             //autoStatemachine.update();
         }
+        tracer.printEpochs();
     }
 
     private void updateWantedTeleopState () {
