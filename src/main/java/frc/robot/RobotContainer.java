@@ -50,7 +50,7 @@ public class RobotContainer {
     private final AimPlanner aimPlanner = new AimPlanner(
         () -> swerve.getPose(),
         () -> swerve.getChassisSpeeds(),
-        () -> true
+        OI.Inputs.enableShootWhileMoving
     );
 
     /* STATE MACHINES */
@@ -135,7 +135,7 @@ public class RobotContainer {
         if(OI.Swerve.isLockIn.getAsBoolean()) {
             teleopStatemachine.requestSwerveState(SwerveState.LOCK_IN);
         }
-        else if(!OI.Swerve.isFieldRelative.getAsBoolean()) {
+        else if(!OI.Swerve.isRobotCentric.getAsBoolean()) {
             teleopStatemachine.requestSwerveState(SwerveState.ROBOT_CENTRIC);
         }
         else {

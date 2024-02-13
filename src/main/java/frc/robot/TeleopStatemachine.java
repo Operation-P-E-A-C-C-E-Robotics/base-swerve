@@ -31,8 +31,8 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
     private final FlipperStatemachine diverterStatemachine;
     private final ClimberStatemachine climberStatemachine;
 
-    private final MotionPlanner intakeMotionPlanner;
-    private final AimPlanner aimPlanner;
+    // private final MotionPlanner intakeMotionPlanner;
+    // private final AimPlanner aimPlanner;
     //private final StageAvoidancePlanner stageAvoidancePlanner;
 
     public TeleopStatemachine (SwerveStatemachine swerveStatemachine, 
@@ -51,8 +51,8 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
         this.pivotStatemachine = pivotStatemachine;
         this.diverterStatemachine = diverterStatemachine;
         this.climberStatemachine = climberStatemachine;
-        this.intakeMotionPlanner = intakeMotionPlanner;
-        this.aimPlanner = aimPlanner;
+        // this.intakeMotionPlanner = intakeMotionPlanner;
+        // this.aimPlanner = aimPlanner;
         // this.stageAvoidancePlanner = stageAvoidancePlanner;
     }
 
@@ -132,14 +132,14 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
 
     public enum TeleopState {
         REST,
-        INTAKE,
-        INTAKE_FLYWHEEL (
+        STOW,
+        INTAKE_FRONT (
             FlywheelIntakeState.INTAKE,
             TriggerIntakeState.RETRACT,
             ShooterState.INTAKE,
             PivotState.INTAKE
         ),
-        INTAKE_TRIGGER (
+        INTAKE_BACK (
             FlywheelIntakeState.RETRACT,
             TriggerIntakeState.INTAKE,
             ShooterState.INTAKE
@@ -170,14 +170,14 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
             PivotState.AMP,
             FlipperState.PLACE_AMP
         ),
-        PRE_CLIMB(
+        ALIGN_CLIMB(
             ShooterState.RAMP_DOWN,
             PivotState.PRE_CLIMB
         ),
         CLIMB_EXTEND(
             TriggerIntakeState.AVOID,
             PivotState.CLIMB,
-            FlipperState.RETRACT, //possible climb state
+            FlipperState.RETRACT, //TODO possible climb state
             ClimberState.EXTEND
         ),
         CLIMB_RETRACT(
@@ -185,6 +185,12 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
             PivotState.CLIMB,
             FlipperState.RETRACT,
             ClimberState.RETRACT
+        ),
+        CLIMB_BALANCE(
+            TriggerIntakeState.AVOID,
+            PivotState.CLIMB,
+            FlipperState.RETRACT,
+            ClimberState.BALANCE
         ),
         HANDOFF(
             FlywheelIntakeState.RETRACT, 

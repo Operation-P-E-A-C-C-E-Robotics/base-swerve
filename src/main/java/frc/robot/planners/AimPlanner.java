@@ -1,7 +1,7 @@
 package frc.robot.planners;
 
 import java.util.function.Supplier;
-
+import java.util.function.BooleanSupplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -21,7 +21,7 @@ import frc.robot.Constants;
 public class AimPlanner {
     private final Supplier<Pose2d> robotPoseSupplier;
     private final Supplier<ChassisSpeeds> robotRelativeChassisSpeeds;
-    private final Supplier<Boolean> shootWhileMoving; // enable correction for drivetrain velocity
+    private final BooleanSupplier shootWhileMoving; // enable correction for drivetrain velocity
 
     private final Translation2d targetCenterTranslation = new Translation2d(0, 0);
 
@@ -44,7 +44,7 @@ public class AimPlanner {
     private double pivotAngularVelocity = 0;
     private double shooterAngularAcceleration = 0;
 
-    public AimPlanner (Supplier<Pose2d> robotPoseSupplier, Supplier<ChassisSpeeds> robotRelativeChassisSpeeds, Supplier<Boolean> shootWhileMoving) {
+    public AimPlanner (Supplier<Pose2d> robotPoseSupplier, Supplier<ChassisSpeeds> robotRelativeChassisSpeeds, BooleanSupplier shootWhileMoving) {
         this.robotPoseSupplier = robotPoseSupplier;
         this.robotRelativeChassisSpeeds = robotRelativeChassisSpeeds;
         this.shootWhileMoving = shootWhileMoving;
@@ -64,7 +64,7 @@ public class AimPlanner {
         SmartDashboard.putNumber("Pivot Angle", pivotAngle.getDegrees());
         SmartDashboard.putNumber("Exit Velocity", exitVelocity);
 
-        if(!shootWhileMoving.get()) {
+        if(!shootWhileMoving.getAsBoolean()) {
             drivetrainAngularVelocity = 0;
             pivotAngularVelocity = 0;
             shooterAngularAcceleration = 0;

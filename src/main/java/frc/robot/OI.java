@@ -16,30 +16,42 @@ public class OI {
         public static final DoubleSupplier rotation = () -> -driverJoystick.getRawAxis(0);
         public static final DoubleSupplier heading = () -> (double) -driverJoystick.getPOV();
         public static final BooleanSupplier useHeading = () -> driverJoystick.getPOV() != -1;
-        public static final BooleanSupplier isFieldRelative = () -> driverJoystick.getRawAxis(2) < 0.2;
+        public static final BooleanSupplier isRobotCentric = () -> driverJoystick.getRawAxis(2) > 0.2;
         public static final BooleanSupplier isLockIn = () -> driverJoystick.getRawAxis(3) > 0.2;
         public static final BooleanSupplier isZeroOdometry = () -> driverJoystick.getRawButton(7);
         public static final BooleanSupplier isOpenLoop = () -> true;
-        public static final BooleanSupplier isOverrideHeading = () -> false;
     }
-
+    
     public static class Modes {
         public static final BooleanSupplier wantsSpeakerMode = () -> false;
         public static final BooleanSupplier wantsAmpMode = () -> false;
         public static final BooleanSupplier wantsClimbMode = () -> false;
     }
 
+    public static class Inputs {
+        public static final BooleanSupplier wantsIntake = () -> false;
+        public static final BooleanSupplier wantsShoot = () -> false;
+        public static final BooleanSupplier wantsStow = () -> false;
+        public static final BooleanSupplier wantsPlace = () -> false; //general place button, varies by mode
+
+        public static final BooleanSupplier wantsAlign = () -> false;
+        public static final BooleanSupplier wantsBalance = () -> false;
+        public static final BooleanSupplier wantsClimbExtend = () -> false;
+        public static final BooleanSupplier wantsClimbRetract = () -> false;
+
+        public static final BooleanSupplier enableShootWhileMoving = () -> false;
+    }
+    
     public static class Overrides {
         /* MODE OVERRIDES */ //overrides the state requested by the mode
         public static final BooleanSupplier forceAim = () -> false;
         public static final BooleanSupplier forceIntakeFront = () -> false;
         public static final BooleanSupplier forceIntakeBack = () -> false;
-       
-        /* STATE OVERRIDES */ //overrides the state requested by the teleop state machine
         public static final BooleanSupplier forceHandoff = () -> false;
         public static final BooleanSupplier forceAmp = () -> false;
-
+        
         /* DIRECT OVERRIDES */ //directly sets the state of the subsystem
+        public static final BooleanSupplier disableAutoHeading = () -> false;
         public static final BooleanSupplier forceTrigger = () -> false;
         public static final BooleanSupplier eject = () -> false;
     }
@@ -48,6 +60,8 @@ public class OI {
         public static final DoubleSupplier jogTrigger = () -> 0.0;
         public static final DoubleSupplier jogPivot = () -> 0.0;
         public static final DoubleSupplier jogClimber = () -> 0.0;
+
+        public static final BooleanSupplier resetManualInputs = () -> false;
     }
 
     private static final double swerveCurrentRumbleThreshold = 40; //Amps
