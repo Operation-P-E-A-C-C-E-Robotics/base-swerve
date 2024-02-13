@@ -359,7 +359,7 @@ System.out.println("             <_______><_______>");
  * had put in so much effort, and I was the only one who knew that I had failed. It was quite frustrating.
  *    The next year, still no competitions. Finally, one offseason event was run, and I was able to get some
  * real experience running code on a robot. Once again, however, an embarrasing failure. Since I had gone so
- * long without ever going to a competition, I was used to f-5ing the code to run it. Unfortunately, this
+ * long without ever going to a competition, I was used to using <F-5> to run code. Unfortunately, this
  * debugs the code, rather than deploying the code - deleting all the code on the robot. Thanks to this little
  * mistake, the robot failed to move during two of our matches. We placed dead last in the event.
  *    Finally, the 2022 season - a full season. Time to finally prove myself. We built a solidly mediocre robot,
@@ -401,19 +401,6 @@ System.out.println("             <_______><_______>");
  * Then, it never worked again. I was so shortsighted and had so much build-up cognitive bias (as did
  * the team as a whole) that i couln't see how the automation was killing our change of success.
  * We needed more driver practice, not more automation. (swerve would have helped too).
- *    All this wouldn't have been so frustrating if it weren't for the worst part: lack of appreciation.
- * It was just like the minibot. Hundreds of hours and thousands of lines in. Carefully refined,
- * documented. I obsessively organized the code to refute the claims of "your code is hard to read",
- * but it did nothing. I considered for hours, all the possible control schemes, different position
- * controllers, anything I could do to control this monstrosity of an arm in a cohesive manner.
- * I spent hours wrestling with these position controllers in the simulation. I did things no other
- * teams have done; I made my own motion profiles that could be generated in real time.
- * We could generate trajectories for any setpoint from any position, and somehow, miraculously,
- * manipulate all 5 degrees of freedom in unison to get there, with extreme precision, and speed.
- * And the only thing the team could see was that the apriltags on the field were an inch off so
- * we missed. The only feedback I got was "it doesn't work", and "it's too complicated".
- *    Now, I'm also not blaming anyone else for these failures because I was involved in the design
- * as well. However, maybe give your programmers a little appreciacion. 
  *    I would be very, very surprised if anyone actually reads this, but if you do, I hope you enjoyed it.
  * I'm literally the only one who looks at the code. It makes me sad, because this code is honestly
  * special to me. I want people to see it. It has many comments on the assumption that
@@ -421,11 +408,12 @@ System.out.println("             <_______><_______>");
  * in the hopes that some future programmer will find them and smile, and maybe look back and say, "wow, this
  * guy was a real asshole, but he was a pretty good programmer".
  *    So, that brings us to my final season - 2024. I'm a senior. I'm old. I'm a veteran. So,
- * I'm going to do what I do best: write code. I'm going to do my best to make this the best damn season
+ * I'm going to do what I do best: write code. I'm going to do my best to make this the best season
  * this team has ever seen. I'm going to write code that's so good that it's impossible to ignore (and, 
  * most importantly, "actually works"). So, maybe I do write code that's too complicated. Maybe I do
- * write code that's too hard to read. Maybe I'm still an asshole. And maybe, just maybe, we're all just
- * assholes who don't know anything about anything.
+ * write code that's too hard to read. But, I'm going to do my best to make it work. I'm going to do my
+ * best to make it work, and I'm going to do my best to make it work, and I'm going to do my best to make
+ * it work, and I'm going to do my best to make it work, and I'm going to do my best to make it work, and
  *    But we're going to worlds this year.
  * - Peaccy, a.k.a. Sean Benham, a.k.a. "the programmer" - 00:00 12/23/23
  * (also the driver and co-captain and CAD guy)

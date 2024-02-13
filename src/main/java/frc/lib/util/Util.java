@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Contains basic functions that are used often.

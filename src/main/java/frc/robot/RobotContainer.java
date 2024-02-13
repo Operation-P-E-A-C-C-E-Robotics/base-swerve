@@ -103,55 +103,50 @@ public class RobotContainer {
             return;
         }
         if(RobotState.isTeleop()) {
-            updateWantedTeleopState();
+            teleopStatemachine.requestState(TeleopInputs.getInstance().getWantedTeleopState());
+            swerveStatemachine.requestState(TeleopInputs.getInstance().getWantedSwerveState());
+
+
             teleopStatemachine.update();
             tracer.addEpoch("teleopStatemachine.update()");
 
-            updateTeleopStateOverrides();
-            tracer.addEpoch("updateTeleopStateOverrides()");
             swerveStatemachine.update();
             tracer.addEpoch("swerveStatemachine.update()");
+
+
             flywheelIntakeStatemachine.update();
             tracer.addEpoch("flywheelIntakeStatemachine.update()");
+
             triggerIntakeStatemachine.update();
             tracer.addEpoch("triggerIntakeStatemachine.update()");
+
             pivotStatemachine.update();
             tracer.addEpoch("pivotStatemachine.update()");
+
             shooterStatemachine.update();
             tracer.addEpoch("shooterStatemachine.update()");
+
             diverterStatemachine.update();
             tracer.addEpoch("diverterStatemachine.update()");
+            
             climberStatemachine.update();
             tracer.addEpoch("climberStatemachine.update()");
+
+            if(OI.Overrides.forceTrigger.getAsBoolean()) {
+                shooter.setTrigerPercent(1);
+            }
+            if(OI.Overrides.eject.getAsBoolean()) {
+                flywheelIntake.setRollerSpeed(-1);
+                triggerIntake.setRollerSpeed(-1);
+                shooter.setTrigerPercent(-1);
+                shooter.setFlywheelPercent(1);
+                diverter.setDiverterRoller(1);
+            }
         }
         if(RobotState.isAutonomous()) {
             //autoStatemachine.update();
         }
         tracer.printEpochs();
-    }
-
-    private void updateWantedTeleopState () {
-        //swerve state
-        if(OI.Swerve.isLockIn.getAsBoolean()) {
-            teleopStatemachine.requestSwerveState(SwerveState.LOCK_IN);
-        }
-        else if(!OI.Swerve.isRobotCentric.getAsBoolean()) {
-            teleopStatemachine.requestSwerveState(SwerveState.ROBOT_CENTRIC);
-        }
-        else {
-            teleopStatemachine.requestSwerveState(OI.Swerve.isOpenLoop.getAsBoolean() ? SwerveState.OPEN_LOOP_TELEOP : SwerveState.CLOSED_LOOP_TELEOP);
-        }
-    }
-
-    private void updateTeleopStateOverrides () {
-        if(OI.Overrides.forceHandoff.getAsBoolean()) {
-            shooterStatemachine.requestState(ShooterStatemachine.ShooterState.HANDOFF);
-            diverterStatemachine.requestState(FlipperStatemachine.FlipperState.HANDOFF);
-        }
-        if(OI.Overrides.forceAmp.getAsBoolean()) {
-            pivotStatemachine.requestState(PivotStatemachine.PivotState.AMP);
-            diverterStatemachine.requestState(FlipperStatemachine.FlipperState.ALIGN_AMP);
-        }
     }
 
     EnumSendableChooser<TeleopStatemachine.TeleopState> robotStateChooser = new EnumSendableChooser<>(TeleopState.values());
