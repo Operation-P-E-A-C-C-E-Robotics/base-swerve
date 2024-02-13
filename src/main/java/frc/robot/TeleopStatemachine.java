@@ -63,6 +63,10 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
      */
     @Override
     public void requestState(TeleopState state){
+        if(state == TeleopState.INTAKE_FRONT && this.state == TeleopState.CLIMB_RETRACT) return;
+        if(state == TeleopState.INTAKE_BACK && this.state == TeleopState.CLIMB_RETRACT) return;
+        if(state == TeleopState.PLACE_TRAP && this.state != TeleopState.CLIMB_RETRACT) return;
+        
         this.state = state;
     }
 
@@ -191,12 +195,6 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
             ShooterState.RAMP_DOWN,
             PivotState.CLIMB,
             FlipperState.PLACE_TRAP
-        ),
-        INTAKE_AND_AIM( // intake with the trigger intake while the shooter and pivot are aiming
-            FlywheelIntakeState.AVOID,
-            TriggerIntakeState.INTAKE,
-            ShooterState.AUTO_AIM, // TODO needs it's own state
-            PivotState.AUTO_AIM
         );
 
         private FlywheelIntakeState flywheelIntakeState;

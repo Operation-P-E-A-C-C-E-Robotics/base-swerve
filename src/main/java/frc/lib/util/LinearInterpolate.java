@@ -29,7 +29,7 @@ public class LinearInterpolate {
         return (this.y[i + 1] - this.y[i]) / (this.x[i + 1] - this.x[i]);
     }
 
-    private double interpolate (double x, double x0, double x1, double y0, double y1) {
+    public static double interpolate (double x, double x0, double x1, double y0, double y1) {
         return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
     }
 

@@ -52,7 +52,6 @@ public class AimPlanner {
 
     public void update() {
         Pose2d blueOriginPose = AllianceFlipUtil.apply(robotPoseSupplier.get());
-        SmartDashboard.putString("aim fixed pose", blueOriginPose.toString());
         double distanceToTarget = blueOriginPose.getTranslation().getDistance(targetCenterTranslation);
 
         Rotation2d angleToTarget = blueOriginPose.getTranslation().minus(targetCenterTranslation).getAngle();
