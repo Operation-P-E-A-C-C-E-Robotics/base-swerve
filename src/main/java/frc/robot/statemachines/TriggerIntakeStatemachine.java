@@ -69,10 +69,10 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
     public enum TriggerIntakeState{
         //TODO
         RETRACT(Rotation2d.fromDegrees(0),0.0),
-        EXTEND(Rotation2d.fromDegrees(0),0.0),
-        INTAKE(Rotation2d.fromDegrees(0),0.0),
-        AVOID(Rotation2d.fromDegrees(0),0.0),
-        EJECT(Rotation2d.fromDegrees(0),0.0);
+        EXTEND(Rotation2d.fromDegrees(70),0.0),
+        INTAKE(Rotation2d.fromDegrees(90),0.0),
+        AVOID(Rotation2d.fromDegrees(50),0.0),
+        EJECT(Rotation2d.fromDegrees(50),0.0);
         
         private Rotation2d deployAngle;
         private Double speed;

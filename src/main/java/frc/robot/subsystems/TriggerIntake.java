@@ -29,8 +29,8 @@ public class TriggerIntake {
         
         deployMotor.setSoftLimit(SoftLimitDirection.kForward, triggerIntakeDeployMaxAngle);
         deployMotor.setSoftLimit(SoftLimitDirection.kReverse, triggerIntakeDeployMinAngle);
-        deployMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
-        deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+        deployMotor.enableSoftLimit(SoftLimitDirection.kForward, false);
+        deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
 
         deployController.setP(triggerIntakeDeployKp);
         deployController.setI(triggerIntakeDeployKi);

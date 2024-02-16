@@ -24,7 +24,10 @@ public class AimPlanner {
     private final Supplier<ChassisSpeeds> robotRelativeChassisSpeeds;
     private final BooleanSupplier shootWhileMoving; // enable correction for drivetrain velocity
 
-    private final Translation2d targetCenterTranslation = new Translation2d(0, 0);
+    private final Translation2d targetCenterTranslation = new Translation2d(
+        FieldConstants.Speaker.centerSpeakerOpening.getX(),
+        FieldConstants.Speaker.centerSpeakerOpening.getY()
+    );
 
     private final double[][] distanceCalibrationData = {
         {90, 80}, // pivot angles (deg)

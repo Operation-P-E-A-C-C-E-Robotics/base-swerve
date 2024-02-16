@@ -32,8 +32,8 @@ public class FlywheelIntake {
         //for this code that it will break its own neck without warning
         Reporter.report(deployMotor.setSoftLimit(SoftLimitDirection.kForward, flywheelIntakeDeployMaxAngle), "Couldn't set front intake forward soft limit");
         Reporter.report(deployMotor.setSoftLimit(SoftLimitDirection.kReverse, flywheelIntakeDeployMinAngle), "Couldn't set front intake reverse soft limit");
-        Reporter.report(deployMotor.enableSoftLimit(SoftLimitDirection.kForward, true), "Couldn't enable front intake forward soft limit");
-        Reporter.report(deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, true), "Couldn't enable front intake reverse soft limit");
+        Reporter.report(deployMotor.enableSoftLimit(SoftLimitDirection.kForward, false), "Couldn't enable front intake forward soft limit");
+        Reporter.report(deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, false), "Couldn't enable front intake reverse soft limit");
 
         Reporter.report(deployPIDController.setP(flywheelIntakeDeployKp), "Couldn't configure front intake pid");   //Hehe, thats funny, it spells PID.... WAIT
         deployPIDController.setI(flywheelIntakeDeployKi);

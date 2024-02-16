@@ -15,8 +15,8 @@ public class OI {
         public static final DoubleSupplier strafe = () -> -driverJoystick.getRawAxis(2);
         public static final DoubleSupplier rotation = () -> -driverJoystick.getRawAxis(0);
         public static final DoubleSupplier heading = () -> (double) -driverJoystick.getPOV();
-        public static final BooleanSupplier useHeading = () -> false;//driverJoystick.getPOV() != -1;
-        public static final BooleanSupplier isRobotCentric = () -> true;//driverJoystick.getRawAxis(2) > 0.2;
+        public static final BooleanSupplier useHeading = () -> driverJoystick.getPOV() != -1;
+        public static final BooleanSupplier isRobotCentric = () -> false;//driverJoystick.getRawAxis(2) > 0.2;
         public static final BooleanSupplier isLockIn = () -> false;//driverJoystick.getRawAxis(3) > 0.2;
         public static final BooleanSupplier isZeroOdometry = () -> false;//driverJoystick.getRawButton(7);
         public static final BooleanSupplier isOpenLoop = () -> true;
@@ -39,19 +39,19 @@ public class OI {
         public static final BooleanSupplier wantsClimbExtend = () -> false;
         public static final BooleanSupplier wantsClimbRetract = () -> false;
 
-        public static final BooleanSupplier enableShootWhileMoving = () -> false;
+        public static final BooleanSupplier enableShootWhileMoving = () -> true;
     }
     
     public static class Overrides {
         /* MODE OVERRIDES */ //overrides the state requested by the mode
         public static final BooleanSupplier forceAim = () -> false;
-        public static final BooleanSupplier forceIntakeFront = () -> false;
-        public static final BooleanSupplier forceIntakeBack = () -> false;
+        public static final BooleanSupplier forceIntakeFront = () -> driverJoystick.getRawButton(1);
+        public static final BooleanSupplier forceIntakeBack = () -> driverJoystick.getRawButton(2);
         public static final BooleanSupplier forceHandoff = () -> false;
         public static final BooleanSupplier forceAmp = () -> false;
         
         /* DIRECT OVERRIDES */ //directly sets the state of the subsystem
-        public static final BooleanSupplier disableAutoHeading = () -> true;
+        public static final BooleanSupplier disableAutoHeading = () -> false;
         public static final BooleanSupplier forceTrigger = () -> false;
         public static final BooleanSupplier eject = () -> false;
     }

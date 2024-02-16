@@ -58,10 +58,10 @@ public class FlywheelIntakeStatemachine extends StateMachine<FlywheelIntakeState
     public enum FlywheelIntakeState{
         //TODO
         RETRACT(Rotation2d.fromDegrees(0),0.0),
-        EXTEND(Rotation2d.fromDegrees(0),0.0),
-        INTAKE(Rotation2d.fromDegrees(0),1.0),
-        AVOID(Rotation2d.fromDegrees(0),0.0),
-        EJECT(Rotation2d.fromDegrees(0),-1.0);
+        EXTEND(Rotation2d.fromDegrees(70),0.0),
+        INTAKE(Rotation2d.fromDegrees(70),1.0),
+        AVOID(Rotation2d.fromDegrees(40),0.0),
+        EJECT(Rotation2d.fromDegrees(40),-1.0);
         
         private Rotation2d deployAngle;
         private Double speed;

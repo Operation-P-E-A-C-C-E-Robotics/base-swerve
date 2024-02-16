@@ -77,18 +77,18 @@ public final class Constants {
   }
 
   public static final class FlywheelIntake {
-    public static final int flywheelIntakeDeployMotorId = 18;
-    public static final int flywheelIntakeRollerMotorId = 19;
+    public static final int flywheelIntakeDeployMotorId = 19;
+    public static final int flywheelIntakeRollerMotorId = 18;
 
-    public static final double flywheelIntakeDeployKp = 0.02;
+    public static final double flywheelIntakeDeployKp = 2;
     public static final double flywheelIntakeDeployKi = 0;
     public static final double flywheelIntakeDeployKd = 0;
 
     public static final float flywheelIntakeDeployMinAngle = 0.0f;
     public static final float flywheelIntakeDeployMaxAngle = 360.0f;
 
-    public static final double flywheelIntakeDeployGearing = 1;
-    public static final double flywheelIntakeDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
+    public static final double flywheelIntakeDeployGearing = 0.01;
+    public static final double flywheelIntakeDeployTolerance = 1; //how close to the target position the deployer needs to be to be considered "deployed"
 
     public static final boolean flywheelIntakeDeployMotorInverted = false;
     public static final boolean flywheelIntakeRollerMotorInverted = false;
@@ -98,17 +98,17 @@ public final class Constants {
     public static final int triggerIntakeRollerMotorId = 16;
     public static final int triggerIntakeDeployMotorId = 17;
 
-    public static final double triggerIntakeDeployKp = 0.02;
+    public static final double triggerIntakeDeployKp = 2;
     public static final double triggerIntakeDeployKi = 0;
     public static final double triggerIntakeDeployKd = 0;
 
-    public static final double triggerIntakeDeployGearing = 1;
+    public static final double triggerIntakeDeployGearing = 0.01;
     public static final double triggerIntakeDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
 
     public static final float triggerIntakeDeployMinAngle = 0.0f;
     public static final float triggerIntakeDeployMaxAngle = 360.0f;
 
-    public static final boolean triggerIntakeDeployMotorInverted = false;
+    public static final boolean triggerIntakeDeployMotorInverted = true;
     public static final boolean triggerIntakeRollerMotorInverted = false;
   }
 
@@ -247,7 +247,7 @@ public final class Constants {
 
 
     /* CTRE SWERVE CONSTANTS */
-    public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(24.75));
+    public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(18.75));
 
     /*change from dev drivebase
      * front left -> rear right
@@ -284,7 +284,7 @@ public final class Constants {
     public static final boolean invertSteerMotors = Robot.isReal(); //cant invert in simulation which is dumb.
 
     /* HEADING CONTROLLER CONSTANTS */
-    public static final double autoHeadingKP = 500;
+    public static final double autoHeadingKP = 1000;
     public static final double autoHeadingKI = 0.0; //DOES NOTHING LOL
     public static final double autoHeadingKD = 0.0; //ALSO DOES NOTHING LOL
     public static final double autoHeadingKV = 0.7;

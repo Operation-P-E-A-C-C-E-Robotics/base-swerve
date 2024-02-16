@@ -17,6 +17,7 @@ import frc.robot.statemachines.SwerveStatemachine;
 import frc.robot.statemachines.TriggerIntakeStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine.FlywheelIntakeState;
 import frc.robot.statemachines.SwerveStatemachine.SwerveState;
+import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Diverter;
 import frc.robot.subsystems.FlywheelIntake;
@@ -114,10 +115,10 @@ public class RobotContainer {
             tracer.addEpoch("swerveStatemachine.update()");
 
 
-            // flywheelIntakeStatemachine.update();
+            flywheelIntakeStatemachine.update();
             // tracer.addEpoch("flywheelIntakeStatemachine.update()");
 
-            // triggerIntakeStatemachine.update();
+            triggerIntakeStatemachine.update();
             // tracer.addEpoch("triggerIntakeStatemachine.update()");
 
             // pivotStatemachine.update();
