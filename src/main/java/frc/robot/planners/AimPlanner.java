@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.LinearInterpolate;
 import frc.robot.Constants;
+import frc.robot.FieldConstants;
 
 /**
  * In charge of calculating the correct angles for the pivot and drivetrain,

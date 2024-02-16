@@ -114,23 +114,23 @@ public class RobotContainer {
             tracer.addEpoch("swerveStatemachine.update()");
 
 
-            flywheelIntakeStatemachine.update();
-            tracer.addEpoch("flywheelIntakeStatemachine.update()");
+            // flywheelIntakeStatemachine.update();
+            // tracer.addEpoch("flywheelIntakeStatemachine.update()");
 
-            triggerIntakeStatemachine.update();
-            tracer.addEpoch("triggerIntakeStatemachine.update()");
+            // triggerIntakeStatemachine.update();
+            // tracer.addEpoch("triggerIntakeStatemachine.update()");
 
-            pivotStatemachine.update();
-            tracer.addEpoch("pivotStatemachine.update()");
+            // pivotStatemachine.update();
+            // tracer.addEpoch("pivotStatemachine.update()");
 
-            shooterStatemachine.update();
-            tracer.addEpoch("shooterStatemachine.update()");
+            // shooterStatemachine.update();
+            // tracer.addEpoch("shooterStatemachine.update()");
 
-            diverterStatemachine.update();
-            tracer.addEpoch("diverterStatemachine.update()");
+            // diverterStatemachine.update();
+            // tracer.addEpoch("diverterStatemachine.update()");
             
-            climberStatemachine.update();
-            tracer.addEpoch("climberStatemachine.update()");
+            // climberStatemachine.update();
+            // tracer.addEpoch("climberStatemachine.update()");
 
             if(OI.Overrides.forceTrigger.getAsBoolean()) {
                 shooter.setTrigerPercent(1);

@@ -251,6 +251,10 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             }
         }
 
+        if(OI.Overrides.disableAutoHeading.getAsBoolean()) {
+            request.withHoldHeading(false).withLockHeading(false).withSoftHoldHeading(false);
+        }
+
         //yay peaccyrequest,
         //(my beautiful swerve request),
         //will handle the rest :D,

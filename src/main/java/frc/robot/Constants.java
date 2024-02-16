@@ -38,9 +38,9 @@ public final class Constants {
   }
 
   public static final class Shooter {
-    public static final int upperFlywheelMotorId = 50; //will be 13 once swerve ids fixed
-    public static final int lowerFlywheelMotorId = 14;
-    public static final int triggerMotorId = 15;
+    public static final int upperFlywheelMotorId = 27; //will be 13 once swerve ids fixed
+    public static final int lowerFlywheelMotorId = 29;
+    public static final int triggerMotorId = 28;
 
     public static final int flywheelSwitchId = 0;
     public static final int triggerSwitchId = 1;
@@ -77,10 +77,10 @@ public final class Constants {
   }
 
   public static final class FlywheelIntake {
-    public static final int flywheelIntakeDeployMotorId = 16;
-    public static final int flywheelIntakeRollerMotorId = 17;
+    public static final int flywheelIntakeDeployMotorId = 18;
+    public static final int flywheelIntakeRollerMotorId = 19;
 
-    public static final double flywheelIntakeDeployKp = 0;
+    public static final double flywheelIntakeDeployKp = 0.02;
     public static final double flywheelIntakeDeployKi = 0;
     public static final double flywheelIntakeDeployKd = 0;
 
@@ -95,10 +95,10 @@ public final class Constants {
   }
 
   public static final class TriggerIntake {
-    public static final int triggerIntakeRollerMotorId = 18;
-    public static final int triggerIntakeDeployMotorId = 19;
+    public static final int triggerIntakeRollerMotorId = 16;
+    public static final int triggerIntakeDeployMotorId = 17;
 
-    public static final double triggerIntakeDeployKp = 0;
+    public static final double triggerIntakeDeployKp = 0.02;
     public static final double triggerIntakeDeployKi = 0;
     public static final double triggerIntakeDeployKd = 0;
 
@@ -113,9 +113,9 @@ public final class Constants {
   }
 
   public static final class Pivot {
-    public static final int pivotMasterID = 20;
-    public static final int pivotSlaveID = 21;
-    public static final int pivotCANCoderID = 0;
+    public static final int pivotMasterID = 22;
+    public static final int pivotSlaveID = 24;
+    public static final int pivotCANCoderID = 25;
 
     public static final double restingAngle = 0; //rotations
 
@@ -152,8 +152,8 @@ public final class Constants {
   }
 
   public static final class Diverter {
-    public static final int diverterRollerMotorId = 22;
-    public static final int diverterDeployMotorId = 23;
+    public static final int diverterRollerMotorId = 50;
+    public static final int diverterDeployMotorId = 26;
 
     public static final double diverterDeployGearRatio = 1;
     public static final double diverterDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
@@ -191,8 +191,8 @@ public final class Constants {
   }
 
   public static final class Climber {
-    public static final int climberLeftMotorId = 24;
-    public static final int climberRightMotorId = 25;
+    public static final int climberLeftMotorId = 21;
+    public static final int climberRightMotorId = 23;
 
     public static final double climberGearRatio = 1;
 
@@ -249,16 +249,29 @@ public final class Constants {
     /* CTRE SWERVE CONSTANTS */
     public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(24.75));
 
+    /*change from dev drivebase
+     * front left -> rear right
+     * front right to rear left
+     * rear left to front right
+     * rear right to front left
+     */
+
     //to: whoever did this; why did you label the modules differetly on the robot vs the tuner????? -love, peaccy
-    public static final CANIDs frontLeftIDs =   new CANIDs(8,   10,   9); //module 3 (tuner) / 2 (robot)
-    public static final CANIDs frontRighIDs =   new CANIDs(5,   7,    6); //module (tuner) 2 / (robot) 1
-    public static final CANIDs rearLeftIDs =    new CANIDs(11,  13,   12); //module (tuner) 4 / (robot) 3
-    public static final CANIDs rearRightIDs =   new CANIDs(2,   4,    3); //module (tuner) 1 / (robot) 0
+    public static final CANIDs frontLeftIDs =   new CANIDs(4,   5,    6); //module 0
+    public static final CANIDs rearLeftIDs =   new CANIDs(7,   8,    9); //module 1
+    public static final CANIDs rearRightIDs =   new CANIDs(10,   11,   12); //module 2
+    public static final CANIDs frontRightIDs =    new CANIDs(13,  14,   15); //module 3
 
     public static final Gearing gearing = new Gearing(DriveGearRatios.SDSMK4i_L2, ((150.0 / 7.0) / 1.0), (3.85/2), 0);
-    public static final EncoderOffsets offsets = new EncoderOffsets(-0.488770, -0.225342, -0.224609, -0.906738); //todo these offsets are very wrong.
+    // public static final EncoderOffsets offsets = new EncoderOffsets(-0.488770, -0.225342, -0.224609, -0.906738); //todo these offsets are very wrong.
+    public static final EncoderOffsets offsets = new EncoderOffsets(
+      -0.409424, //Front Left, module 0
+      0.277344, //Front Right, module 3
+      -0.412109,  // Rear Left, module 1
+      -0.307861); //Rear Right, module 2
 
-    public static final Inversion inversion = new Inversion(false, true, true, false); //herra 4.5, 6
+    // public static final Inversion inversion = new Inversion(false, true, true, false); //herra 4.5, 6
+    public static final Inversion inversion = new Inversion(false, true, false, true);
 
     //inertia only used for simulation
     public static final Physics physics = new Physics(0.05,0.01, Robot.isReal() ? 50 : 800, 10);
@@ -267,14 +280,14 @@ public final class Constants {
     public static final PidGains driveGains = new PidGains(0.35, 0, 0, 0.11, 0.3); 
     public static final PidGains angleGains = new PidGains(90, 0, 0.001, 0, 0);
 
-    public static final int pigeonCANId = 14;
+    public static final int pigeonCANId = 3;
     public static final boolean invertSteerMotors = Robot.isReal(); //cant invert in simulation which is dumb.
 
     /* HEADING CONTROLLER CONSTANTS */
-    public static final double autoHeadingKP = 2000;//500;
+    public static final double autoHeadingKP = 500;
     public static final double autoHeadingKI = 0.0; //DOES NOTHING LOL
     public static final double autoHeadingKD = 0.0; //ALSO DOES NOTHING LOL
-    public static final double autoHeadingKV = 10;//0.7;
+    public static final double autoHeadingKV = 0.7;
     public static final double autoHeadingKA = 0.02;
     public static final double autoHeadingMaxVelocity = 3; //deg/s (i think)
     public static final double autoHeadingMaxAcceleration = 10; //deg/s^2
@@ -313,8 +326,10 @@ public final class Constants {
   }
 
   public static final class ControlSystem {
-    public static final int PDPCanId = 0;
-    public static final ModuleType PDPModuleType = ModuleType.kCTRE;
+    public static final int PDPCanId = 2;
+    public static final int PCHCanId = 1;
+
+    public static final ModuleType PDPModuleType = ModuleType.kRev;
   }
 
   public static final class Field{

@@ -11,14 +11,14 @@ public class OI {
     private static final Joystick driverJoystick = new Joystick(0);
     private static final Joystick operatorJoystick = new Joystick(1);
     public static class Swerve{
-        public static final DoubleSupplier translation = () -> -driverJoystick.getRawAxis(5);
-        public static final DoubleSupplier strafe = () -> -driverJoystick.getRawAxis(4);
+        public static final DoubleSupplier translation = () -> -driverJoystick.getRawAxis(3);
+        public static final DoubleSupplier strafe = () -> -driverJoystick.getRawAxis(2);
         public static final DoubleSupplier rotation = () -> -driverJoystick.getRawAxis(0);
         public static final DoubleSupplier heading = () -> (double) -driverJoystick.getPOV();
-        public static final BooleanSupplier useHeading = () -> driverJoystick.getPOV() != -1;
-        public static final BooleanSupplier isRobotCentric = () -> driverJoystick.getRawAxis(2) > 0.2;
-        public static final BooleanSupplier isLockIn = () -> driverJoystick.getRawAxis(3) > 0.2;
-        public static final BooleanSupplier isZeroOdometry = () -> driverJoystick.getRawButton(7);
+        public static final BooleanSupplier useHeading = () -> false;//driverJoystick.getPOV() != -1;
+        public static final BooleanSupplier isRobotCentric = () -> true;//driverJoystick.getRawAxis(2) > 0.2;
+        public static final BooleanSupplier isLockIn = () -> false;//driverJoystick.getRawAxis(3) > 0.2;
+        public static final BooleanSupplier isZeroOdometry = () -> false;//driverJoystick.getRawButton(7);
         public static final BooleanSupplier isOpenLoop = () -> true;
     }
     
@@ -51,7 +51,7 @@ public class OI {
         public static final BooleanSupplier forceAmp = () -> false;
         
         /* DIRECT OVERRIDES */ //directly sets the state of the subsystem
-        public static final BooleanSupplier disableAutoHeading = () -> false;
+        public static final BooleanSupplier disableAutoHeading = () -> true;
         public static final BooleanSupplier forceTrigger = () -> false;
         public static final BooleanSupplier eject = () -> false;
     }
