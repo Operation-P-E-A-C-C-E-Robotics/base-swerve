@@ -19,6 +19,10 @@ import frc.robot.statemachines.PivotStatemachine.PivotState;
 import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 
+/**
+ * This controls the state of the whole robot by setting the states
+ * of all the subsystems' state machines.
+ */
 public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopState>{
     private TeleopState state = TeleopState.REST;
     
@@ -63,8 +67,11 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
      */
     @Override
     public void requestState(TeleopState state){
+        //no intaking while climbing
         if(state == TeleopState.INTAKE_FRONT && this.state == TeleopState.CLIMB_RETRACT) return;
         if(state == TeleopState.INTAKE_BACK && this.state == TeleopState.CLIMB_RETRACT) return;
+
+        //cant place trap until we are done climbing
         if(state == TeleopState.PLACE_TRAP && this.state != TeleopState.CLIMB_RETRACT) return;
         
         this.state = state;
@@ -94,7 +101,7 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
 
     /**
      * Get the state that is currently being
-     * requested by the state machine
+     * executed by the state machine
      */
     @Override
     public TeleopState getState(){

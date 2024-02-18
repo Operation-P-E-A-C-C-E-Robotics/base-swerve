@@ -38,7 +38,7 @@ public final class Constants {
   }
 
   public static final class Shooter {
-    public static final int upperFlywheelMotorId = 27; //will be 13 once swerve ids fixed
+    public static final int upperFlywheelMotorId = 27;
     public static final int lowerFlywheelMotorId = 29;
     public static final int triggerMotorId = 28;
 
@@ -69,6 +69,10 @@ public final class Constants {
       flywheelConfigs.Feedback.SensorToMechanismRatio = flywheelGearRatio;
     }
 
+    public static final boolean topFlywheelMotorInverted = false;
+    public static final boolean bottomFlywheelMotorInverted = false;
+    public static final boolean triggerMotorInverted = false;
+
     public static final double flywheelEfficiency = 1; // percentage of flywheel surface speed to exit velocity
     public static final double flywheelTolerance = 0; //how close to the target velocity the flywheel needs to be considered ready
 
@@ -85,13 +89,16 @@ public final class Constants {
     public static final double flywheelIntakeDeployKd = 0;
 
     public static final float flywheelIntakeDeployMinAngle = 0.0f;
-    public static final float flywheelIntakeDeployMaxAngle = 360.0f;
+    public static final float flywheelIntakeDeployMaxAngle = 0.0f;
 
     public static final double flywheelIntakeDeployGearing = 0.01;
     public static final double flywheelIntakeDeployTolerance = 1; //how close to the target position the deployer needs to be to be considered "deployed"
 
     public static final boolean flywheelIntakeDeployMotorInverted = false;
     public static final boolean flywheelIntakeRollerMotorInverted = false;
+
+    public static final int flywheelIntakeDeployFreeCurrentLimit = 10; //TODO low for testing
+    public static final int flywheelIntakeDeployStallCurrentLimit = 5; //TODO low for testing
   }
 
   public static final class TriggerIntake {
@@ -106,15 +113,18 @@ public final class Constants {
     public static final double triggerIntakeDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
 
     public static final float triggerIntakeDeployMinAngle = 0.0f;
-    public static final float triggerIntakeDeployMaxAngle = 360.0f;
+    public static final float triggerIntakeDeployMaxAngle = 0.0f;
 
     public static final boolean triggerIntakeDeployMotorInverted = true;
     public static final boolean triggerIntakeRollerMotorInverted = false;
+
+    public static final int triggerIntakeDeployFreeCurrentLimit = 10; //TODO low for testing
+    public static final int triggerIntakeDeployStallCurrentLimit = 5; //TODO low for testing
   }
 
   public static final class Pivot {
     public static final int pivotMasterID = 22;
-    public static final int pivotSlaveID = 24;
+    public static final int pivotFollowerID = 24;
     public static final int pivotCANCoderID = 25;
 
     public static final double restingAngle = 0; //rotations
@@ -122,8 +132,8 @@ public final class Constants {
     public static final double pivotMinAngle = 0;
     public static final double pivotMaxAngle = 1000;
 
-    public static final double pivotGearRatio = 100; // pivot rotations per motor rotation
-    public static final double pivotTolerance = 0; //how close to the target position the pivot needs to be considered ready
+    public static final double pivotGearRatio = 0.01; // pivot rotations per motor rotation
+    public static final double pivotTolerance = 0.05; //how close to the target position the pivot needs to be considered ready
 
     public static final double gravityFeedforwardkG = 0;
 

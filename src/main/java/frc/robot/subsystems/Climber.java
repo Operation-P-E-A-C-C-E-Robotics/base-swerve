@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.Climber.*;
 
+import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -21,6 +22,7 @@ public class Climber {
 
     private Climber () {
         var leftInversionConfig = new MotorOutputConfigs();
+ 
         leftInversionConfig.Inverted = climberLeftMotorIsInverted;
         leftInversionConfig.NeutralMode = NeutralModeValue.Brake;
 

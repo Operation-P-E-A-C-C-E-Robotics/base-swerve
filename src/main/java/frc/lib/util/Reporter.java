@@ -8,8 +8,35 @@ import com.revrobotics.REVLibError;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.util.LinkedList;
 
 public class Reporter {
+    private static LinkedList<String> meesageBuffer = new LinkedList<>();
+    private static int messageLimit = 10;
+
+    /**
+     * Reports a message to the dashboard
+     * @param message the message to report
+     * @param error prints the message to the driver station as an error if true
+     */
+    public static void report(String message, boolean error) {
+        meesageBuffer.add(message);
+        if(meesageBuffer.size() > messageLimit) {
+            meesageBuffer.removeFirst();
+        }
+        if (error) DriverStation.reportError(message, false);
+    }
+
+    /**
+     * Reports a message to the dashboard
+     * @param message the message to report
+     */
+    public static void report(String message) {
+        report(message, false);
+    }
+
     /**
      * Reports a CTRE status code to the driver station
      * if it is an error code.
@@ -18,7 +45,7 @@ public class Reporter {
      */
     public static void report (StatusCode status, String message) {
         if (!status.isOK()) {
-            DriverStation.reportError(message + ": " + status.getDescription(), false);
+            report(message + ": " + status.getDescription(), true);
         }
     }
 
@@ -30,7 +57,7 @@ public class Reporter {
      */
     public static void report (REVLibError status, String message) {
         if (status != REVLibError.kOk) {
-            DriverStation.reportError(message + ": " + status, false);
+            report(message + ": " + status.toString(), true);
         }
     }
 
@@ -66,5 +93,13 @@ public class Reporter {
                 logEntries.put(message, new StringLogEntry(DataLogManager.getLog(), "Reporter/REV errors/" + message));
             }
         }
+    }
+
+    public static void putDashboard() {
+        String message = "";
+        for(String s : meesageBuffer) {
+            message += s + "\n";
+        }
+        SmartDashboard.putString("Reporter Messages", message);
     }
 }

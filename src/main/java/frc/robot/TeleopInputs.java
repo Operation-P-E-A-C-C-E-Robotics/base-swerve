@@ -69,6 +69,7 @@ public class TeleopInputs {
         if(OI.Modes.wantsAmpMode.getAsBoolean()) mode = TeleopMode.AMP;
         if(OI.Modes.wantsClimbMode.getAsBoolean()) mode = TeleopMode.CLIMB;
         if(OI.Modes.wantsSpeakerMode.getAsBoolean()) mode = TeleopMode.SPEAKER;
+        if(OI.Modes.wantsPanicMode.getAsBoolean()) mode = TeleopMode.PANIC;
 
         // reset the climb mode if we're not climbing
         if(mode != TeleopMode.CLIMB) climbMode = ClimbMode.ALIGN;
@@ -98,6 +99,8 @@ public class TeleopInputs {
                     break;
             }
         }
+
+        if(mode == TeleopMode.PANIC) return TeleopState.REST;
 
 
         //handle mode-specific automation
@@ -180,7 +183,7 @@ public class TeleopInputs {
     }
 
     public enum TeleopMode {
-        SPEAKER, AMP, CLIMB
+        SPEAKER, AMP, CLIMB, PANIC
     }
 
     public enum IntakingMode {

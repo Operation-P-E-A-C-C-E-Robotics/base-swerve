@@ -17,7 +17,6 @@ import frc.robot.statemachines.SwerveStatemachine;
 import frc.robot.statemachines.TriggerIntakeStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine.FlywheelIntakeState;
 import frc.robot.statemachines.SwerveStatemachine.SwerveState;
-import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Diverter;
 import frc.robot.subsystems.FlywheelIntake;
@@ -42,11 +41,7 @@ public class RobotContainer {
     private final Climber climber = Climber.getInstance();
 
     /* PLANNERS */
-    private final MotionPlanner motionPlanner = new MotionPlanner(
-        pivot::getPivotPosition,
-        flywheelIntake::getDeploymentAngle,
-        () -> swerve.getChassisSpeeds().vxMetersPerSecond
-    );
+    private final MotionPlanner motionPlanner = new MotionPlanner();
 
     private final AimPlanner aimPlanner = new AimPlanner(
         () -> swerve.getPose(),
@@ -84,7 +79,8 @@ public class RobotContainer {
         return teleopStatemachine;
     }
 
-    Tracer tracer = new Tracer();
+    //keep track of how long things take to run for debugging
+    private final Tracer tracer = new Tracer();
 
     /**
      * The main update loop of the robot.
@@ -92,28 +88,32 @@ public class RobotContainer {
      * It updates the supersystem state, planners, and state machines.
      */
     public void run() {
+        /* UPDATE PLANNERS */
         tracer.addEpoch("RobotContainer.run(): start");
         motionPlanner.update();
         tracer.addEpoch("motionPlanner.update()");
         aimPlanner.update();
         tracer.addEpoch("aimPlanner.update()");
 
+        /* TEST DASHBOARD */
         if(RobotState.isTest()) {
             runTestDashboard();
             tracer.addEpoch("runTestDashboard()");
             return;
         }
+
+        /* LET THE DRIVERS COOK */
         if(RobotState.isTeleop()) {
+            // update with the state the driver wants
             teleopStatemachine.requestState(TeleopInputs.getInstance().getWantedTeleopState());
             swerveStatemachine.requestState(TeleopInputs.getInstance().getWantedSwerveState());
 
-
+            //run all the state machines
             teleopStatemachine.update();
             tracer.addEpoch("teleopStatemachine.update()");
 
             swerveStatemachine.update();
             tracer.addEpoch("swerveStatemachine.update()");
-
 
             flywheelIntakeStatemachine.update();
             // tracer.addEpoch("flywheelIntakeStatemachine.update()");
@@ -133,6 +133,7 @@ public class RobotContainer {
             // climberStatemachine.update();
             // tracer.addEpoch("climberStatemachine.update()");
 
+            // handle driver overrides
             if(OI.Overrides.forceTrigger.getAsBoolean()) {
                 shooter.setTrigerPercent(1);
             }
@@ -144,6 +145,8 @@ public class RobotContainer {
                 diverter.setDiverterRoller(1);
             }
         }
+
+        /* AUTONOMOUS */
         if(RobotState.isAutonomous()) {
             //autoStatemachine.update();
         }

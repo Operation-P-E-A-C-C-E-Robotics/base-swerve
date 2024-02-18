@@ -25,21 +25,57 @@ public class FlywheelIntake {
     private double targetRotations = 0;
 
     private FlywheelIntake () {
+        rollerMotor.restoreFactoryDefaults();
+
         rollerMotor.setInverted(flywheelIntakeRollerMotorInverted);
         deployMotor.setInverted(flywheelIntakeDeployMotorInverted);
 
         //«««Warning»»» : dont let stretch interact with this code by any means. It has so much hatred 
         //for this code that it will break its own neck without warning
-        Reporter.report(deployMotor.setSoftLimit(SoftLimitDirection.kForward, flywheelIntakeDeployMaxAngle), "Couldn't set front intake forward soft limit");
-        Reporter.report(deployMotor.setSoftLimit(SoftLimitDirection.kReverse, flywheelIntakeDeployMinAngle), "Couldn't set front intake reverse soft limit");
-        Reporter.report(deployMotor.enableSoftLimit(SoftLimitDirection.kForward, false), "Couldn't enable front intake forward soft limit");
-        Reporter.report(deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, false), "Couldn't enable front intake reverse soft limit");
+        Reporter.report(
+            deployMotor.setSoftLimit(SoftLimitDirection.kForward, flywheelIntakeDeployMaxAngle), 
+            "Couldn't set front intake forward soft limit"
+        );
+        Reporter.report(
+            deployMotor.setSoftLimit(SoftLimitDirection.kReverse, flywheelIntakeDeployMinAngle), 
+            "Couldn't set front intake reverse soft limit"
+        );
+        Reporter.report(
+            deployMotor.enableSoftLimit(SoftLimitDirection.kForward, false), 
+            "Couldn't enable front intake forward soft limit"
+        );
+        Reporter.report(
+            deployMotor.enableSoftLimit(SoftLimitDirection.kReverse, false), 
+            "Couldn't enable front intake reverse soft limit"
+        );
 
-        Reporter.report(deployPIDController.setP(flywheelIntakeDeployKp), "Couldn't configure front intake pid");   //Hehe, thats funny, it spells PID.... WAIT
-        deployPIDController.setI(flywheelIntakeDeployKi);
-        deployPIDController.setD(flywheelIntakeDeployKd);
+        Reporter.report(
+            deployPIDController.setP(flywheelIntakeDeployKp), 
+            "Couldn't configure front intake kP"
+        );   //Hehe, thats funny, it spells PID.... WAIT
+        Reporter.report(
+            deployPIDController.setI(flywheelIntakeDeployKi), 
+            "Couldn't configure front intake kI"
+        );
+        Reporter.report(
+            deployPIDController.setD(flywheelIntakeDeployKd), 
+            "Couldn't configure front intake kD"
+        );
 
-        Reporter.report(deployEncoder.setPositionConversionFactor(flywheelIntakeDeployGearing), "Couldn't configure front intake encoder");
+        Reporter.report(
+            deployEncoder.setPositionConversionFactor(flywheelIntakeDeployGearing), 
+            "Couldn't configure front intake encoder"
+        );
+
+        Reporter.report(
+            deployMotor.setSmartCurrentLimit(flywheelIntakeDeployStallCurrentLimit, flywheelIntakeDeployFreeCurrentLimit), 
+            "Couldn't configure front intake current limits"
+        );
+
+        Reporter.report(
+            deployMotor.burnFlash(),
+            "Couldn't burn flash on front intake deploy motor"
+        );
     }
 
     

@@ -1,9 +1,10 @@
 package frc.robot.planners;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.subsystems.FlywheelIntake;
+import frc.robot.subsystems.Pivot;
+import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.TriggerIntake;
 
 /**
  * In charge of calculating whether the pivot and flywheel can
@@ -12,15 +13,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * Also says whether the diverter can extend
  */
 public class MotionPlanner {
-    private final Supplier<Rotation2d> pivotAngle;
-    private final Supplier<Rotation2d> flywheelIntakeExtension;
-    private final DoubleSupplier xVelocity;
-
     //TODO
     //Angles in rotations
     public static final Rotation2d interferenceLowerPivotAngle = Rotation2d.fromDegrees(0); //threshold for the flywheel intake to avoid the pivot
     public static final Rotation2d interferenceUpperPivotAngle = Rotation2d.fromDegrees(0); //threshold for the trigger intake to avoid the pivot
-    public static final Rotation2d interferenceIntakeExtension = Rotation2d.fromDegrees(0); //threshold for the pivot to be allowed to flatten
+    public static final Rotation2d flywheelIntakeMinExtensionToFlatten = Rotation2d.fromDegrees(0); //threshold for the pivot to be allowed to flatten
+    public static final Rotation2d triggerIntakeMaxExtensionToFlatten = Rotation2d.fromDegrees(0); //threshold for the pivot to be allowed to flatten
     public static final Rotation2d allowIntakeLowerPivotAngle = Rotation2d.fromDegrees(0); //threshold for the flywheel intake to be allowed to intake
     public static final Rotation2d canDiverterExtendMinPivotAngle = Rotation2d.fromDegrees(0); //threshold for the flipper to be allowed to extend
 
@@ -30,15 +28,15 @@ public class MotionPlanner {
     private boolean readyToIntake = false;
     private boolean canDiverterExtend = false;
 
-    public MotionPlanner (Supplier<Rotation2d> pivotAngle, Supplier<Rotation2d> flywheelIntakeExtension, DoubleSupplier xVelocity) {
-        this.pivotAngle = pivotAngle;
-        this.flywheelIntakeExtension = flywheelIntakeExtension;
-        this.xVelocity = xVelocity;
+    public MotionPlanner () {
     }
 
     public void update() {
-        var pivotRadians = pivotAngle.get().getRadians();
-        canFlattenPivot = flywheelIntakeExtension.get().getRadians() < interferenceIntakeExtension.getRadians();
+        var pivotRadians = Pivot.getInstance().getPivotPosition().getRadians();
+        var flywheelIntakeExtension = FlywheelIntake.getInstance().getDeploymentAngle().getRadians();
+        var triggerIntakeExtension = TriggerIntake.getInstance().getDeploymentAngle().getRadians();
+        canFlattenPivot = flywheelIntakeExtension < flywheelIntakeMinExtensionToFlatten.getRadians()
+                        && triggerIntakeExtension < triggerIntakeMaxExtensionToFlatten.getRadians();
         shouldFlywheelIntakeAvoid = pivotRadians < interferenceLowerPivotAngle.getRadians();
         shouldTriggerIntakeAvoid = pivotRadians > interferenceUpperPivotAngle.getRadians();
         readyToIntake = pivotRadians < allowIntakeLowerPivotAngle.getRadians();
@@ -66,10 +64,10 @@ public class MotionPlanner {
     }
 
     public boolean shouldTransitionToFront() {
-        return xVelocity.getAsDouble() > 0.5;
+        return Swerve.getInstance().getChassisSpeeds().vxMetersPerSecond > 0.5;
     }
 
     public boolean shouldTransitionToBack() {
-        return xVelocity.getAsDouble() < -0.5;
+        return Swerve.getInstance().getChassisSpeeds().vxMetersPerSecond < -0.5;
     }
 }
