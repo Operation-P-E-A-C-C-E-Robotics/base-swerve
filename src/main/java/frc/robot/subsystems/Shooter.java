@@ -112,7 +112,7 @@ public class Shooter {
         bottomFlywheelMotor.setInverted(bottomFlywheelMotorInverted);
         triggerMotor.setInverted(triggerMotorInverted);
 
-        //disable all CAN signals we don't use
+        //disable all CAN signals we don't use to minimize bus usage
         topFlywheelMotor.optimizeBusUtilization();
         bottomFlywheelMotor.optimizeBusUtilization();
 
@@ -121,7 +121,7 @@ public class Shooter {
         topFlywheelAcceleration = topFlywheelMotor.getAcceleration();
         bottomFlywheelAcceleration = bottomFlywheelMotor.getAcceleration();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(50, 
+        BaseStatusSignal.setUpdateFrequencyForAll(100, 
             topFlywheelVelocity,
             bottomFlywheelVelocity,
             topFlywheelAcceleration,

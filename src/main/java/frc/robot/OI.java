@@ -45,6 +45,9 @@ public class OI {
         public static final BooleanSupplier wantsClimbExtend = () -> false;
         public static final BooleanSupplier wantsClimbRetract = () -> false;
 
+        public static final BooleanSupplier wantsAimLayup = () -> false;
+        public static final BooleanSupplier wantsAimProtected = () -> false;
+
         public static final BooleanSupplier enableShootWhileMoving = () -> driverJoystick.getRawButton(7);
     }
     

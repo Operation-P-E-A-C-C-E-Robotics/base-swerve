@@ -89,7 +89,10 @@ public class TriggerIntake {
             "Couldn't configure rear intake current limits"
         );
 
-        deployMotor.burnFlash();
+        Reporter.report(
+            deployMotor.burnFlash(),
+            "Couldn't burn flash on rear intake deploy motor"
+        );
     }
 
     /**
@@ -99,6 +102,7 @@ public class TriggerIntake {
      */
     public void setDeploymentAngle (Rotation2d angle) {
         targetRotation = angle.getRotations(); 
+        targetDeployAngleLog.append(angle.getRotations());
         Reporter.report(
             deployController.setReference(angle.getRotations(), CANSparkMax.ControlType.kPosition),
             "couldn't set rear intake deploy angle"
@@ -110,6 +114,7 @@ public class TriggerIntake {
      * @param speed the speed of the roller (-1 to 1, positive intakes)
      */
     public void setRollerSpeed (double speed) {
+        rollerSpeedLog.append(speed);
         rollerMotor.set(speed);
     }
 
@@ -118,25 +123,18 @@ public class TriggerIntake {
      * @return the current deployment angle
      */
     public Rotation2d getDeploymentAngle () {
-        return Rotation2d.fromRotations(deployEncoder.getPosition());
+        var rotations = deployEncoder.getPosition();
+        deployAnglePublisher.accept(rotations);
+        return Rotation2d.fromRotations(rotations);
     }
 
     /**
      * @return whether the trigger intake has attained is goal deployment angle.
      */
     public boolean deployedToSetpoint () {
-        return Util.inRange(getDeploymentAngle().getRotations() - targetRotation, triggerIntakeDeployTolerance);
-    }
-
-
-    /**
-     * Write telemetry to the data logger and network tables
-     */
-    public void writeTelemetry() {
-        deployAnglePublisher.accept(getDeploymentAngle().getDegrees());
-        targetDeployAngleLog.append(targetRotation);
-        deployedToSetpointLog.append(deployedToSetpoint());
-        rollerSpeedLog.append(rollerMotor.get());
+        var deployed = Util.inRange(getDeploymentAngle().getRotations() - targetRotation, triggerIntakeDeployTolerance);
+        deployedToSetpointLog.append(deployed);
+        return deployed;
     }
 
     private static final TriggerIntake instance = new TriggerIntake();

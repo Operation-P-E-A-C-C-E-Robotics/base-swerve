@@ -130,7 +130,7 @@ public final class Constants {
     public static final double restingAngle = 0; //rotations
 
     public static final double pivotMinAngle = 0;
-    public static final double pivotMaxAngle = 1000;
+    public static final double pivotMaxAngle = 0;
 
     public static final double pivotGearRatio = 0.01; // pivot rotations per motor rotation
     public static final double pivotTolerance = 0.05; //how close to the target position the pivot needs to be considered ready
@@ -143,7 +143,7 @@ public final class Constants {
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      pivotConfigs.Slot0.kP = 100;
+      pivotConfigs.Slot0.kP = 0;
       pivotConfigs.Slot0.kI = 0;
       pivotConfigs.Slot0.kD = 0;
       pivotConfigs.Slot0.kS = 0;

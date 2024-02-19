@@ -9,6 +9,9 @@ import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,10 +34,14 @@ public class Pivot {
     /* TELEMETRY */
     private final Mechanism2d pivotMech = new Mechanism2d(100, 100);
     private final MechanismLigament2d pivotLigament = pivotMech.getRoot("pivot", 50, 50).append(new MechanismLigament2d("pivot", 30, 0));
+    private final NetworkTable pivotTable = NetworkTableInstance.getDefault().getTable("Pivot");
+    private final DoublePublisher pivotAnglePublisher = pivotTable.getDoubleTopic("pivot angle").publish();
+    private final DoublePublisher targetPivotAnglePublisher = pivotTable.getDoubleTopic("target pivot angle").publish();
 
     /* STATUS SIGNALS */
     private final StatusSignal <Double> positionSignal;
     private final StatusSignal <Double> velocitySignal;
+    private final StatusSignal <Double> errorSignal;
 
     private Pivot () {
         Reporter.report(
@@ -53,7 +60,8 @@ public class Pivot {
         ParentDevice.optimizeBusUtilizationForAll(pivotMaster, pivotFollower, pivotEncoder);
         positionSignal = pivotEncoder.getAbsolutePosition();
         velocitySignal = pivotEncoder.getVelocity();
-        BaseStatusSignal.setUpdateFrequencyForAll(100, positionSignal, velocitySignal);
+        errorSignal = pivotMaster.getClosedLoopError();
+        BaseStatusSignal.setUpdateFrequencyForAll(100, positionSignal, velocitySignal, errorSignal);
 
         SmartDashboard.putData("pivot mech", pivotMech);
     }
@@ -64,8 +72,12 @@ public class Pivot {
      */
     public void setPivotPosition (Rotation2d position) {
         var gravity = gravityFeedforward.calculate(getPivotPosition().getRadians(), 0);
+
         pivotControl.withFeedForward(gravity).withPosition(position.getRotations());
+
         Reporter.log(pivotMaster.setControl(pivotControl), "couldn't set pivot position");
+
+        targetPivotAnglePublisher.accept(position.getDegrees());
 
         if(Robot.isSimulation()) {
             pivotEncoder.getSimState().setRawPosition(position.getRotations());
@@ -79,8 +91,12 @@ public class Pivot {
      */
     public Rotation2d getPivotPosition () {
         Reporter.report(positionSignal.getStatus(), "Couldn't read pivot position");
+
         var compensatedRotations = BaseStatusSignal.getLatencyCompensatedValue(positionSignal, velocitySignal);
-        return Rotation2d.fromRotations(compensatedRotations);
+
+        var angle = Rotation2d.fromRotations(compensatedRotations);
+        pivotAnglePublisher.accept(angle.getDegrees());
+        return angle;
     }
 
     public void engageBrake (boolean enable) {
@@ -88,7 +104,7 @@ public class Pivot {
     }
 
     public boolean atSetpoint () {
-        return Util.inRange(pivotMaster.getClosedLoopError().getValue(), pivotTolerance);
+        return Util.inRange(errorSignal.getValue(), pivotTolerance);
     }
 
     private static final Pivot instance = new Pivot();

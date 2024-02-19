@@ -86,6 +86,9 @@ public class TeleopInputs {
             return intakingMode == IntakingMode.FRONT ? TeleopState.INTAKE_FRONT : TeleopState.INTAKE_BACK;
         }
 
+        if(OI.Inputs.wantsAimLayup.getAsBoolean()) return TeleopState.AIM_LAYUP;
+        if(OI.Inputs.wantsAimProtected.getAsBoolean()) return TeleopState.AIM_PROTECTED;
+
         //handle the driver's request to "place" (a button that does different things based on the mode)
         if(OI.Inputs.wantsPlace.getAsBoolean()) {
             switch (mode) {

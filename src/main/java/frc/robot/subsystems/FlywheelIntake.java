@@ -6,6 +6,13 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import frc.lib.util.Reporter;
 import frc.lib.util.Util;
 
@@ -15,14 +22,26 @@ import com.revrobotics.CANSparkBase.SoftLimitDirection;
 
 //software for the intake that is on the front of the robot
 public class FlywheelIntake {
+    /* HARDWARE */
     private CANSparkMax deployMotor = new CANSparkMax(flywheelIntakeDeployMotorId, MotorType.kBrushless);
     private CANSparkMax rollerMotor = new CANSparkMax(flywheelIntakeRollerMotorId, MotorType.kBrushless);
 
     private RelativeEncoder deployEncoder = deployMotor.getEncoder();
 
+    /* CONTROLLERS */
     private SparkPIDController deployPIDController = deployMotor.getPIDController();
 
+    /* STATE */
     private double targetRotations = 0;
+
+    /* TELEMETRY */
+    private final NetworkTable table = NetworkTableInstance.getDefault().getTable("Intake");
+    private final DoublePublisher deployAnglePublisher = table.getDoubleTopic("Front Deploy Angle").publish();
+
+    DataLog log = DataLogManager.getLog();
+    DoubleLogEntry targetDeployAngleLog = new DoubleLogEntry(log, "Intake/Target Front Deploy Angle (rotations)");
+    BooleanLogEntry deployedToSetpointLog = new BooleanLogEntry(log, "Intake/Front Deployed to Setpoint (rotations)");
+    DoubleLogEntry rollerSpeedLog = new DoubleLogEntry(log, "Intake/Front Roller Speed %");
 
     private FlywheelIntake () {
         rollerMotor.restoreFactoryDefaults();
@@ -84,16 +103,18 @@ public class FlywheelIntake {
      */
     public void setDeploymentAngle (Rotation2d angle) {
         targetRotations = angle.getRotations(); 
+        targetDeployAngleLog.append(angle.getRotations());
         Reporter.log(
             deployPIDController.setReference(angle.getRotations(), CANSparkMax.ControlType.kPosition),
             "couldn't set front intake deploy angle"
-        ); //might need to divide by gearing, not sure.
+        );
     }
 
     /**
      * set the speed of the roller, from -1 to 1
      */
     public void setRollerSpeed (double speed) {
+        rollerSpeedLog.append(speed);
         rollerMotor.set(speed);
     }
 
@@ -101,14 +122,18 @@ public class FlywheelIntake {
      * get the current angle of the intake, in rotations
      */
     public Rotation2d getDeploymentAngle(){
-        return Rotation2d.fromRotations(deployEncoder.getPosition());
+        var rotations = deployEncoder.getPosition();
+        deployAnglePublisher.accept(rotations);
+        return Rotation2d.fromRotations(rotations);
     }
     /**
      * get whether the deploy motor is at its setpoint
      */
 
     public boolean deployedToSetpoint () {
-        return Util.inRange(getDeploymentAngle().getRotations() - targetRotations, flywheelIntakeDeployTolerance);
+        var deployed = Util.inRange(getDeploymentAngle().getRotations() - targetRotations, flywheelIntakeDeployTolerance);
+        deployedToSetpointLog.append(deployed);
+        return deployed;
     }
 
     private static FlywheelIntake instance = new FlywheelIntake();
