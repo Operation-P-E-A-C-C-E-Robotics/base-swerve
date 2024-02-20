@@ -59,10 +59,10 @@ public final class Constants {
     public static final double flywheelControlEffort = 12;
     public static final double flywheelErrorTolerance = 8;
 
-    public static final double shotDetectionAccelerationThreshold = 0;
-    public static final double shotDetectionTimeThreshold = 0;
-    public static final double shotDetectionMinVelocity = 0;
-    public static final double shotDetectionResetTime = 0;
+    public static final double shotDetectionAccelerationThreshold = 2;
+    public static final double shotDetectionTimeThreshold = 0.05;
+    public static final double shotDetectionMinVelocity = 5;
+    public static final double shotDetectionResetTime = 0.1;
 
     public static final TalonFXConfiguration flywheelConfigs = new TalonFXConfiguration();
     static {
@@ -77,11 +77,8 @@ public final class Constants {
     public static final boolean bottomFlywheelMotorInverted = true;
     public static final boolean triggerMotorInverted = true;
 
-    public static final double flywheelEfficiency = 1; // percentage of flywheel surface speed to exit velocity
-    public static final double flywheelTolerance = 0; //how close to the target velocity the flywheel needs to be considered ready
-
-    public static final double triggerMetersPerRotation = 0;
-    public static final double triggerKp = 0;
+    public static final double flywheelEfficiency = 0.5; // percentage of flywheel surface speed to exit velocity
+    public static final double flywheelTolerance = 0.1; //how close to the target velocity the flywheel needs to be considered ready
   }
 
   public static final class FlywheelIntake {
@@ -98,7 +95,7 @@ public final class Constants {
     public static final double flywheelIntakeDeployGearing = 0.01;
     public static final double flywheelIntakeDeployTolerance = 1; //how close to the target position the deployer needs to be to be considered "deployed"
 
-    public static final boolean flywheelIntakeDeployMotorInverted = false;
+    public static final boolean flywheelIntakeDeployMotorInverted = true;
     public static final boolean flywheelIntakeRollerMotorInverted = false;
 
     public static final int flywheelIntakeDeployFreeCurrentLimit = 5; //TODO low for testing
@@ -122,8 +119,8 @@ public final class Constants {
     public static final boolean triggerIntakeDeployMotorInverted = false;
     public static final boolean triggerIntakeRollerMotorInverted = false;
 
-    public static final int triggerIntakeDeployFreeCurrentLimit = 20; //TODO low for testing
-    public static final int triggerIntakeDeployStallCurrentLimit = 20; //TODO low for testing
+    public static final int triggerIntakeDeployFreeCurrentLimit = 20;
+    public static final int triggerIntakeDeployStallCurrentLimit = 20;
   }
 
   public static final class Pivot {

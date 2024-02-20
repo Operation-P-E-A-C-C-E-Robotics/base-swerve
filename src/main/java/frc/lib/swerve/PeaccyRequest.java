@@ -18,7 +18,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.motion.Trajectory;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.Util;
@@ -354,7 +353,6 @@ public class PeaccyRequest implements SwerveRequest {
      */
     private double applyAutoHeading(SwerveControlRequestParameters parameters) {
         var currentHeading = parameters.currentPose.getRotation().getRadians();
-        SmartDashboard.putNumber("current heading", currentHeading);
 
         //make sure our odometry heading is within +/- 180 degrees of the target heading to prevent it from wrapping LIKE CTRE DOES >:(
         while (Math.abs(currentHeading - Heading) > Math.PI) {
@@ -364,7 +362,6 @@ public class PeaccyRequest implements SwerveRequest {
                 currentHeading += 2 * Math.PI;
             }
         }
-        SmartDashboard.putNumber("current heading fixed", currentHeading);
 
         //regenerate the trajectory if the target heading has changed
         if(Heading != headingTrajectory.getTarget().position || Math.abs(currentHeading - prevHeading) > (Math.PI/4)) {

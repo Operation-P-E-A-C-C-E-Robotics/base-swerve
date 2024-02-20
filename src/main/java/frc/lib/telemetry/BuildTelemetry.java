@@ -1,7 +1,5 @@
 package frc.lib.telemetry;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
@@ -9,7 +7,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import frc.lib.util.Util;
 
 public class BuildTelemetry {
-    public static NetworkTable buildTable = NetworkTableInstance.getDefault().getTable("Build");
     private static final DataLog log = DataLogManager.getLog();
     static {
         new StringLogEntry(log, "Build/Project Name").append(BuildConstants.MAVEN_NAME);

@@ -127,6 +127,9 @@ public class Shooter {
             topFlywheelAcceleration,
             bottomFlywheelAcceleration
         );
+
+        topControl.withUpdateFreqHz(100);
+        bottomControl.withUpdateFreqHz(100);
     }
 
     /**
@@ -143,8 +146,6 @@ public class Shooter {
      * @param bottom the velocity to set the bottom flywheel to in RPS
      */
     public void setFlywheelVelocity (double top, double bottom) {
-        System.out.println("top: " + top + "bottom: " + bottom);
-
         var topVelocityCompensated = getTopFlywheelVelocity();
         var bottomVelocityCompensated = getBottomFlywheelVelocity();
 

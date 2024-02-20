@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
     DriverStation.startDataLog(DataLogManager.getLog());
 
     //log current draw
-    SmartDashboard.putData("PDP", pdp);
+    // SmartDashboard.putData("PDP", pdp);
     System.out.println("Robot Initialized");
     System.out.println("yay the software didn't crash yet");
   }
@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-        SmartDashboard.putNumber("pivot angle", Pivot.getInstance().getPivotPosition().getDegrees());
+    SmartDashboard.putNumber("pivot angle", Pivot.getInstance().getPivotPosition().getDegrees());
   }
 
   @Override
@@ -90,7 +90,6 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     DataLogManager.logNetworkTables(true);
-    RobotContainer.getInstance().initTestDashboard();
     System.out.println("Robot Test");
     System.out.println("ok but what are yall doing i don't even know why you'd be running in test mode");
   }

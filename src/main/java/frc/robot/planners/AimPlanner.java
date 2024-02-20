@@ -9,7 +9,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.LinearInterpolate;
 import frc.robot.Constants;
@@ -31,22 +33,38 @@ public class AimPlanner {
 
     private final double[][] distanceCalibrationData = {
         {90, 80}, // pivot angles (deg)
-        {0, 10}, //exit velocities (m/s)
+        {0, 10}, // flywheel speed rps
         {0, 1}  //distances (m)
     };
 
     private final LinearInterpolate pivotInterpolator = new LinearInterpolate(distanceCalibrationData[2], distanceCalibrationData[0]);
-    private final LinearInterpolate exitVelocityInterpolator = new LinearInterpolate(distanceCalibrationData[2], distanceCalibrationData[1]);
+    private final LinearInterpolate flywheelAngularVelocityInterpolater = new LinearInterpolate(distanceCalibrationData[2], distanceCalibrationData[1]);
 
     private Rotation2d drivetrainAngle = new Rotation2d();
     private Rotation2d pivotAngle = new Rotation2d();
-    private double shooterRPS = 0;
+    private double flywheelAngularVelocity = 0;
 
     //what the desired velocity of the different mechanisms are based off the robot's speed, 
     //so we can add a feedforward to them that will match the robots motion to track the target better
     private double drivetrainAngularVelocity = 0;
     private double pivotAngularVelocity = 0;
     private double shooterAngularAcceleration = 0;
+
+    /* TELEMETRY */ //note: SOTM = Shoot on the Move
+    private final NetworkTable aimTable = NetworkTableInstance.getDefault().getTable("Aim Planner");
+    private final DoublePublisher distanceToTargetPublisher = aimTable.getDoubleTopic("Distance to Target").publish();
+    private final DoublePublisher angleToTargetPublisher = aimTable.getDoubleTopic("Angle to Target").publish();
+    private final DoublePublisher pivotAnglePublisher = aimTable.getDoubleTopic("Pivot Angle Regression (deg)").publish();
+    private final DoublePublisher shooterVelocityPublisher = aimTable.getDoubleTopic("Shooter Velocity Regression (rps)").publish();
+    private final DoublePublisher exitVelocityPublisher = aimTable.getDoubleTopic("Exit Velocity Conversion (m/s)").publish();
+
+    private final DoublePublisher sotmPivotAnglePublisher = aimTable.getDoubleTopic("SOTM Corrected Pivot Angle").publish();
+    private final DoublePublisher sotmExitVelocityPublisher = aimTable.getDoubleTopic("SOTM Corrected Exit Velocity").publish();
+    private final DoublePublisher sotmDrivetrainAnglePublisher = aimTable.getDoubleTopic("SOTM Corrected Drivetrain Angle").publish();
+
+    private final DoublePublisher drivetrainAngularVelocityPublisher = aimTable.getDoubleTopic("SuperSOTM Drivetrain Angular Velocity").publish();
+    private final DoublePublisher pivotAngularVelocityPublisher = aimTable.getDoubleTopic("SuperSOTM Pivot Angular Velocity").publish();
+    private final DoublePublisher shooterAngularAccelerationPublisher = aimTable.getDoubleTopic("SuperSOTM Shooter Angular Acceleration").publish();
 
     public AimPlanner (Supplier<Pose2d> robotPoseSupplier, Supplier<ChassisSpeeds> robotRelativeChassisSpeeds, BooleanSupplier shootWhileMoving) {
         this.robotPoseSupplier = robotPoseSupplier;
@@ -60,19 +78,21 @@ public class AimPlanner {
 
         Rotation2d angleToTarget = blueOriginPose.getTranslation().minus(targetCenterTranslation).getAngle();
         Rotation2d pivotAngle = Rotation2d.fromDegrees(pivotInterpolator.interpolate(distanceToTarget));
-        double exitVelocity = exitVelocityInterpolator.interpolate(distanceToTarget);
+        double flywheelAngularVelocity = flywheelAngularVelocityInterpolater.interpolate(distanceToTarget);
+        double exitVelocity = RPSToExitVelocity(flywheelAngularVelocity);
 
-        SmartDashboard.putNumber("Distance to Target", distanceToTarget);
-        SmartDashboard.putNumber("Angle to Target", angleToTarget.getDegrees());
-        SmartDashboard.putNumber("Pivot Angle", pivotAngle.getDegrees());
-        SmartDashboard.putNumber("Exit Velocity", exitVelocity);
+        distanceToTargetPublisher.accept(distanceToTarget);
+        angleToTargetPublisher.accept(angleToTarget.getDegrees());
+        pivotAnglePublisher.accept(pivotAngle.getDegrees());
+        shooterVelocityPublisher.accept(flywheelAngularVelocity);
+        exitVelocityPublisher.accept(exitVelocity);
 
         if(!shootWhileMoving.getAsBoolean()) {
             drivetrainAngularVelocity = 0;
             pivotAngularVelocity = 0;
             shooterAngularAcceleration = 0;
             this.pivotAngle = pivotAngle;
-            this.shooterRPS = exitVelocityToRPS(exitVelocity);
+            this.flywheelAngularVelocity = flywheelAngularVelocity;
             this.drivetrainAngle = angleToTarget;
             return;
         }
@@ -81,12 +101,12 @@ public class AimPlanner {
         ShotAngle uncorrectedShotAngle = new ShotAngle(angleToTarget, pivotAngle, exitVelocity);
         ShotAngle correctedShotAngle = ShotAngle.correctFromChassisSpeeds(uncorrectedShotAngle, robotVelocity, blueOriginPose.getRotation());
         this.pivotAngle = correctedShotAngle.getPivotAngle();
-        this.shooterRPS = exitVelocityToRPS(correctedShotAngle.getExitVelocity());
+        this.flywheelAngularVelocity = exitVelocityToRPS(correctedShotAngle.getExitVelocity());
         this.drivetrainAngle = correctedShotAngle.getDrivetrainAngle();
 
-        SmartDashboard.putNumber("Corrected Pivot Angle", this.pivotAngle.getDegrees());
-        SmartDashboard.putNumber("Corrected Exit Velocity", correctedShotAngle.getExitVelocity());
-        SmartDashboard.putNumber("Corrected Drivetrain Angle", this.drivetrainAngle.getDegrees());
+        sotmPivotAnglePublisher.accept(pivotAngle.getDegrees());
+        sotmExitVelocityPublisher.accept(uncorrectedShotAngle.getExitVelocity());
+        sotmDrivetrainAnglePublisher.accept(uncorrectedShotAngle.getDrivetrainAngle().getDegrees());
 
         //calculate the angular velocities of the mechanisms
         //first get the robots velocity relative to the target
@@ -97,11 +117,11 @@ public class AimPlanner {
         //use the distarce to the target to get the angular velocity
         drivetrainAngularVelocity = Units.radiansToDegrees((targetRelativeVelocity.getY() / distanceToTarget));
         pivotAngularVelocity = pivotInterpolator.derivative(distanceToTarget) * deltaDistance;
-        shooterAngularAcceleration = exitVelocityInterpolator.derivative(distanceToTarget) * deltaDistance;
+        shooterAngularAcceleration = flywheelAngularVelocityInterpolater.derivative(distanceToTarget) * deltaDistance;
 
-        SmartDashboard.putNumber("Drivetrain wanted Angular Velocity", drivetrainAngularVelocity);
-        SmartDashboard.putNumber("Pivot Angular Velocity", pivotAngularVelocity);
-        SmartDashboard.putNumber("Shooter Angular Acceleration", shooterAngularAcceleration);
+        drivetrainAngularVelocityPublisher.accept(drivetrainAngularVelocity);
+        pivotAngularVelocityPublisher.accept(pivotAngularVelocity);
+        shooterAngularAccelerationPublisher.accept(shooterAngularAcceleration);
     }
 
     public Rotation2d getTargetDrivetrainAngle() {
@@ -113,7 +133,7 @@ public class AimPlanner {
     }
 
     public double getTargetFlywheelVelocityRPS() {
-        return shooterRPS;
+        return flywheelAngularVelocity;
     }
 
     public double getDrivetrainAngularVelocity() {
@@ -130,6 +150,10 @@ public class AimPlanner {
 
     private double exitVelocityToRPS(double exitVelocity) {
         return (exitVelocity / (Constants.Shooter.flywheelDiameter * Math.PI) / Constants.Shooter.flywheelGearRatio) * Constants.Shooter.flywheelEfficiency;
+    }
+
+    private double RPSToExitVelocity(double rps) {
+        return (rps * Constants.Shooter.flywheelDiameter * Math.PI * Constants.Shooter.flywheelGearRatio) / Constants.Shooter.flywheelEfficiency;
     }
 
     public static class ShotAngle {

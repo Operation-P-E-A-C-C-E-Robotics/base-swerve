@@ -18,6 +18,8 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
 
     private boolean hasNote = false;
 
+    private boolean manualTriggerMode = false;
+
     public ShooterStatemachine(Shooter shooter, AimPlanner aimPlanner, BooleanSupplier alignedToShoot){
         this.shooter = shooter;
         this.aimPlanner = aimPlanner;
@@ -135,11 +137,11 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     public enum ShooterState{
         RAMP_DOWN(0.0,0.0),
         COAST (0.0, 0.0),
-        INTAKE(0.0,0.0), //NOTE: this should fold flat if the flywheel-side intake is out
+        INTAKE(-10.0,1.0), //NOTE: this should fold flat if the flywheel-side intake is out
         INDEX(0.0,0.2),
-        HANDOFF(0.0,0.0), //to diverter
-        AIM_LAYUP(1000.0,0.0),
-        AIM_PROTECTED(0.0,0.0),
+        HANDOFF(20.0,1.0), //to diverter
+        AIM_LAYUP(60.0,0.0),
+        AIM_PROTECTED(60.0,0.0),
         AUTO_AIM(0.0,0.0),
         SHOOT(0.0,1.0);
 

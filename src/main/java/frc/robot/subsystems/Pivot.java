@@ -4,7 +4,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -89,6 +88,10 @@ public class Pivot {
             pivotEncoder.getSimState().setRawPosition(position.getRotations());
             pivotLigament.setAngle(getPivotPosition());
         }
+    }
+
+    public void setPivotPercent (double percent) {
+        pivotMaster.set(percent);
     }
 
     /**

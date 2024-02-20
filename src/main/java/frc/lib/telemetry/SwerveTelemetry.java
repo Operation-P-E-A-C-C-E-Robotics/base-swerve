@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 /**
  * Handles all the telemetry for the swerve drive. Designed to be used with advantagescope.
@@ -94,7 +95,7 @@ public class SwerveTelemetry {
         rearLeftModule.append(rearLeftLigament);
         rearRightModule.append(rearRightLigament);
 
-        SmartDashboard.putData("Swerve Mech", swerve);
+        if(Robot.isSimulation()) SmartDashboard.putData("Swerve Mech", swerve);
         SmartDashboard.putData("Field", field);
 
         PathPlannerLogging.setLogActivePathCallback((poses) -> {
