@@ -35,17 +35,17 @@ public class OI {
     }
 
     public static class Inputs {
-        public static final BooleanSupplier wantsIntake = () -> driverJoystick.getRawAxis(2) > 0.2;
+        public static final BooleanSupplier wantsIntake = () -> false;
         public static final BooleanSupplier wantsShoot = () -> false;
         public static final BooleanSupplier wantsStow = () -> driverJoystick.getRawButton(6);
-        public static final BooleanSupplier wantsPlace = () -> driverJoystick.getRawAxis(3) > 0.2; //general place button, varies by mode
+        public static final BooleanSupplier wantsPlace = () -> false;//driverJoystick.getRawAxis(3) > 0.2; //general place button, varies by mode
 
         public static final BooleanSupplier wantsAlign = () -> false;
         public static final BooleanSupplier wantsBalance = () -> false;
         public static final BooleanSupplier wantsClimbExtend = () -> false;
         public static final BooleanSupplier wantsClimbRetract = () -> false;
 
-        public static final BooleanSupplier wantsAimLayup = () -> false;
+        public static final BooleanSupplier wantsAimLayup = () -> driverJoystick.getRawButton(4);
         public static final BooleanSupplier wantsAimProtected = () -> false;
 
         public static final BooleanSupplier enableShootWhileMoving = () -> driverJoystick.getRawButton(7);
@@ -54,14 +54,14 @@ public class OI {
     public static class Overrides {
         /* MODE OVERRIDES */ //overrides the state requested by the mode
         public static final BooleanSupplier forceAim = () -> false;
-        public static final BooleanSupplier forceIntakeFront = () -> driverJoystick.getRawButton(1);
-        public static final BooleanSupplier forceIntakeBack = () -> driverJoystick.getRawButton(2);
+        public static final BooleanSupplier forceIntakeFront = () -> false;
+        public static final BooleanSupplier forceIntakeBack = () -> driverJoystick.getRawAxis(2) > 0.2;
         public static final BooleanSupplier forceHandoff = () -> false;
         public static final BooleanSupplier forceAmp = () -> false;
         
         /* DIRECT OVERRIDES */ //directly sets the state of the subsystem
         public static final BooleanSupplier disableAutoHeading = () -> false;
-        public static final BooleanSupplier forceTrigger = () -> false;
+        public static final BooleanSupplier forceTrigger = () -> driverJoystick.getRawButton(2);
         public static final BooleanSupplier eject = () -> false;
     }
 

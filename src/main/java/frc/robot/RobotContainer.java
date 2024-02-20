@@ -121,10 +121,10 @@ public class RobotContainer {
             triggerIntakeStatemachine.update();
             // tracer.addEpoch("triggerIntakeStatemachine.update()");
 
-            // pivotStatemachine.update();
+            pivotStatemachine.update();
             // tracer.addEpoch("pivotStatemachine.update()");
 
-            // shooterStatemachine.update();
+            shooterStatemachine.update();
             // tracer.addEpoch("shooterStatemachine.update()");
 
             // diverterStatemachine.update();
@@ -150,7 +150,7 @@ public class RobotContainer {
         if(RobotState.isAutonomous()) {
             //autoStatemachine.update();
         }
-        tracer.printEpochs();
+        // tracer.printEpochs();
     }
 
     EnumSendableChooser<TeleopStatemachine.TeleopState> robotStateChooser = new EnumSendableChooser<>(TeleopState.values());

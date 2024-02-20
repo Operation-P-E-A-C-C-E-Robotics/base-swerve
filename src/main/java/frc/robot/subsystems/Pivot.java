@@ -4,6 +4,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -49,16 +50,21 @@ public class Pivot {
             "Couldn't configure pivot master"
         );
 
-        pivotMaster.setInverted(false);
+        pivotMaster.setInverted(true);
 
         Reporter.report(
-            pivotFollower.setControl(new Follower(pivotMasterID, false)),
+            pivotFollower.setControl(new Follower(pivotMasterID, true)),
             "Couldn't configure pivot slave"
+        );
+
+        Reporter.report(
+            pivotEncoder.getConfigurator().apply(cancoderConfiguration),
+            "Couldn't configure pivot encoder"
         );
 
         //disable all unused status signals to minimize CAN usage
         ParentDevice.optimizeBusUtilizationForAll(pivotMaster, pivotFollower, pivotEncoder);
-        positionSignal = pivotEncoder.getAbsolutePosition();
+        positionSignal = pivotEncoder.getPosition();
         velocitySignal = pivotEncoder.getVelocity();
         errorSignal = pivotMaster.getClosedLoopError();
         BaseStatusSignal.setUpdateFrequencyForAll(100, positionSignal, velocitySignal, errorSignal);
@@ -90,10 +96,11 @@ public class Pivot {
      * @return the pivot position with 0 being fully horizontal
      */
     public Rotation2d getPivotPosition () {
-        Reporter.report(positionSignal.getStatus(), "Couldn't read pivot position");
+        // Reporter.report(positionSignal.getStatus(), "Couldn't read pivot position");
 
-        var compensatedRotations = BaseStatusSignal.getLatencyCompensatedValue(positionSignal, velocitySignal);
+        var compensatedRotations = positionSignal.getValue();
 
+        // System.out.println("pivot position:" + pivotMaster.getPosition().getValue());
         var angle = Rotation2d.fromRotations(compensatedRotations);
         pivotAnglePublisher.accept(angle.getDegrees());
         return angle;

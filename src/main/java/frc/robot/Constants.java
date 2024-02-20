@@ -6,10 +6,14 @@ package frc.robot;
 
 import java.util.function.DoubleFunction;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -48,8 +52,8 @@ public final class Constants {
     public static final double flywheelMaxControllableVelocity = 0; //rotations per second
     public static final double flywheelGearRatio = 1;
     public static final double flywheelDiameter = Units.inchesToMeters(5);
-    public static final double flywheelKv = 1;
-    public static final double flywheelKa = 1;
+    public static final double flywheelKv = 0.5;
+    public static final double flywheelKa = 0.5;
     public static final double flywheelModelStDev = 3;
     public static final double flywheelEncoderStDev = 0.01;
     public static final double flywheelControlEffort = 12;
@@ -69,9 +73,9 @@ public final class Constants {
       flywheelConfigs.Feedback.SensorToMechanismRatio = flywheelGearRatio;
     }
 
-    public static final boolean topFlywheelMotorInverted = false;
-    public static final boolean bottomFlywheelMotorInverted = false;
-    public static final boolean triggerMotorInverted = false;
+    public static final boolean topFlywheelMotorInverted = true;
+    public static final boolean bottomFlywheelMotorInverted = true;
+    public static final boolean triggerMotorInverted = true;
 
     public static final double flywheelEfficiency = 1; // percentage of flywheel surface speed to exit velocity
     public static final double flywheelTolerance = 0; //how close to the target velocity the flywheel needs to be considered ready
@@ -81,8 +85,8 @@ public final class Constants {
   }
 
   public static final class FlywheelIntake {
-    public static final int flywheelIntakeDeployMotorId = 19;
-    public static final int flywheelIntakeRollerMotorId = 18;
+    public static final int flywheelIntakeRollerMotorId = 16;
+    public static final int flywheelIntakeDeployMotorId = 17;
 
     public static final double flywheelIntakeDeployKp = 2;
     public static final double flywheelIntakeDeployKi = 0;
@@ -97,15 +101,15 @@ public final class Constants {
     public static final boolean flywheelIntakeDeployMotorInverted = false;
     public static final boolean flywheelIntakeRollerMotorInverted = false;
 
-    public static final int flywheelIntakeDeployFreeCurrentLimit = 10; //TODO low for testing
+    public static final int flywheelIntakeDeployFreeCurrentLimit = 5; //TODO low for testing
     public static final int flywheelIntakeDeployStallCurrentLimit = 5; //TODO low for testing
   }
 
   public static final class TriggerIntake {
-    public static final int triggerIntakeRollerMotorId = 16;
-    public static final int triggerIntakeDeployMotorId = 17;
+    public static final int triggerIntakeRollerMotorId = 18;
+    public static final int triggerIntakeDeployMotorId = 19;
 
-    public static final double triggerIntakeDeployKp = 2;
+    public static final double triggerIntakeDeployKp = 4;
     public static final double triggerIntakeDeployKi = 0;
     public static final double triggerIntakeDeployKd = 0;
 
@@ -115,11 +119,11 @@ public final class Constants {
     public static final float triggerIntakeDeployMinAngle = 0.0f;
     public static final float triggerIntakeDeployMaxAngle = 0.0f;
 
-    public static final boolean triggerIntakeDeployMotorInverted = true;
+    public static final boolean triggerIntakeDeployMotorInverted = false;
     public static final boolean triggerIntakeRollerMotorInverted = false;
 
-    public static final int triggerIntakeDeployFreeCurrentLimit = 10; //TODO low for testing
-    public static final int triggerIntakeDeployStallCurrentLimit = 5; //TODO low for testing
+    public static final int triggerIntakeDeployFreeCurrentLimit = 20; //TODO low for testing
+    public static final int triggerIntakeDeployStallCurrentLimit = 20; //TODO low for testing
   }
 
   public static final class Pivot {
@@ -127,12 +131,12 @@ public final class Constants {
     public static final int pivotFollowerID = 24;
     public static final int pivotCANCoderID = 25;
 
-    public static final double restingAngle = 0; //rotations
+    public static final double restingAngle = 0.25; //rotations
 
-    public static final double pivotMinAngle = 0;
-    public static final double pivotMaxAngle = 0;
+    public static final double pivotMinAngle = Units.degreesToRotations(10);
+    public static final double pivotMaxAngle = Units.degreesToRotations(90);
 
-    public static final double pivotGearRatio = 0.01; // pivot rotations per motor rotation
+    public static final double pivotGearRatio = 0.01 * (16/24) * (16/24); // pivot rotations per motor rotation
     public static final double pivotTolerance = 0.05; //how close to the target position the pivot needs to be considered ready
 
     public static final double gravityFeedforwardkG = 0;
@@ -143,21 +147,35 @@ public final class Constants {
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      pivotConfigs.Slot0.kP = 0;
+      pivotConfigs.Slot0.kP = 20;
       pivotConfigs.Slot0.kI = 0;
       pivotConfigs.Slot0.kD = 0;
       pivotConfigs.Slot0.kS = 0;
-      pivotConfigs.Slot0.kV = 1;
-      pivotConfigs.Slot0.kA = 1;
+      pivotConfigs.Slot0.kV = 0.4;
+      pivotConfigs.Slot0.kA = 0;
+      pivotConfigs.Slot0.kG = 0;
+      pivotConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 1;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 0.5;
       pivotConfigs.MotionMagic.MotionMagicExpo_kV = 1;
       pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
 
+      // pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+      // pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+      // pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = pivotMaxAngle;
+      // pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = pivotMinAngle;
+
       pivotConfigs.Feedback.FeedbackRemoteSensorID = pivotCANCoderID;
-      pivotConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-      pivotConfigs.Feedback.FeedbackRotorOffset = 0;
+      pivotConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+      // pivotConfigs.Feedback.FeedbackRotorOffset = 0.371582;
       pivotConfigs.Feedback.RotorToSensorRatio = pivotGearRatio;
+    }
+
+    public static CANcoderConfiguration cancoderConfiguration = new CANcoderConfiguration();
+    static {
+      cancoderConfiguration.MagnetSensor.MagnetOffset = -0.632080078125;
+      cancoderConfiguration.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+      cancoderConfiguration.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
     }
   }
 
@@ -284,7 +302,7 @@ public final class Constants {
     public static final Inversion inversion = new Inversion(false, true, false, true);
 
     //inertia only used for simulation
-    public static final Physics physics = new Physics(0.05,0.01, Robot.isReal() ? 50 : 800, 10);
+    public static final Physics physics = new Physics(0.05,0.01, Robot.isReal() ? 80 : 800, 7);
     public static final double steerMotorCurrentLimit = Robot.isReal() ? 40 : 120; //amps
     
     public static final PidGains driveGains = new PidGains(0.35, 0, 0, 0.11, 0.3); 

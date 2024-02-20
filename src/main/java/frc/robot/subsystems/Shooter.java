@@ -143,6 +143,8 @@ public class Shooter {
      * @param bottom the velocity to set the bottom flywheel to in RPS
      */
     public void setFlywheelVelocity (double top, double bottom) {
+        System.out.println("top: " + top + "bottom: " + bottom);
+
         var topVelocityCompensated = getTopFlywheelVelocity();
         var bottomVelocityCompensated = getBottomFlywheelVelocity();
 

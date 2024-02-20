@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.ControlSystemTelemetry;
 import frc.robot.Constants.ControlSystem;
+import frc.robot.subsystems.Pivot;
 
 public class Robot extends TimedRobot {
   private PowerDistribution pdp = new PowerDistribution(ControlSystem.PDPCanId, ControlSystem.PDPModuleType);
@@ -60,7 +61,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+        SmartDashboard.putNumber("pivot angle", Pivot.getInstance().getPivotPosition().getDegrees());
+  }
 
   @Override
   public void autonomousInit() {

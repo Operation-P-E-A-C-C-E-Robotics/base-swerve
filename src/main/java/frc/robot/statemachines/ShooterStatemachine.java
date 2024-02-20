@@ -29,28 +29,28 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
      * e.g. intaking to indexing when the gamepiece is detected
      */
     private void updateState(){
-        switch (state) {
-            case RAMP_DOWN:
-                if(shooter.flywheelSwitchTripped() || shooter.triggerSwitchTripped()) state = ShooterState.INDEX;
-            case INTAKE:
-                if(shooter.flywheelSwitchTripped()) state = ShooterState.INDEX;
-            case SHOOT:
-                if(!alignedToShoot.getAsBoolean()) state = lastAimingState;
-            case INDEX:
-                if(!(shooter.triggerSwitchTripped() || shooter.flywheelSwitchTripped())) state = ShooterState.RAMP_DOWN;
-            default:
-                break;
-        }
-        if (
-              (state == ShooterState.AUTO_AIM
-            ||state == ShooterState.AIM_LAYUP
-            ||state == ShooterState.AIM_PROTECTED)
-            && alignedToShoot.getAsBoolean() 
-            && shooter.flywheelAtTargetVelocity()
-        ) {
-            lastAimingState = state;
-            state = ShooterState.SHOOT;
-        }
+        // switch (state) {
+        //     case RAMP_DOWN:
+        //         if(shooter.flywheelSwitchTripped() || shooter.triggerSwitchTripped()) state = ShooterState.INDEX;
+        //     case INTAKE:
+        //         if(shooter.flywheelSwitchTripped()) state = ShooterState.INDEX;
+        //     case SHOOT:
+        //         if(!alignedToShoot.getAsBoolean()) state = lastAimingState;
+        //     case INDEX:
+        //         if(!(shooter.triggerSwitchTripped() || shooter.flywheelSwitchTripped())) state = ShooterState.RAMP_DOWN;
+        //     default:
+        //         break;
+        // }
+        // if (
+        //       (state == ShooterState.AUTO_AIM
+        //     ||state == ShooterState.AIM_LAYUP
+        //     ||state == ShooterState.AIM_PROTECTED)
+        //     && alignedToShoot.getAsBoolean() 
+        //     && shooter.flywheelAtTargetVelocity()
+        // ) {
+        //     lastAimingState = state;
+        //     state = ShooterState.SHOOT;
+        // }
     }
 
     /**
@@ -77,6 +77,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
 
         if(state == ShooterState.AUTO_AIM) {
             shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
+            shooter.setTrigerPercent(0);
             return;
         }
 
@@ -137,7 +138,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         INTAKE(0.0,0.0), //NOTE: this should fold flat if the flywheel-side intake is out
         INDEX(0.0,0.2),
         HANDOFF(0.0,0.0), //to diverter
-        AIM_LAYUP(0.0,0.0),
+        AIM_LAYUP(1000.0,0.0),
         AIM_PROTECTED(0.0,0.0),
         AUTO_AIM(0.0,0.0),
         SHOOT(0.0,1.0);

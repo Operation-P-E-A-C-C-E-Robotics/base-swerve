@@ -63,22 +63,22 @@ public class TeleopInputs {
      * @return
      */
     public TeleopState getWantedTeleopState() {
-        var blueAlliancePose = AllianceFlipUtil.apply(Swerve.getInstance().getPose()); //robot pose for automation
+        // var blueAlliancePose = AllianceFlipUtil.apply(Swerve.getInstance().getPose()); //robot pose for automation
 
-        // change the mode based on the operator inputs
-        if(OI.Modes.wantsAmpMode.getAsBoolean()) mode = TeleopMode.AMP;
-        if(OI.Modes.wantsClimbMode.getAsBoolean()) mode = TeleopMode.CLIMB;
-        if(OI.Modes.wantsSpeakerMode.getAsBoolean()) mode = TeleopMode.SPEAKER;
-        if(OI.Modes.wantsPanicMode.getAsBoolean()) mode = TeleopMode.PANIC;
+        // // change the mode based on the operator inputs
+        // if(OI.Modes.wantsAmpMode.getAsBoolean()) mode = TeleopMode.AMP;
+        // if(OI.Modes.wantsClimbMode.getAsBoolean()) mode = TeleopMode.CLIMB;
+        // if(OI.Modes.wantsSpeakerMode.getAsBoolean()) mode = TeleopMode.SPEAKER;
+        // if(OI.Modes.wantsPanicMode.getAsBoolean()) mode = TeleopMode.PANIC;
 
         // reset the climb mode if we're not climbing
         if(mode != TeleopMode.CLIMB) climbMode = ClimbMode.ALIGN;
 
-        // operator overrides - these take precedence over everything else
-        if(OI.Inputs.wantsStow.getAsBoolean())  return TeleopState.STOW;
-        if(OI.Overrides.forceHandoff.getAsBoolean()) return TeleopState.HANDOFF;
-        if(OI.Overrides.forceAmp.getAsBoolean()) return TeleopState.ALIGN_AMP;
-        if(OI.Overrides.forceAim.getAsBoolean()) return TeleopState.AUTO_AIM;
+        // // operator overrides - these take precedence over everything else
+        // if(OI.Inputs.wantsStow.getAsBoolean())  return TeleopState.STOW;
+        // if(OI.Overrides.forceHandoff.getAsBoolean()) return TeleopState.HANDOFF;
+        // if(OI.Overrides.forceAmp.getAsBoolean()) return TeleopState.ALIGN_AMP;
+        // if(OI.Overrides.forceAim.getAsBoolean()) return TeleopState.AUTO_AIM;
 
         //handle the drivers' intaking requests, these take precedence over modes & automation
         intakingMode = wantedIntakeMode();
@@ -89,52 +89,52 @@ public class TeleopInputs {
         if(OI.Inputs.wantsAimLayup.getAsBoolean()) return TeleopState.AIM_LAYUP;
         if(OI.Inputs.wantsAimProtected.getAsBoolean()) return TeleopState.AIM_PROTECTED;
 
-        //handle the driver's request to "place" (a button that does different things based on the mode)
-        if(OI.Inputs.wantsPlace.getAsBoolean()) {
-            switch (mode) {
-                case AMP:
-                    return TeleopState.PLACE_AMP;
-                case CLIMB:
-                    if(climbMode == ClimbMode.RETRACT) return TeleopState.PLACE_TRAP;
-                case SPEAKER:
-                    return TeleopState.SHOOT;
-                default:
-                    break;
-            }
-        }
+        // //handle the driver's request to "place" (a button that does different things based on the mode)
+        // if(OI.Inputs.wantsPlace.getAsBoolean()) {
+        //     switch (mode) {
+        //         case AMP:
+        //             return TeleopState.PLACE_AMP;
+        //         case CLIMB:
+        //             if(climbMode == ClimbMode.RETRACT) return TeleopState.PLACE_TRAP;
+        //         case SPEAKER:
+        //             return TeleopState.SHOOT;
+        //         default:
+        //             break;
+        //     }
+        // }
 
-        if(mode == TeleopMode.PANIC) return TeleopState.REST;
+        // if(mode == TeleopMode.PANIC) return TeleopState.REST;
 
 
-        //handle mode-specific automation
-        switch (mode) {
-            case AMP:
-                aiming = false;
-                if(wantsHandoff(blueAlliancePose)) {
-                    return TeleopState.HANDOFF;
-                }
-                if(wantsAlignAmp(blueAlliancePose)) {
-                    return TeleopState.ALIGN_AMP;
-                }
-                return TeleopState.REST;
-            case CLIMB:
-                aiming = false;
-                climbMode = wantedClimbMode();
-                if(climbMode == ClimbMode.ALIGN) return TeleopState.ALIGN_CLIMB;
-                if(climbMode == ClimbMode.EXTEND) return TeleopState.CLIMB_EXTEND;
-                if(climbMode == ClimbMode.RETRACT) return TeleopState.CLIMB_RETRACT;
-                if(climbMode == ClimbMode.BALANCE) return TeleopState.CLIMB_BALANCE;
-                return TeleopState.ALIGN_CLIMB;
-            case SPEAKER:
-                aiming = wantsAim(blueAlliancePose); // stored for use in swerve state
-                if(OI.Inputs.wantsShoot.getAsBoolean()) return TeleopState.SHOOT;
-                if(aiming) {
-                    return TeleopState.AUTO_AIM;
-                }
-                return TeleopState.REST;
-            default:
-                break;
-        }
+        // //handle mode-specific automation
+        // switch (mode) {
+        //     case AMP:
+        //         aiming = false;
+        //         if(wantsHandoff(blueAlliancePose)) {
+        //             return TeleopState.HANDOFF;
+        //         }
+        //         if(wantsAlignAmp(blueAlliancePose)) {
+        //             return TeleopState.ALIGN_AMP;
+        //         }
+        //         return TeleopState.REST;
+        //     case CLIMB:
+        //         aiming = false;
+        //         climbMode = wantedClimbMode();
+        //         if(climbMode == ClimbMode.ALIGN) return TeleopState.ALIGN_CLIMB;
+        //         if(climbMode == ClimbMode.EXTEND) return TeleopState.CLIMB_EXTEND;
+        //         if(climbMode == ClimbMode.RETRACT) return TeleopState.CLIMB_RETRACT;
+        //         if(climbMode == ClimbMode.BALANCE) return TeleopState.CLIMB_BALANCE;
+        //         return TeleopState.ALIGN_CLIMB;
+        //     case SPEAKER:
+        //         aiming = wantsAim(blueAlliancePose); // stored for use in swerve state
+        //         if(OI.Inputs.wantsShoot.getAsBoolean()) return TeleopState.SHOOT;
+        //         if(aiming) {
+        //             return TeleopState.AUTO_AIM;
+        //         }
+        //         return TeleopState.REST;
+        //     default:
+        //         break;
+        // }
 
 
         return TeleopState.REST;
