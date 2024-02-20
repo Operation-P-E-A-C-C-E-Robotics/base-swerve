@@ -267,6 +267,10 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         driveTrain.drive(request);
     }
 
+    public void zeroAutoHeading() {
+        request.withHeading(driveTrain.getPose().getRotation().getRadians());
+    }
+
     @Override
     public boolean transitioning(){
         if(state.isFollowingPath() || state.isPathFinding()){

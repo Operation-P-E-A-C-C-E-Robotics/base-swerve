@@ -100,7 +100,7 @@ public class Pivot {
      */
     public Rotation2d getPivotPosition () {
         // Reporter.report(positionSignal.getStatus(), "Couldn't read pivot position");
-
+        positionSignal.refresh();
         var compensatedRotations = positionSignal.getValue();
 
         // System.out.println("pivot position:" + pivotMaster.getPosition().getValue());

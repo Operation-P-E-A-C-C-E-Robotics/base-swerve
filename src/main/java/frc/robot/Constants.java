@@ -52,12 +52,12 @@ public final class Constants {
     public static final double flywheelMaxControllableVelocity = 0; //rotations per second
     public static final double flywheelGearRatio = 1;
     public static final double flywheelDiameter = Units.inchesToMeters(5);
-    public static final double flywheelKv = 0.5;
-    public static final double flywheelKa = 0.5;
+    public static final double flywheelKv = 0.2;
+    public static final double flywheelKa = 0.1;
     public static final double flywheelModelStDev = 3;
     public static final double flywheelEncoderStDev = 0.01;
     public static final double flywheelControlEffort = 12;
-    public static final double flywheelErrorTolerance = 8;
+    public static final double flywheelErrorTolerance = 5;
 
     public static final double shotDetectionAccelerationThreshold = 2;
     public static final double shotDetectionTimeThreshold = 0.05;
@@ -66,7 +66,7 @@ public final class Constants {
 
     public static final TalonFXConfiguration flywheelConfigs = new TalonFXConfiguration();
     static {
-      flywheelConfigs.CurrentLimits.StatorCurrentLimit = 20;
+      flywheelConfigs.CurrentLimits.StatorCurrentLimit = 80;
       flywheelConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       flywheelConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast; //needs to be coast because we can override this to brake but not the other way around
 
@@ -130,7 +130,7 @@ public final class Constants {
 
     public static final double restingAngle = 0.25; //rotations
 
-    public static final double pivotMinAngle = Units.degreesToRotations(10);
+    public static final double pivotMinAngle = Units.degreesToRotations(15);
     public static final double pivotMaxAngle = Units.degreesToRotations(90);
 
     public static final double pivotGearRatio = 0.01 * (16/24) * (16/24); // pivot rotations per motor rotation
@@ -140,7 +140,7 @@ public final class Constants {
 
     public static final TalonFXConfiguration pivotConfigs = new TalonFXConfiguration();
     static {
-      pivotConfigs.CurrentLimits.StatorCurrentLimit = 20;
+      pivotConfigs.CurrentLimits.StatorCurrentLimit = 40;
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -157,10 +157,10 @@ public final class Constants {
       pivotConfigs.MotionMagic.MotionMagicExpo_kV = 1;
       pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
 
-      // pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-      // pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-      // pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = pivotMaxAngle;
-      // pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = pivotMinAngle;
+      pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+      pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+      pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = pivotMaxAngle;
+      pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = pivotMinAngle;
 
       pivotConfigs.Feedback.FeedbackRemoteSensorID = pivotCANCoderID;
       pivotConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;

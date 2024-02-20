@@ -62,6 +62,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    RobotContainer.getInstance().zeroAutoHeading();
     SmartDashboard.putNumber("pivot angle", Pivot.getInstance().getPivotPosition().getDegrees());
   }
 

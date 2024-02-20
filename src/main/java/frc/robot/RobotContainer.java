@@ -73,6 +73,10 @@ public class RobotContainer {
         return teleopStatemachine;
     }
 
+    public void zeroAutoHeading() {
+        swerveStatemachine.zeroAutoHeading();
+    }
+
     /**
      * The main update loop of the robot.
      * This is called periodically by the main robot class.

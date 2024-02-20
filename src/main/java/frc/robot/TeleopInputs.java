@@ -20,7 +20,7 @@ import frc.robot.subsystems.TriggerIntake;
  * but the actual logic for the state machine is defined here.
  */
 public class TeleopInputs {
-    private TeleopMode mode = TeleopMode.SPEAKER;
+    private TeleopMode mode = TeleopMode.PANIC;
     private IntakingMode intakingMode = IntakingMode.NONE;
     private ClimbMode climbMode = ClimbMode.ALIGN;
     private boolean aiming = false;
@@ -47,7 +47,7 @@ public class TeleopInputs {
      * @return
      */
     public SwerveState getWantedSwerveState() {
-        if(OI.Overrides.forceAim.getAsBoolean() || aiming) {
+        if(OI.Overrides.forceAim.getAsBoolean() || (aiming && mode == TeleopMode.SPEAKER)) {
             return SwerveState.AIM;
         }
 
@@ -147,6 +147,7 @@ public class TeleopInputs {
                 }
                 return TeleopState.REST;
             default:
+                aiming = false;
                 break;
         }
 
@@ -166,7 +167,7 @@ public class TeleopInputs {
             Diverter.getInstance().setDiverterRoller(1);
         }
 
-        var manualPivot = OI.ManualInputs.jogPivot.getAsDouble() / 4;
+        var manualPivot = OI.ManualInputs.jogPivot.getAsDouble() * 0.35;
         var manualTrigger = OI.ManualInputs.jogTrigger.getAsDouble();
 
         if(OI.ManualInputs.resetManualInputs.getAsBoolean()) {
@@ -174,12 +175,12 @@ public class TeleopInputs {
             jogTriggerMode = false;
         }
 
-        if(jogPivotMode || manualPivot > 0.2) {
+        if(jogPivotMode || Math.abs(manualPivot) > 0.2) {
             jogPivotMode = true;
             Pivot.getInstance().setPivotPercent(manualPivot);
         }
 
-        if(jogTriggerMode || manualTrigger > 0.2) {
+        if(jogTriggerMode || Math.abs(manualTrigger) > 0.2) {
             jogTriggerMode = true;
             Shooter.getInstance().setTrigerPercent(manualTrigger);
         }

@@ -210,14 +210,16 @@ public class Shooter {
      * @return latency-compensated flywheel velocity in rotations/second
      */
     public double getTopFlywheelVelocity () {
-        return BaseStatusSignal.getLatencyCompensatedValue(topFlywheelVelocity, topFlywheelAcceleration);
+        topFlywheelVelocity.refresh();
+        return topFlywheelVelocity.getValue();
     }
 
     /**
      * @return latency-compensated flywheel velocity in rotations/second
      */
     public double getBottomFlywheelVelocity () {
-        return BaseStatusSignal.getLatencyCompensatedValue(bottomFlywheelVelocity, bottomFlywheelAcceleration);
+        bottomFlywheelVelocity.refresh();
+        return bottomFlywheelVelocity.getValue();
     }
 
     /**
