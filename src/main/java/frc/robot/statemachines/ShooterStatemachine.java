@@ -141,7 +141,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         INDEX(0.0,0.2),
         HANDOFF(20.0,1.0), //to diverter
         AIM_LAYUP(40.0,0.0),
-        AIM_PROTECTED(60.0,0.0),
+        AIM_PROTECTED(200.0,0.0),
         AUTO_AIM(0.0,0.0),
         SHOOT(0.0,1.0);
 

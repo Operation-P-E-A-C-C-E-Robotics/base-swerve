@@ -52,8 +52,8 @@ public final class Constants {
     public static final double flywheelMaxControllableVelocity = 0; //rotations per second
     public static final double flywheelGearRatio = 1;
     public static final double flywheelDiameter = Units.inchesToMeters(5);
-    public static final double flywheelKv = 0.2;
-    public static final double flywheelKa = 0.1;
+    public static final double flywheelKv = 0.13;
+    public static final double flywheelKa = 0.01;
     public static final double flywheelModelStDev = 3;
     public static final double flywheelEncoderStDev = 0.01;
     public static final double flywheelControlEffort = 12;
@@ -144,17 +144,17 @@ public final class Constants {
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      pivotConfigs.Slot0.kP = 20;
+      pivotConfigs.Slot0.kP = 10;
       pivotConfigs.Slot0.kI = 0;
       pivotConfigs.Slot0.kD = 0;
       pivotConfigs.Slot0.kS = 0;
-      pivotConfigs.Slot0.kV = 0.4;
-      pivotConfigs.Slot0.kA = 0;
-      pivotConfigs.Slot0.kG = 0;
+      pivotConfigs.Slot0.kV = 15;
+      pivotConfigs.Slot0.kA = 0.3;
+      pivotConfigs.Slot0.kG = 0.2;
       pivotConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 0.5;
-      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 1;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 20;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 20;
       pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
 
       pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;

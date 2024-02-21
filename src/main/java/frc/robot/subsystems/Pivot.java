@@ -2,8 +2,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -49,25 +51,31 @@ public class Pivot {
             "Couldn't configure pivot master"
         );
 
+        // Reporter.report(
+        //     pivotFollower.getConfigurator().apply(pivotConfigs),
+        //     "Couldn't configure pivot follower"
+        // );
+
         pivotMaster.setInverted(true);
+        pivotFollower.setInverted(false);
 
-        Reporter.report(
-            pivotFollower.setControl(new Follower(pivotMasterID, true)),
-            "Couldn't configure pivot slave"
-        );
-
+        
         Reporter.report(
             pivotEncoder.getConfigurator().apply(cancoderConfiguration),
             "Couldn't configure pivot encoder"
         );
-
+            
         //disable all unused status signals to minimize CAN usage
-        ParentDevice.optimizeBusUtilizationForAll(pivotMaster, pivotFollower, pivotEncoder);
+        // ParentDevice.optimizeBusUtilizationForAll(pivotMaster, pivotFollower, pivotEncoder);
         positionSignal = pivotEncoder.getPosition();
         velocitySignal = pivotEncoder.getVelocity();
         errorSignal = pivotMaster.getClosedLoopError();
         BaseStatusSignal.setUpdateFrequencyForAll(100, positionSignal, velocitySignal, errorSignal);
-
+            
+        Reporter.report(
+            pivotFollower.setControl(new StrictFollower(pivotMaster.getDeviceID())),
+            "Couldn't configure pivot slave"
+        );
         SmartDashboard.putData("pivot mech", pivotMech);
     }
 
@@ -76,6 +84,7 @@ public class Pivot {
      * @param position the position duh
      */
     public void setPivotPosition (Rotation2d position) {
+        // return;
         var gravity = gravityFeedforward.calculate(getPivotPosition().getRadians(), 0);
 
         pivotControl.withFeedForward(gravity).withPosition(position.getRotations());
@@ -91,7 +100,7 @@ public class Pivot {
     }
 
     public void setPivotPercent (double percent) {
-        pivotMaster.set(percent);
+        pivotMaster.setControl(new DutyCycleOut(percent));
     }
 
     /**
