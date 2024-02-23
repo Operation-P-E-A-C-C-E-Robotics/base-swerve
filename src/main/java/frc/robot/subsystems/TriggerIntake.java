@@ -15,15 +15,17 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import frc.lib.util.Reporter;
 import frc.lib.util.Util;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
 
 public class TriggerIntake {
     /* HARDWARE */
     private CANSparkMax deployMotor = new CANSparkMax(triggerIntakeDeployMotorId, MotorType.kBrushless);
-    private CANSparkMax rollerMotor = new CANSparkMax(triggerIntakeRollerMotorId, MotorType.kBrushless);
+    private WPI_TalonSRX rollerMotor = new WPI_TalonSRX(triggerIntakeRollerMotorId);
 
     private RelativeEncoder deployEncoder = deployMotor.getEncoder();
 
@@ -107,6 +109,10 @@ public class TriggerIntake {
             deployController.setReference(angle.getRotations(), CANSparkMax.ControlType.kPosition),
             "couldn't set rear intake deploy angle"
         );
+    }
+
+    public void setDeploymentSpeed(double percent) {
+        deployController.setReference(percent, ControlType.kDutyCycle);
     }
 
     /**

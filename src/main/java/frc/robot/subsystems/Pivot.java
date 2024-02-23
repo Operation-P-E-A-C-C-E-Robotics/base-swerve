@@ -51,11 +51,6 @@ public class Pivot {
             "Couldn't configure pivot master"
         );
 
-        // Reporter.report(
-        //     pivotFollower.getConfigurator().apply(pivotConfigs),
-        //     "Couldn't configure pivot follower"
-        // );
-
         pivotMaster.setInverted(true);
         pivotFollower.setInverted(false);
 

@@ -71,7 +71,7 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
 
     public enum PivotState {
         REST(Rotation2d.fromDegrees(25)),
-        INTAKE(Rotation2d.fromDegrees(30)),
+        INTAKE(Rotation2d.fromDegrees(16)),
         AMP(Rotation2d.fromDegrees(30)),
         PRE_CLIMB(Rotation2d.fromDegrees(30)),
         CLIMB(Rotation2d.fromDegrees(30)),

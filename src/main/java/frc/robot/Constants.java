@@ -103,7 +103,7 @@ public final class Constants {
   }
 
   public static final class TriggerIntake {
-    public static final int triggerIntakeRollerMotorId = 18;
+    public static final int triggerIntakeRollerMotorId = 16;
     public static final int triggerIntakeDeployMotorId = 19;
 
     public static final double triggerIntakeDeployKp = 4;
@@ -119,8 +119,8 @@ public final class Constants {
     public static final boolean triggerIntakeDeployMotorInverted = false;
     public static final boolean triggerIntakeRollerMotorInverted = false;
 
-    public static final int triggerIntakeDeployFreeCurrentLimit = 20;
-    public static final int triggerIntakeDeployStallCurrentLimit = 20;
+    public static final int triggerIntakeDeployFreeCurrentLimit = 5;
+    public static final int triggerIntakeDeployStallCurrentLimit = 5;
   }
 
   public static final class Pivot {

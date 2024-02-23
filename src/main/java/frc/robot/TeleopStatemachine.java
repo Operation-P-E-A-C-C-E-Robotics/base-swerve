@@ -134,7 +134,8 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
         INTAKE_BACK (
             FlywheelIntakeState.RETRACT,
             TriggerIntakeState.INTAKE,
-            ShooterState.INTAKE
+            ShooterState.INTAKE,
+            PivotState.INTAKE
         ),
         AIM_LAYUP (
             ShooterState.AIM_LAYUP,

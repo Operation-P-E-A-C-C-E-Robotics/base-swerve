@@ -6,7 +6,7 @@ package frc.lib.state;
  * You should break up the logic for your subsystem into states and transitions between states,
  * and then implement those states and transitions in the state machine.
  * 
- * This class takes a generic type T that is an enum, which should
+ * This class takes a generic type T that is an enum, which should                                                                         PN: an enum is an array but you cant add to it.
  * be used to hold the states of the state machine.
  */
 public abstract class StateMachine <T extends Enum<T>> {
