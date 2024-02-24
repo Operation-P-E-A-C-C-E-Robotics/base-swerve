@@ -124,7 +124,12 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
 
     public enum TeleopState {
         REST,
-        STOW,
+        STOW(
+            FlywheelIntakeState.RETRACT,
+            TriggerIntakeState.RETRACT,
+            ShooterState.RAMP_DOWN,
+            PivotState.STOW
+        ),
         INTAKE_FRONT (
             FlywheelIntakeState.INTAKE,
             TriggerIntakeState.RETRACT,
