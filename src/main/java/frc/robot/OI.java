@@ -15,28 +15,15 @@ import frc.robot.subsystems.Shooter;
 public class OI {
     private static final Joystick driverJoystick = new Joystick(0);
     private static final Joystick operatorJoystick = new Joystick(1);
-    // public static class Swerve{
-    //     public static final DoubleSupplier translation = () -> -driverJoystick.getRawAxis(5);
-    //     public static final DoubleSupplier strafe = () -> -driverJoystick.getRawAxis(4);
-    //     public static final DoubleSupplier rotation = () -> -driverJoystick.getRawAxis(0);
-    //     public static final DoubleSupplier heading = () -> (double) -driverJoystick.getPOV();
-    //     public static final BooleanSupplier useHeading = () -> driverJoystick.getPOV() != -1;
-    //     public static final BooleanSupplier isRobotCentric = () -> driverJoystick.getRawButton(7);//driverJoystick.getRawAxis(2) > 0.2;
-    //     public static final BooleanSupplier isLockIn = () -> driverJoystick.getRawButton(1);
-    //     public static final BooleanSupplier isZeroOdometry = () -> driverJoystick.getRawButton(8);
-    //     public static final BooleanSupplier isOpenLoop = () -> true;
-    // }
-
-    //flight stick bindings
     public static class Swerve{
-        public static final DoubleSupplier translation = () -> -driverJoystick.getRawAxis(1);
-        public static final DoubleSupplier strafe = () -> -driverJoystick.getRawAxis(0);
-        public static final DoubleSupplier rotation = () -> -driverJoystick.getRawAxis(2);
+        public static final DoubleSupplier translation = () -> -driverJoystick.getRawAxis(5);
+        public static final DoubleSupplier strafe = () -> -driverJoystick.getRawAxis(4);
+        public static final DoubleSupplier rotation = () -> -driverJoystick.getRawAxis(0);
         public static final DoubleSupplier heading = () -> (double) -driverJoystick.getPOV();
         public static final BooleanSupplier useHeading = () -> driverJoystick.getPOV() != -1;
-        public static final BooleanSupplier isRobotCentric = () -> driverJoystick.getRawButton(2);//driverJoystick.getRawAxis(2) > 0.2;
+        public static final BooleanSupplier isRobotCentric = () -> driverJoystick.getRawButton(7);//driverJoystick.getRawAxis(2) > 0.2;
         public static final BooleanSupplier isLockIn = () -> driverJoystick.getRawButton(1);
-        public static final BooleanSupplier isZeroOdometry = () -> driverJoystick.getRawButton(4);
+        public static final BooleanSupplier isZeroOdometry = () -> driverJoystick.getRawButton(8);
         public static final BooleanSupplier isOpenLoop = () -> true;
     }
     
@@ -51,7 +38,7 @@ public class OI {
         public static final BooleanSupplier wantsIntake = () -> false;
         public static final BooleanSupplier wantsShoot = () -> false;
         public static final BooleanSupplier wantsStow = () -> driverJoystick.getRawButton(5);
-        public static final BooleanSupplier wantsPlace = () -> false;//driverJoystick.getRawAxis(3) > 0.2; //general place button, varies by mode
+        public static final BooleanSupplier wantsPlace = () -> driverJoystick.getRawAxis(3) > 0.2; //general place button, varies by mode
 
         public static final BooleanSupplier wantsAlign = () -> false;
         public static final BooleanSupplier wantsBalance = () -> false;
@@ -68,14 +55,13 @@ public class OI {
         /* MODE OVERRIDES */ //overrides the state requested by the mode
         public static final BooleanSupplier forceAim = () -> false;//operatorJoystick.getRawButton(5);
         public static final BooleanSupplier forceIntakeFront = () -> false;
-        public static final BooleanSupplier forceIntakeBack = () -> operatorJoystick.getRawButton(5);
-        // public static final BooleanSupplier forceIntakeBack = () -> driverJoystick.getRawButton(3);
+        public static final BooleanSupplier forceIntakeBack = () -> driverJoystick.getRawAxis(2) > 0.2 || operatorJoystick.getRawButton(-1);
         public static final BooleanSupplier forceHandoff = () -> false;
         public static final BooleanSupplier forceAmp = () -> false;
         
         /* DIRECT OVERRIDES */ //directly sets the state of the subsystem
         public static final BooleanSupplier disableAutoHeading = () -> false;
-        public static final BooleanSupplier forceTrigger = () -> operatorJoystick.getRawButton(8);
+        public static final BooleanSupplier forceTrigger = () -> false;//operatorJoystick.getRawButton(8);
         public static final BooleanSupplier eject = () -> operatorJoystick.getRawButton(6);
     }
 
