@@ -183,6 +183,9 @@ public class TeleopInputs {
         if(jogTriggerMode || Math.abs(manualTrigger) > 0.2) {
             jogTriggerMode = true;
             Shooter.getInstance().setTrigerPercent(manualTrigger);
+            if(manualTrigger < 0) {
+                Shooter.getInstance().setFlywheelVelocity(-5);
+            }
         }
     }
     

@@ -52,8 +52,8 @@ public final class Constants {
     public static final double flywheelMaxControllableVelocity = 0; //rotations per second
     public static final double flywheelGearRatio = 1;
     public static final double flywheelDiameter = Units.inchesToMeters(5);
-    public static final double flywheelKv = 0.13;
-    public static final double flywheelKa = 0.01;
+    public static final double flywheelKv = 0.115;
+    public static final double flywheelKa = 0.00001;
     public static final double flywheelModelStDev = 3;
     public static final double flywheelEncoderStDev = 0.01;
     public static final double flywheelControlEffort = 12;
@@ -106,7 +106,7 @@ public final class Constants {
     public static final int triggerIntakeRollerMotorId = 16;
     public static final int triggerIntakeDeployMotorId = 19;
 
-    public static final double triggerIntakeDeployKp = 4;
+    public static final double triggerIntakeDeployKp = 3;
     public static final double triggerIntakeDeployKi = 0;
     public static final double triggerIntakeDeployKd = 0;
 
@@ -119,8 +119,8 @@ public final class Constants {
     public static final boolean triggerIntakeDeployMotorInverted = false;
     public static final boolean triggerIntakeRollerMotorInverted = false;
 
-    public static final int triggerIntakeDeployFreeCurrentLimit = 5;
-    public static final int triggerIntakeDeployStallCurrentLimit = 5;
+    public static final int triggerIntakeDeployFreeCurrentLimit = 20;
+    public static final int triggerIntakeDeployStallCurrentLimit = 20;
   }
 
   public static final class Pivot {

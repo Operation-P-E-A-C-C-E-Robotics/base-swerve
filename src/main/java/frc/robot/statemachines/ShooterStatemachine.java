@@ -95,7 +95,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
             else if (shooter.triggerSwitchTripped() && !shooter.flywheelSwitchTripped()) shooter.setTrigerPercent(state.getTriggerPercent());
             else shooter.setTrigerPercent(0.0);
 
-            shooter.brakeFlywheel();
+            shooter.setFlywheelVelocity(state.flywheelVelocity);
             return;
         }
 
@@ -138,10 +138,10 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         RAMP_DOWN(0.0,0.0),
         COAST (0.0, 0.0),
         INTAKE(-10.0,1.0), //NOTE: this should fold flat if the flywheel-side intake is out
-        INDEX(0.0,0.2),
+        INDEX(-5.0,0.4),
         HANDOFF(20.0,1.0), //to diverter
         AIM_LAYUP(40.0,0.0),
-        AIM_PROTECTED(200.0,0.0),
+        AIM_PROTECTED(80.0,0.0),
         AUTO_AIM(0.0,0.0),
         SHOOT(0.0,1.0);
 

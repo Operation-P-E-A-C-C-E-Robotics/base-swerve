@@ -24,8 +24,8 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
      */
     private void updateState(){
         //don't allow the shooter to hit the intake
-        if(state == TriggerIntakeState.RETRACT && intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = TriggerIntakeState.AVOID;
-        if(state == TriggerIntakeState.AVOID && !intakeMotionPlanner.shouldFlywheelIntakeAvoid()) state = TriggerIntakeState.RETRACT;
+        if(state == TriggerIntakeState.RETRACT && intakeMotionPlanner.shouldTriggerIntakeAvoid()) state = TriggerIntakeState.AVOID;
+        if(state == TriggerIntakeState.AVOID && !intakeMotionPlanner.shouldTriggerIntakeAvoid()) state = TriggerIntakeState.RETRACT;
     }
 
     /**
@@ -75,9 +75,9 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
     public enum TriggerIntakeState{
         //TODO
         RETRACT(Rotation2d.fromDegrees(0),0.0),
-        EXTEND(Rotation2d.fromDegrees(140),0.0),
-        INTAKE(Rotation2d.fromDegrees(140),1.0),
-        AVOID(Rotation2d.fromDegrees(140),0.0),
+        EXTEND(Rotation2d.fromDegrees(145),0.0),
+        INTAKE(Rotation2d.fromDegrees(145),1.0),
+        AVOID(Rotation2d.fromDegrees(50),0.0),
         EJECT(Rotation2d.fromDegrees(140),0.0);
         
         private Rotation2d deployAngle;

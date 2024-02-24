@@ -24,7 +24,7 @@ import com.revrobotics.CANSparkBase.SoftLimitDirection;
 public class FlywheelIntake {
     /* HARDWARE */
     private CANSparkMax deployMotor = new CANSparkMax(flywheelIntakeDeployMotorId, MotorType.kBrushless);
-    private CANSparkMax rollerMotor = new CANSparkMax(flywheelIntakeRollerMotorId, MotorType.kBrushless);
+    // private WPI_TalonSRX rollerMotor = new WPI_TalonSRX(flywheelIntakeRollerMotorId);
 
     private RelativeEncoder deployEncoder = deployMotor.getEncoder();
 
@@ -44,9 +44,9 @@ public class FlywheelIntake {
     DoubleLogEntry rollerSpeedLog = new DoubleLogEntry(log, "Intake/Front Roller Speed %");
 
     private FlywheelIntake () {
-        rollerMotor.restoreFactoryDefaults();
+        // rollerMotor.restoreFactoryDefaults();
 
-        rollerMotor.setInverted(flywheelIntakeRollerMotorInverted);
+        // rollerMotor.setInverted(flywheelIntakeRollerMotorInverted);
         deployMotor.setInverted(flywheelIntakeDeployMotorInverted);
 
         //«««Warning»»» : dont let stretch interact with this code by any means. It has so much hatred 
@@ -115,7 +115,7 @@ public class FlywheelIntake {
      */
     public void setRollerSpeed (double speed) {
         rollerSpeedLog.append(speed);
-        rollerMotor.set(speed);
+        // rollerMotor.set(speed);
     }
 
     /**

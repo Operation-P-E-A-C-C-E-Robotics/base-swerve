@@ -62,7 +62,7 @@ public class OI {
         /* DIRECT OVERRIDES */ //directly sets the state of the subsystem
         public static final BooleanSupplier disableAutoHeading = () -> false;
         public static final BooleanSupplier forceTrigger = () -> operatorJoystick.getRawButton(8);
-        public static final BooleanSupplier eject = () -> false;//operatorJoystick.getRawButton(7);
+        public static final BooleanSupplier eject = () -> operatorJoystick.getRawButton(6);
     }
 
     public static class ManualInputs {
