@@ -32,9 +32,9 @@ public class AimPlanner {
     );
 
     private final double[][] distanceCalibrationData = {
-        {90, 80}, // pivot angles (deg)
-        {0, 10}, // flywheel speed rps
-        {0, 1}  //distances (m)
+        {52, 35, 27, 24}, // pivot angles (deg)
+        {40, 50, 50, 50}, // flywheel speed rps
+        {1, 2, 2.5, 3}  //distances (m)
     };
 
     private final LinearInterpolate pivotInterpolator = new LinearInterpolate(distanceCalibrationData[2], distanceCalibrationData[0]);
@@ -73,10 +73,11 @@ public class AimPlanner {
     }
 
     public void update() {
-        Pose2d blueOriginPose = AllianceFlipUtil.apply(robotPoseSupplier.get());
-        double distanceToTarget = blueOriginPose.getTranslation().getDistance(targetCenterTranslation);
+        Pose2d blueOriginPose = robotPoseSupplier.get();
+        var blueTargetTranslation = AllianceFlipUtil.apply(targetCenterTranslation);
+        double distanceToTarget = blueOriginPose.getTranslation().getDistance(blueTargetTranslation);
 
-        Rotation2d angleToTarget = blueOriginPose.getTranslation().minus(targetCenterTranslation).getAngle();
+        Rotation2d angleToTarget = blueOriginPose.getTranslation().minus(blueTargetTranslation).getAngle();
         Rotation2d pivotAngle = Rotation2d.fromDegrees(pivotInterpolator.interpolate(distanceToTarget));
         double flywheelAngularVelocity = flywheelAngularVelocityInterpolater.interpolate(distanceToTarget);
         double exitVelocity = RPSToExitVelocity(flywheelAngularVelocity);

@@ -189,7 +189,7 @@ public class TeleopInputs {
             }
         }
 
-        if((OI.Inputs.wantsAimLayup.getAsBoolean() || OI.Inputs.wantsAimProtected.getAsBoolean()) && OI.Inputs.wantsShoot.getAsBoolean()) {
+        if((OI.Inputs.wantsAimLayup.getAsBoolean() || OI.Inputs.wantsAimProtected.getAsBoolean()) && OI.Inputs.wantsPlace.getAsBoolean()) {
             Shooter.getInstance().setTrigerPercent(1);
         }
     }

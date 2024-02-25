@@ -4,11 +4,14 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -146,8 +149,13 @@ public class Swerve extends SubsystemBase {
         var frontResults = LimelightHelpers.getLatestResults(Constants.Cameras.frontLimelight).targetingResults;
         var rearResults = LimelightHelpers.getLatestResults(Constants.Cameras.rearLimelight).targetingResults;
         if(frontResults.botpose.length == 6) {
+            if(frontResults.botpose[0] == 0) return;
             Pose2d pose = frontResults.getBotPose2d_wpiBlue();
-            swerve.addVisionMeasurement(pose, frontResults.timestamp_RIOFPGA_capture); //todo right timestamp?
+            swerve.addVisionMeasurement(
+                pose, 
+                Timer.getFPGATimestamp(),
+                VecBuilder.fill(5,5,100)
+            ); //todo right timestamp?
         }
         if(rearResults.botpose.length == 6) {
             Pose2d pose = rearResults.getBotPose2d_wpiBlue();

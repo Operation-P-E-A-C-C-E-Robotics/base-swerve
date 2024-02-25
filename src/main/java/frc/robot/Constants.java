@@ -66,7 +66,7 @@ public final class Constants {
 
     public static final TalonFXConfiguration flywheelConfigs = new TalonFXConfiguration();
     static {
-      flywheelConfigs.CurrentLimits.StatorCurrentLimit = 80;
+      flywheelConfigs.CurrentLimits.StatorCurrentLimit = 50;
       flywheelConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       flywheelConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast; //needs to be coast because we can override this to brake but not the other way around
 
@@ -119,8 +119,8 @@ public final class Constants {
     public static final boolean triggerIntakeDeployMotorInverted = false;
     public static final boolean triggerIntakeRollerMotorInverted = false;
 
-    public static final int triggerIntakeDeployFreeCurrentLimit = 20;
-    public static final int triggerIntakeDeployStallCurrentLimit = 20;
+    public static final int triggerIntakeDeployFreeCurrentLimit = 5;
+    public static final int triggerIntakeDeployStallCurrentLimit = 2;
   }
 
   public static final class Pivot {

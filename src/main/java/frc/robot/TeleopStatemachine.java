@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Tracer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.planners.AimPlanner;
@@ -85,18 +86,28 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
         swerveStatemachine.requestState(state);
     }
 
+    Tracer lol = new Tracer();
+
     /**
      * Make the robot attain the desired state
      */
     @Override
     public void update(){
         SmartDashboard.putString("Robot State", state.name());
+        lol.addEpoch("update start");
         flywheelIntakeStatemachine.requestState(state.getFlywheelIntakeState());
+        lol.addEpoch("flywheel intake update");
         triggerIntakeStatemachine.requestState(state.getTriggerIntakeState());
+        lol.addEpoch("trigger intake update");
         shooterStatemachine.requestState(state.getShooterState());
+        lol.addEpoch("shooter update");
         pivotStatemachine.requestState(state.getPivotState());
+        lol.addEpoch("pivot update");
         diverterStatemachine.requestState(state.getDiverterState());
+        lol.addEpoch("diverter update");
         climberStatemachine.requestState(state.getClimberState());
+        lol.addEpoch("climber update");
+        lol.printEpochs();
     }
 
     /**

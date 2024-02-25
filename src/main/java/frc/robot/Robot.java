@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -13,11 +15,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.ControlSystemTelemetry;
+import frc.lib.util.AllianceFlipUtil;
 import frc.robot.Constants.ControlSystem;
 import frc.robot.subsystems.Pivot;
+import frc.robot.subsystems.Swerve;
 
 public class Robot extends TimedRobot {
-  private PowerDistribution pdp = new PowerDistribution(ControlSystem.PDPCanId, ControlSystem.PDPModuleType);
+  // private PowerDistribution pdp = new PowerDistribution(ControlSystem.PDPCanId, ControlSystem.PDPModuleType);
   private Timer scheduleTimer = new Timer();
 
   public Robot() {
@@ -35,7 +39,7 @@ public class Robot extends TimedRobot {
     DriverStation.startDataLog(DataLogManager.getLog());
 
     //log current draw
-    SmartDashboard.putData("PDP", pdp);
+    // SmartDashboard.putData("PDP", pdp);
     System.out.println("Robot Initialized");
     System.out.println("yay the software didn't crash yet");
   }
@@ -64,6 +68,10 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     RobotContainer.getInstance().zeroAutoHeading();
     SmartDashboard.putNumber("pivot angle", Pivot.getInstance().getPivotPosition().getDegrees());
+    Swerve.getInstance().periodic();
+    // if(AllianceFlipUtil.shouldFlip()) {
+    //   Swerve.getInstance().resetOdometry(new Pose2d(0,0,Rotation2d.fromDegrees(180)));
+    // }
   }
 
   @Override

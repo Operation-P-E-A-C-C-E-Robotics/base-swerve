@@ -10,6 +10,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
@@ -179,7 +180,8 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean();
 
         if(isZeroOdometry) {
-            driveTrain.resetOdometry();
+            var cpose = driveTrain.getPose();
+            driveTrain.resetOdometry(new Pose2d(cpose.getX(), cpose.getY(), Rotation2d.fromDegrees(cpose.getRotation().getDegrees() + 180)));
             request.withHeading(driveTrain.getPose().getRotation().getRadians());
         }
 

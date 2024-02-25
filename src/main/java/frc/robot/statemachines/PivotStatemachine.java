@@ -40,15 +40,11 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
     public void update(){
         // if (state == PivotState.INTAKE && !intakeMotionPlanner.canFlattenPivot()) state = PivotState.REST;
 
-        // if(state == PivotState.AUTO_AIM) {
-        //     var angle = aimPlanner.getTargetPivotAngle();
-        //     if(angle.getRadians() > MotionPlanner.interferenceLowerPivotAngle.getRadians() || intakeMotionPlanner.canFlattenPivot()) {
-        //         pivot.setPivotPosition(angle);
-        //         return;
-        //     } else {
-        //         state = PivotState.REST;
-        //     }
-        // }
+        if(state == PivotState.AUTO_AIM) {
+            var angle = aimPlanner.getTargetPivotAngle();
+                pivot.setPivotPosition(angle);
+                return;
+        }
 
         SmartDashboard.putString("Pivot State", state.name());
         pivot.setPivotPosition(state.getAngle());

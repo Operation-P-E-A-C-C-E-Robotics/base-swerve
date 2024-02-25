@@ -2,6 +2,7 @@ package frc.lib.swerve;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
@@ -52,6 +53,12 @@ public class PeaccefulSwerve extends SwerveDrivetrain {
     public PeaccefulSwerve(SwerveDrivetrainConstants swerveConstants, SwerveModuleConstants frontLeft,
             SwerveModuleConstants frontRight, SwerveModuleConstants rearLeft, SwerveModuleConstants rearRight) {
         super(swerveConstants, frontLeft, frontRight, rearLeft, rearRight);
+    }
+
+    public void optimizeBusUtilization() {
+        for(SwerveModule i : Modules) {
+            ParentDevice.optimizeBusUtilizationForAll(i.getCANcoder(), i.getDriveMotor(), i.getSteerMotor());
+        }
     }
 
 
