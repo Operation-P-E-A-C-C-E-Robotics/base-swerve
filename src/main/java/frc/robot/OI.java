@@ -16,59 +16,76 @@ public class OI {
     private static final Joystick driverJoystick = new Joystick(0);
     private static final Joystick operatorJoystick = new Joystick(1);
     public static class Swerve{
-        public static final DoubleSupplier translation = () -> -driverJoystick.getRawAxis(5);
-        public static final DoubleSupplier strafe = () -> -driverJoystick.getRawAxis(4);
-        public static final DoubleSupplier rotation = () -> -driverJoystick.getRawAxis(0);
-        public static final DoubleSupplier heading = () -> (double) -driverJoystick.getPOV();
-        public static final BooleanSupplier useHeading = () -> driverJoystick.getPOV() != -1;
-        public static final BooleanSupplier isRobotCentric = () -> driverJoystick.getRawButton(7);//driverJoystick.getRawAxis(2) > 0.2;
-        public static final BooleanSupplier isLockIn = () -> driverJoystick.getRawButton(1);
-        public static final BooleanSupplier isZeroOdometry = () -> driverJoystick.getRawButton(8);
-        public static final BooleanSupplier isOpenLoop = () -> true;
+        public static final DoubleSupplier translation = () -> -driverJoystick.getRawAxis(5); //how fast the robot should be going forward
+        public static final DoubleSupplier strafe = () -> -driverJoystick.getRawAxis(4); //how fast the robot should be going sideways
+        public static final DoubleSupplier rotation = () -> -driverJoystick.getRawAxis(0); //how fast the robot should be rotating
+        public static final DoubleSupplier heading = () -> (double) -driverJoystick.getPOV(); //the angle the robot should be facing
+        public static final BooleanSupplier useHeading = () -> driverJoystick.getPOV() != -1; //whether the robot should use the heading above
+        public static final BooleanSupplier isRobotCentric = () -> driverJoystick.getRawButton(7); //is forward always forward?
+        public static final BooleanSupplier isLockIn = () -> driverJoystick.getRawButton(1); //make the wheels point in
+        public static final BooleanSupplier isZeroOdometry = () -> driverJoystick.getRawButton(8); //zero the odometry
+        public static final BooleanSupplier isOpenLoop = () -> true; //how hard should we try to actually follow the inputs (false = use the PID, which feels unnatural to me)
     }
     
     public static class Modes {
+        //speaker mode automatically aims once the robot is past the center line (set wantsShoot to true and it should shoot automatically too)
         public static final BooleanSupplier wantsSpeakerMode = () -> operatorJoystick.getRawButton(1);
+
+        //amp mode automatically hands off past a centain x position and then aligns once nearer to the goal
         public static final BooleanSupplier wantsAmpMode = () -> operatorJoystick.getRawButton(2);
+
+        //climb mode prepares the robot to climb, and changes the joystick inputs to control the climber
         public static final BooleanSupplier wantsClimbMode = () -> operatorJoystick.getRawButton(3);
+
+        //panic mode does nothing, litterally. (allows manual overrides without automations screwing things up)
         public static final BooleanSupplier wantsPanicMode = () -> operatorJoystick.getRawButton(4);
     }
 
     public static class Inputs {
-        public static final BooleanSupplier wantsIntake = () -> false;
-        public static final BooleanSupplier wantsShoot = () -> false;
-        public static final BooleanSupplier wantsStow = () -> driverJoystick.getRawButton(5);
+        public static final BooleanSupplier wantsIntake = () -> false; //general intake button, auto selects front/back based on velocity
+        public static final BooleanSupplier wantsShoot = () -> false; //lets the shooter shoot when it feels like it
+        public static final BooleanSupplier wantsStow = () -> driverJoystick.getRawButton(5); //prevent decapitation
         public static final BooleanSupplier wantsPlace = () -> driverJoystick.getRawAxis(3) > 0.2; //general place button, varies by mode
 
-        public static final BooleanSupplier wantsAlign = () -> false;
-        public static final BooleanSupplier wantsBalance = () -> false;
-        public static final BooleanSupplier wantsClimbExtend = () -> false;
-        public static final BooleanSupplier wantsClimbRetract = () -> false;
+        //climber states. these are all mutually exclusive, and will override each other if multiple are true.
+        //they are also sticky, so the climber will stay in the state until another state is requested.
+        public static final BooleanSupplier wantsAlign = () -> false; //aligns the robot to drive under the chain
+        public static final BooleanSupplier wantsBalance = () -> false; //retracts the sides and adjusts them individually to balance the robot
+        public static final BooleanSupplier wantsClimbExtend = () -> false; //extends the climber
+        public static final BooleanSupplier wantsClimbRetract = () -> false; //retracts the climber fully to climb
 
+        //shooter setpoints. these are all mutually exclusive, and will override each other if multiple are true.
+        //they are not sticky, so the shooter only aims while the button is held down.
         public static final BooleanSupplier wantsAimLayup = () -> operatorJoystick.getPOV() == 0;
         public static final BooleanSupplier wantsAimProtected = () -> operatorJoystick.getPOV() == 180;
 
+        //let the shooter get steezy. Applies extra smoothing to the drive inputs to make a SOTM shot easier.
         public static final BooleanSupplier enableShootWhileMoving = () -> driverJoystick.getRawButton(6);
     }
     
     public static class Overrides {
         /* MODE OVERRIDES */ //overrides the state requested by the mode
-        public static final BooleanSupplier forceAim = () -> false;//operatorJoystick.getRawButton(5);
-        public static final BooleanSupplier forceIntakeFront = () -> false;
+        public static final BooleanSupplier forceAim = () -> false;//force the robot into auto aim state
+        public static final BooleanSupplier forceIntakeFront = () -> false; //force the robot to intake from the front
         public static final BooleanSupplier forceIntakeBack = () -> driverJoystick.getRawAxis(2) > 0.2 || operatorJoystick.getRawButton(-1);
-        public static final BooleanSupplier forceHandoff = () -> false;
-        public static final BooleanSupplier forceAmp = () -> false;
+        public static final BooleanSupplier forceHandoff = () -> false; //force the shooter to flipper handoff
+        public static final BooleanSupplier forceAmp = () -> false; //force the robot to go into the place amp state
         
         /* DIRECT OVERRIDES */ //directly sets the state of the subsystem
-        public static final BooleanSupplier disableAutoHeading = () -> false;
-        public static final BooleanSupplier forceTrigger = () -> false;//operatorJoystick.getRawButton(8);
-        public static final BooleanSupplier eject = () -> operatorJoystick.getRawButton(6);
+        private static final boolean disableAutoHeadingToggle = false;
+        public static final BooleanSupplier disableAutoHeading = () -> disableAutoHeadingToggle; //disables the auto heading of the swerve
+        public static final BooleanSupplier forceTrigger = () -> false; //force the trigger to run
+        public static final BooleanSupplier eject = () -> operatorJoystick.getRawButton(6); //oopsie (very overridy) spins everything backwards
     }
 
     public static class ManualInputs {
+        //Direct joystick inputs for critical systems. These are somewhat dangerous since they override most safety features.
+        //They are persistent so the robot won't return to automated control until the reset button is pressed.
+        //(well the trigger might but the pivot and climber won't)
         public static final DoubleSupplier jogTrigger = () -> -operatorJoystick.getRawAxis(1);
         public static final DoubleSupplier jogPivot = () -> -operatorJoystick.getRawAxis(3);
-        public static final DoubleSupplier jogClimber = () -> 0.0;
+        public static final DoubleSupplier jogClimberLeft = () -> 0.0;
+        public static final DoubleSupplier jogClimberRight = () -> 0.0;
 
         public static final BooleanSupplier resetManualInputs = () -> operatorJoystick.getRawButton(7);
     }

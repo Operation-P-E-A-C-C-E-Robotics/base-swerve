@@ -180,12 +180,17 @@ public class TeleopInputs {
             Pivot.getInstance().setPivotPercent(manualPivot);
         }
 
-        if(jogTriggerMode || Math.abs(manualTrigger) > 0.2) {
+        if(Math.abs(manualTrigger) > 0.2) {
             jogTriggerMode = true;
             Shooter.getInstance().setTrigerPercent(manualTrigger);
             if(manualTrigger < 0) {
+                //don't let notes stay stuck in the flywheel.
                 Shooter.getInstance().setFlywheelVelocity(-5);
             }
+        }
+
+        if((OI.Inputs.wantsAimLayup.getAsBoolean() || OI.Inputs.wantsAimProtected.getAsBoolean()) && OI.Inputs.wantsShoot.getAsBoolean()) {
+            Shooter.getInstance().setTrigerPercent(1);
         }
     }
     

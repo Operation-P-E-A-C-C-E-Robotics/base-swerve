@@ -45,7 +45,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
 
     /* Acceleration limiters for a consistent feel and to reduce power draw. */
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit); //limit the change in speed
-    private final SlewRateLimiter lowBatteryLinearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLowBatteryLinearSpeedLimit); //more aggresive to prevent brownouts
+    private final SlewRateLimiter agressiveLimiter = new SlewRateLimiter(Constants.Swerve.teleopLowBatteryLinearSpeedLimit); //more aggresive to prevent brownouts
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit); //limit the change in direction
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit); //limit the change in angular velocity
 
@@ -80,6 +80,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             Constants.Swerve.autoHeadingKP, 
             Constants.Swerve.autoHeadingKV, 
             Constants.Swerve.autoHeadingKA, 
+            Constants.Swerve.lockHeadingKP,
             driveTrain::getChassisSpeeds, 
             driveTrain::getTotalDriveCurrent, 
             Constants.Swerve.softHeadingCurrentLimit
@@ -209,6 +210,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         //X-lock the wheels if we're stopped and the driver wants to
         if (isLockIn) {
             driveTrain.drive(lockInRequest.withDriveRequestType(isOpenLoop ? DriveRequestType.OpenLoopVoltage : DriveRequestType.Velocity));
+            return;
         }
 
         //update my very nice swerve request with the values we've calculated
@@ -237,12 +239,14 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         }
 
         if(state == SwerveState.AIM){
+            //set the target to heading to the heading from the aim planner
             request.withHeading(aimPlanner.getTargetDrivetrainAngle().getRadians());
             request.withLockHeading(true);
             request.withLockHeadingVelocity(Units.degreesToRadians(aimPlanner.getDrivetrainAngularVelocity()));
         }
 
         if(state == SwerveState.ALIGN_INTAKING){
+            //align with a note automatically for intaking, using the limelight
             var results = LimelightHelpers.getLatestResults(Constants.Cameras.rearLimelight).targetingResults.targets_Detector;
             if(results.length > 0){
                 request.withHeading(Swerve.getInstance().getPose().getRotation().getRadians() + Units.degreesToRadians(results[0].tx));
@@ -252,7 +256,9 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         }
 
         if(OI.Overrides.disableAutoHeading.getAsBoolean()) {
-            request.withHoldHeading(false).withLockHeading(false).withSoftHoldHeading(false);
+            request.withHoldHeading(false)
+                    .withLockHeading(false)
+                    .withSoftHoldHeading(false);
         }
 
         //yay peaccyrequest,
@@ -300,12 +306,13 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
         rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
-        boolean useLowBetteryLimiter = RobotController.getBatteryVoltage() < 10.5;
+        boolean useAggresiveLimiter = RobotController.getBatteryVoltage() < 10.5 
+                                    || OI.Inputs.enableShootWhileMoving.getAsBoolean();
 
-        double lowBatSpeed = lowBatteryLinearSpeedLimiter.calculate(rawLinearSpeed);
+        double lowSpeed = agressiveLimiter.calculate(rawLinearSpeed);
         //limit the linear acceleration
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);
-        if(useLowBetteryLimiter) linearSpeed = lowBatSpeed;
+        if(useAggresiveLimiter) linearSpeed = lowSpeed;
 
         //limit the change in direction
         double rawLinearAngle = linearVelocity.getAngle().getRadians();

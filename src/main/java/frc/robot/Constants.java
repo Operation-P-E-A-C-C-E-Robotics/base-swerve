@@ -309,7 +309,8 @@ public final class Constants {
     public static final boolean invertSteerMotors = Robot.isReal(); //cant invert in simulation which is dumb.
 
     /* HEADING CONTROLLER CONSTANTS */
-    public static final double autoHeadingKP = 1000;
+    public static final double autoHeadingKP = 400;
+    public static final double lockHeadingKP = 1000;
     public static final double autoHeadingKI = 0.0; //DOES NOTHING LOL
     public static final double autoHeadingKD = 0.0; //ALSO DOES NOTHING LOL
     public static final double autoHeadingKV = 0.7;

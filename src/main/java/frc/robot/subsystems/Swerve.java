@@ -122,32 +122,6 @@ public class Swerve extends SubsystemBase {
         return swerve.getRotation3d();
     }
 
-    /**
-     * drive in a straight line to a target pose. THIS IS DUMB BECAUSE
-     * THE RETURNED COMMAND ALWAYS FOLLOWS THE SAME PATH AND DOESN'T REGENERATE.
-     * @param target the goal pose
-     * @return the command to follow the path
-     */
-    // public Command driveToPose(Pose2d target){
-    //     //the target rotation is the angle of the curve, and we want to go in a straight line, so it
-    //     //needs to be the angle between the robot and the target
-    //     Rotation2d targetRotation = target.minus(getPose()).getRotation();
-
-    //     //bezier curve from the current pose to the target pose
-    //     List<Translation2d> waypoints = PathPlannerPath.bezierFromPoses(
-    //         getPose(), 
-    //         new Pose2d(target.getTranslation(), targetRotation)
-    //     );
-
-    //     PathPlannerPath path = new PathPlannerPath(
-    //         waypoints,
-    //         Constants.Swerve.autoMaxSpeed,
-    //         new GoalEndState(0.0, target.getRotation())
-    //     );
-
-    //     return AutoBuilder.followPathWithEvents(path);
-    // }
-
     public double getTotalDriveCurrent(){
         return swerve.getTotalDriveCurrent();
     }

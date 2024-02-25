@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -61,7 +60,7 @@ public class Pivot {
         );
             
         //disable all unused status signals to minimize CAN usage
-        // ParentDevice.optimizeBusUtilizationForAll(pivotMaster, pivotFollower, pivotEncoder);
+        ParentDevice.optimizeBusUtilizationForAll(pivotMaster, pivotFollower, pivotEncoder);
         positionSignal = pivotEncoder.getPosition();
         velocitySignal = pivotEncoder.getVelocity();
         errorSignal = pivotMaster.getClosedLoopError();
@@ -103,18 +102,13 @@ public class Pivot {
      * @return the pivot position with 0 being fully horizontal
      */
     public Rotation2d getPivotPosition () {
-        // Reporter.report(positionSignal.getStatus(), "Couldn't read pivot position");
         positionSignal.refresh();
+        Reporter.report(positionSignal.getStatus(), "Couldn't read pivot position");
         var compensatedRotations = positionSignal.getValue();
 
-        // System.out.println("pivot position:" + pivotMaster.getPosition().getValue());
         var angle = Rotation2d.fromRotations(compensatedRotations);
         pivotAnglePublisher.accept(angle.getDegrees());
         return angle;
-    }
-
-    public void engageBrake (boolean enable) {
-        //TODO
     }
 
     public boolean atSetpoint () {

@@ -20,7 +20,7 @@ import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
 
 /**
- * This controls the state of the whole robot by setting the states
+ * TeleopStatemachine controls the state of the whole robot by setting the states
  * of all the subsystems' state machines.
  */
 public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopState>{

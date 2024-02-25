@@ -78,6 +78,7 @@ public class PeaccyRequest implements SwerveRequest {
     private Trajectory headingTrajectory = new Trajectory(new TrapezoidProfile.State(0, 0)); //make it smooth
     private SimpleMotorFeedforward headingFeedforward = new SimpleMotorFeedforward(0, 0, 0); //make it good
     private double holdHeadingkP = 0; //make it work
+    private double lockHeadingkP = 0; //make it work faster
 
     //heading trajectory constraints
     private double holdHeadingVelocity = 0;
@@ -127,6 +128,7 @@ public class PeaccyRequest implements SwerveRequest {
                     double holdHeadingkP, 
                     double holdHeadingkV, 
                     double holdHeadingkA, 
+                    double lockHeadingkP,
                     Supplier<ChassisSpeeds> chassisSpeedsSupplier,
                     DoubleSupplier totalDriveCurrentSupplier,
                     double softHeadingCurrentLimit) {
@@ -137,6 +139,7 @@ public class PeaccyRequest implements SwerveRequest {
 
         headingFeedforward = new SimpleMotorFeedforward(0, holdHeadingkV, holdHeadingkA);
         this.holdHeadingkP = holdHeadingkP;
+        this.lockHeadingkP = lockHeadingkP;
 
         this.maxLinearVelocity = maxLinearVelocity;
         
@@ -282,6 +285,11 @@ public class PeaccyRequest implements SwerveRequest {
         return this;
     }
 
+    /**
+     * just an extra velocity feedforward for lockheading, to use for aiming
+     * @param lockHeadingVelocity velocity target for feedforward
+     * @return this (so you can chain em nicely :I)
+     */
     public PeaccyRequest withLockHeadingVelocity(double lockHeadingVelocity) {
         this.LockHeadingVelocity = lockHeadingVelocity;
         return this;
@@ -385,6 +393,7 @@ public class PeaccyRequest implements SwerveRequest {
             target.position = Heading;
             target.velocity = LockHeadingVelocity;
         }
+        var kP = LockHeading ? lockHeadingkP : holdHeadingkP;
         var error = target.position - currentHeading;
 
         var acceleration = (target.velocity - getChassisSpeeds.get().omegaRadiansPerSecond);
@@ -394,7 +403,7 @@ public class PeaccyRequest implements SwerveRequest {
         }
 
         var feedforward = headingFeedforward.calculate(target.velocity, acceleration);
-        var pGain = error * holdHeadingkP * parameters.updatePeriod;
+        var pGain = error * kP * parameters.updatePeriod;
         if(SoftHoldHeading) {
             var currentDraw = currentLimitSmoother.calculate(totalDriveCurrent.getAsDouble());
             pGain = pGain * compress(currentDraw, totalDriveCurrentLimit, CURRENT_LIMIT_THRESHOLD);

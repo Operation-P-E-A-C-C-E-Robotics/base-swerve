@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static frc.robot.Constants.Swerve.lockHeadingKP;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
@@ -254,6 +256,7 @@ public class PeaccyTuner extends Command {
             autoHeadingKP, 
             autoHeadingKV, 
             autoHeadingKA, 
+            lockHeadingKP,
             driveTrain::getChassisSpeeds, 
             driveTrain::getTotalDriveCurrent, 
             softHeadingCurrentLimit

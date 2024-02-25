@@ -16,6 +16,10 @@ import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.statemachines.TriggerIntakeStatemachine;
 
+/**
+ * This class is used to control the robot during testing. It allows the user to
+ * override the state of each subsystem from Shuffleboard.
+ */
 public class TestInputs {
     private TestInputs() {}
 

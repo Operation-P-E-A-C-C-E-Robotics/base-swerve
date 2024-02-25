@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
     DriverStation.startDataLog(DataLogManager.getLog());
 
     //log current draw
-    // SmartDashboard.putData("PDP", pdp);
+    SmartDashboard.putData("PDP", pdp);
     System.out.println("Robot Initialized");
     System.out.println("yay the software didn't crash yet");
   }
