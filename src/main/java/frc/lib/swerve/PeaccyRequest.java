@@ -20,7 +20,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.motion.Trajectory;
 import frc.lib.telemetry.SwerveTelemetry;
+import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.Util;
+import frc.robot.subsystems.Swerve;
 
 /**
  * The most epic swerve request ever. Does all the things. Made by the one and only Peaccy.
@@ -360,7 +362,8 @@ public class PeaccyRequest implements SwerveRequest {
      * Get the rotation rate to apply to the robot to go to the target heading
      */
     private double applyAutoHeading(SwerveControlRequestParameters parameters) {
-        var currentHeading = parameters.currentPose.getRotation().getRadians();
+        var currentHeading = Swerve.getInstance().getPose().getRotation().getRadians();
+        if(AllianceFlipUtil.shouldFlip()) currentHeading += Math.PI;
 
         //make sure our odometry heading is within +/- 180 degrees of the target heading to prevent it from wrapping LIKE CTRE DOES >:(
         while (Math.abs(currentHeading - Heading) > Math.PI) {

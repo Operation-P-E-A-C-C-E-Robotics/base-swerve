@@ -180,8 +180,9 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         boolean isZeroOdometry = isZeroOdometrySup.getAsBoolean();
 
         if(isZeroOdometry) {
-            var cpose = driveTrain.getPose();
-            driveTrain.resetOdometry(new Pose2d(cpose.getX(), cpose.getY(), Rotation2d.fromDegrees(cpose.getRotation().getDegrees() + 180)));
+            // var cpose = driveTrain.getPose();
+            // driveTrain.resetOdometry(new Pose2d(cpose.getX(), cpose.getY(), Rotation2d.fromDegrees(cpose.getRotation().getDegrees() + 180)));
+            driveTrain.resetOdometry();
             request.withHeading(driveTrain.getPose().getRotation().getRadians());
         }
 

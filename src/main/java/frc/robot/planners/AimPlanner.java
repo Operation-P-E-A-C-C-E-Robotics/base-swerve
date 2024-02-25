@@ -16,6 +16,7 @@ import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.LinearInterpolate;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
+import frc.robot.Constants.Swerve;
 
 /**
  * In charge of calculating the correct angles for the pivot and drivetrain,
@@ -73,7 +74,7 @@ public class AimPlanner {
     }
 
     public void update() {
-        Pose2d blueOriginPose = robotPoseSupplier.get();
+        Pose2d blueOriginPose = frc.robot.subsystems.Swerve.getInstance().getPose();
         var blueTargetTranslation = AllianceFlipUtil.apply(targetCenterTranslation);
         double distanceToTarget = blueOriginPose.getTranslation().getDistance(blueTargetTranslation);
 
