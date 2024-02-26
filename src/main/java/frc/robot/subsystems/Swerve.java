@@ -6,6 +6,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -137,32 +138,34 @@ public class Swerve extends SubsystemBase {
         swerve.applySteerConfigs(gains);
     }
 
+    private static final double xyStDevCoeff = 1;
+    private static final double thetaStDevCoeff = 100;
+
     @Override
     public void periodic() {
         if(SmartDashboard.getBoolean("seed pose", false)) {
-            // swerve.tareEverything();
             resetOdometry(poseSeedChooser.getSelected());
             SmartDashboard.putBoolean("seed pose", false);
         }
 
-        //update odometry from limelight
-        var frontResults = LimelightHelpers.getLatestResults(Constants.Cameras.frontLimelight).targetingResults;
-        var rearResults = LimelightHelpers.getLatestResults(Constants.Cameras.rearLimelight).targetingResults;
-        if(frontResults.botpose.length == 6) {
-            if(frontResults.botpose[0] == 0) return;
-            Pose2d pose = frontResults.getBotPose2d_wpiBlue();
+        var frontLLPose = LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.Cameras.frontLimelight);
+
+        var trustCoefficient = (frontLLPose.avgTagDist * frontLLPose.avgTagDist) / frontLLPose.tagCount;
+
+        if(frontLLPose.tagCount > 1) {
             swerve.addVisionMeasurement(
-                pose, 
-                Timer.getFPGATimestamp(),
-                VecBuilder.fill(5,5,100)
+                frontLLPose.pose, 
+                frontLLPose.timestampSeconds,
+                VecBuilder.fill(
+                    trustCoefficient*xyStDevCoeff,
+                    trustCoefficient*xyStDevCoeff,
+                    trustCoefficient*thetaStDevCoeff
+                )
             ); //todo right timestamp?
         }
-        if(rearResults.botpose.length == 6) {
-            Pose2d pose = rearResults.getBotPose2d_wpiBlue();
-            swerve.addVisionMeasurement(pose, rearResults.timestamp_RIOFPGA_capture); //todo right timestamp?
-        }
 
-        LimelightTelemetry.update(Constants.Cameras.frontLimelight, swerve.getPose3d());
+        //TODO: update limelight telemetry
+        // LimelightTelemetry.update(Constants.Cameras.frontLimelight, swerve.getPose3d());
     }
 
     @Override
