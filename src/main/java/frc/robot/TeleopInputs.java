@@ -33,7 +33,6 @@ public class TeleopInputs {
     private final double INTAKE_TRANSITION_VELOCITY_THRESHOLD = 0.5; // m/s
 
     private boolean jogPivotMode = false;
-    private boolean jogTriggerMode = false;
 
     private TeleopInputs() {
         // This is a singleton class, so the constructor is private to prevent
@@ -172,7 +171,7 @@ public class TeleopInputs {
 
         if(OI.ManualInputs.resetManualInputs.getAsBoolean()) {
             jogPivotMode = false;
-            jogTriggerMode = false;
+            // jogTriggerMode = false;
         }
 
         if(jogPivotMode || Math.abs(manualPivot) > 0.2) {
@@ -180,12 +179,12 @@ public class TeleopInputs {
             Pivot.getInstance().setPivotPercent(manualPivot);
         }
 
-        if(Math.abs(manualTrigger) > 0.2) {
-            jogTriggerMode = true;
-            Shooter.getInstance().setTrigerPercent(manualTrigger);
+        if(Math.abs(manualTrigger) > 0.1) {
+            // jogTriggerMode = true;
+            Shooter.getInstance().setTrigerPercent(manualTrigger/2);
             if(manualTrigger < 0) {
                 //don't let notes stay stuck in the flywheel.
-                Shooter.getInstance().setFlywheelVelocity(-5);
+                Shooter.getInstance().setFlywheelVelocity(manualTrigger * 10);
             }
         }
 
