@@ -1,5 +1,7 @@
 package frc.robot.statemachines;
 
+import static frc.robot.Constants.Swerve.aimTolerance;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -10,7 +12,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
@@ -286,7 +287,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             return !pathFinished;
         }
         if(state == SwerveState.AIM) {
-            return true; //TODO
+            return Math.abs(driveTrain.getPose().getRotation().getDegrees() - aimPlanner.getTargetDrivetrainAngle().getDegrees()) > aimTolerance;
         }
         return false;
     }

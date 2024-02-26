@@ -235,6 +235,8 @@ public class Shooter {
      * @return the average acceleration of the flywheels in rotations/s^2
      */
     public double getFlywheelAcceleration () {
+        topFlywheelAcceleration.refresh();
+        bottomFlywheelAcceleration.refresh();
         return (topFlywheelAcceleration.getValue() + bottomFlywheelAcceleration.getValue()) / 2;
     }
 

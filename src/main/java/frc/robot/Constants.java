@@ -322,6 +322,8 @@ public final class Constants {
     public static final boolean useSoftHoldHeading = false;
     public static final double softHeadingCurrentLimit = 30;
 
+    public static final double aimTolerance = 0.5; //degrees
+
     
     /* PATH FOLLOWING CONSTANTS */
     public static final double pathfollowingMaxVelocity = 3,
