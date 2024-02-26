@@ -16,14 +16,12 @@ import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.LinearInterpolate;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
-import frc.robot.Constants.Swerve;
 
 /**
  * In charge of calculating the correct angles for the pivot and drivetrain,
  * and the flywheel velocity, to shoot at.
  */
 public class AimPlanner {
-    private final Supplier<Pose2d> robotPoseSupplier;
     private final Supplier<ChassisSpeeds> robotRelativeChassisSpeeds;
     private final BooleanSupplier shootWhileMoving; // enable correction for drivetrain velocity
 
@@ -68,7 +66,6 @@ public class AimPlanner {
     private final DoublePublisher shooterAngularAccelerationPublisher = aimTable.getDoubleTopic("SuperSOTM Shooter Angular Acceleration").publish();
 
     public AimPlanner (Supplier<Pose2d> robotPoseSupplier, Supplier<ChassisSpeeds> robotRelativeChassisSpeeds, BooleanSupplier shootWhileMoving) {
-        this.robotPoseSupplier = robotPoseSupplier;
         this.robotRelativeChassisSpeeds = robotRelativeChassisSpeeds;
         this.shootWhileMoving = shootWhileMoving;
     }

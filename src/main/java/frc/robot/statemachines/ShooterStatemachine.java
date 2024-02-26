@@ -18,8 +18,6 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
 
     private boolean hasNote = false;
 
-    private boolean manualTriggerMode = false;
-
     public ShooterStatemachine(Shooter shooter, AimPlanner aimPlanner, BooleanSupplier alignedToShoot){
         this.shooter = shooter;
         this.aimPlanner = aimPlanner;
@@ -43,16 +41,15 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         //     default:
         //         break;
         // }
-        // if (
-        //       (state == ShooterState.AUTO_AIM
-        //     ||state == ShooterState.AIM_LAYUP
-        //     ||state == ShooterState.AIM_PROTECTED)
-        //     && alignedToShoot.getAsBoolean() 
-        //     && shooter.flywheelAtTargetVelocity()
-        // ) {
-        //     lastAimingState = state;
-        //     state = ShooterState.SHOOT;
-        // }
+        if (
+              (state == ShooterState.AUTO_AIM
+            ||state == ShooterState.AIM_LAYUP
+            ||state == ShooterState.AIM_PROTECTED)
+            && alignedToShoot.getAsBoolean()
+        ) {
+            lastAimingState = state;
+            state = ShooterState.SHOOT;
+        }
     }
 
     /**

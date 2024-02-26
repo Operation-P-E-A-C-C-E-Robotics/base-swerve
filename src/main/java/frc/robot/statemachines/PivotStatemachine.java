@@ -12,12 +12,10 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
 
     private final Pivot pivot;
     private final AimPlanner aimPlanner;
-    private final MotionPlanner intakeMotionPlanner;
 
     public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner, MotionPlanner intakeMotionPlanner){
         this.pivot = pivot;
         this.aimPlanner = aimPlanner;
-        this.intakeMotionPlanner = intakeMotionPlanner;
 
         SmartDashboard.putNumber("pivot sim debug", 0);
     }
