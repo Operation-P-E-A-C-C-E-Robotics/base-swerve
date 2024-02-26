@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.RobotState;
+import frc.lib.telemetry.MultiTracers;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
 import frc.robot.statemachines.ClimberStatemachine;
@@ -83,9 +84,12 @@ public class RobotContainer {
      * It updates the supersystem state, planners, and state machines.
      */
     public void run() {
+        MultiTracers.trace("RobotContainer::run", "RobotContainer::run");
         /* UPDATE PLANNERS */
         motionPlanner.update();
+        MultiTracers.trace("RobotContainer::run", "motionPlanner.update");
         aimPlanner.update();
+        MultiTracers.trace("RobotContainer::run", "aimPlanner.update");
 
         /* TEST DASHBOARD */
         if(RobotState.isTest()) {
@@ -96,26 +100,35 @@ public class RobotContainer {
         if(RobotState.isTeleop()) {
             // update with the state the driver wants
             teleopStatemachine.requestState(TeleopInputs.getInstance().getWantedTeleopState());
+            MultiTracers.trace("RobotContainer::run", "teleopStatemachine.requestState");
             swerveStatemachine.requestState(TeleopInputs.getInstance().getWantedSwerveState());
+            MultiTracers.trace("RobotContainer::run", "swerveStatemachine.requestState");
 
             //run all the state machines
             teleopStatemachine.update();
+            MultiTracers.trace("RobotContainer::run", "teleopStatemachine.update");
             swerveStatemachine.update();
+            MultiTracers.trace("RobotContainer::run", "swerveStatemachine.update");
             flywheelIntakeStatemachine.update();
+            MultiTracers.trace("RobotContainer::run", "flywheelIntakeStatemachine.update");
             triggerIntakeStatemachine.update();
+            MultiTracers.trace("RobotContainer::run", "triggerIntakeStatemachine.update");
             pivotStatemachine.update();
+            MultiTracers.trace("RobotContainer::run", "pivotStatemachine.update");
             shooterStatemachine.update();
+            MultiTracers.trace("RobotContainer::run", "shooterStatemachine.update");
             // diverterStatemachine.update();
             // climberStatemachine.update();
             
             // handle driver overrides
             TeleopInputs.getInstance().handleOverrides();
+            MultiTracers.trace("RobotContainer::run", "TeleopInputs.getInstance().handleOverrides");
         }
 
         /* AUTONOMOUS */
         if(RobotState.isAutonomous()) {
             //autoStatemachine.update();
         }
-        // tracer.printEpochs();
+        MultiTracers.print("RobotContainer::run");
     }
 }

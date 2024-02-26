@@ -40,11 +40,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    // if (RobotState.isDisabled()) return;
     //run the robot
     scheduleTimer.reset();
     scheduleTimer.start();
-    // statemachine.update();
+
     RobotContainer.getInstance().run();
 
     ControlSystemTelemetry.update(null, scheduleTimer.get());

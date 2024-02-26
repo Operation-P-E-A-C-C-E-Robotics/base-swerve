@@ -1,8 +1,8 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Tracer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
+import frc.lib.telemetry.MultiTracers;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
 import frc.robot.statemachines.ClimberStatemachine;
@@ -86,28 +86,26 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
         swerveStatemachine.requestState(state);
     }
 
-    Tracer lol = new Tracer();
-
     /**
      * Make the robot attain the desired state
      */
     @Override
     public void update(){
         SmartDashboard.putString("Robot State", state.name());
-        lol.addEpoch("update start");
+        MultiTracers.trace("TeleopStatemachine", "start update");
         flywheelIntakeStatemachine.requestState(state.getFlywheelIntakeState());
-        lol.addEpoch("flywheel intake update");
+        MultiTracers.trace("TeleopStatemachine", "flywheelIntakeStatemachine.requestState");
         triggerIntakeStatemachine.requestState(state.getTriggerIntakeState());
-        lol.addEpoch("trigger intake update");
+        MultiTracers.trace("TeleopStatemachine", "triggerIntakeStatemachine.requestState");
         shooterStatemachine.requestState(state.getShooterState());
-        lol.addEpoch("shooter update");
+        MultiTracers.trace("TeleopStatemachine", "shooterStatemachine.requestState");
         pivotStatemachine.requestState(state.getPivotState());
-        lol.addEpoch("pivot update");
+        MultiTracers.trace("TeleopStatemachine", "pivotStatemachine.requestState");
         diverterStatemachine.requestState(state.getDiverterState());
-        lol.addEpoch("diverter update");
+        MultiTracers.trace("TeleopStatemachine", "diverterStatemachine.requestState");
         climberStatemachine.requestState(state.getClimberState());
-        lol.addEpoch("climber update");
-        lol.printEpochs();
+        MultiTracers.trace("TeleopStatemachine", "climberStatemachine.requestState");
+        MultiTracers.print("TeleopStatemachine");
     }
 
     /**
