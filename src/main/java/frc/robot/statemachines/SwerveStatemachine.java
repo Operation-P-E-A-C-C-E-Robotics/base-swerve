@@ -59,8 +59,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
     private boolean pathFinished = false;
 
     private final AimPlanner aimPlanner;
-
-    
+    private double aimTargetHeading = 0;
 
     /**
      * PeaccyDrive is a swerve drive command designed to handle all the different
@@ -246,8 +245,15 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
 
         if(state == SwerveState.AIM){
             //set the target to heading to the heading from the aim planner
-            request.withHeading(aimPlanner.getTargetDrivetrainAngle().getRadians());
-            request.withLockHeading(true);
+            //use smooth auto heading for the first part of the motion before
+            //locking on aggressively, to avoid excessive current draw
+            var wantedAngle = aimPlanner.getTargetDrivetrainAngle().getRadians();
+            var error = Math.abs(driveTrain.getPose().getRotation().getRadians() - wantedAngle);
+            var headingTargetError = Math.abs(aimTargetHeading - wantedAngle);
+            if(headingTargetError > 0.5 || error < 0.5) aimTargetHeading = wantedAngle;
+
+            request.withHeading(aimTargetHeading);
+            request.withLockHeading(error < 0.5);
             request.withLockHeadingVelocity(Units.degreesToRadians(aimPlanner.getDrivetrainAngularVelocity()));
         }
 
