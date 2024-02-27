@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.ControlSystemTelemetry;
-import frc.robot.subsystems.Pivot;
+import frc.lib.telemetry.MultiTracers;
 import frc.robot.subsystems.Swerve;
 
 public class Robot extends TimedRobot {
@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    // RobotContainer.getInstance().run();
+    MultiTracers.enable();
     //log data from network tables (SmartDashboard, etc.)
     DataLogManager.start();
     DataLogManager.logNetworkTables(false);
@@ -60,7 +60,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     RobotContainer.getInstance().zeroAutoHeading();
-    SmartDashboard.putNumber("pivot angle", Pivot.getInstance().getPivotPosition().getDegrees());
     Swerve.getInstance().periodic();
   }
 

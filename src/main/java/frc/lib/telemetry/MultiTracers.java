@@ -40,10 +40,7 @@ public class MultiTracers {
     public static void print(String tracer) {
         if (!enabled) return;
         if (tracers.containsKey(tracer)) {
-            System.out.println();
-            System.out.println(tracer);
             tracers.get(tracer).printEpochs();
-            System.out.println();
         }
     }
 
