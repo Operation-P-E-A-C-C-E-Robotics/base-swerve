@@ -2,9 +2,11 @@ package frc.robot;
 
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.MultiTracers;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
+import frc.robot.planners.NoteTracker;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.FlipperStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine;
@@ -49,7 +51,12 @@ public class RobotContainer {
     private final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine(flywheelIntake, motionPlanner);
     private final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine(triggerIntake, motionPlanner);
     private final PivotStatemachine pivotStatemachine = new PivotStatemachine(pivot, aimPlanner, motionPlanner);
-    private final ShooterStatemachine shooterStatemachine = new ShooterStatemachine(shooter, aimPlanner, () -> false); //TODO
+    private final ShooterStatemachine shooterStatemachine = new ShooterStatemachine(shooter, aimPlanner, () -> {
+        if(!shooter.flywheelAtTargetVelocity()) return false;
+        if(!pivot.atSetpoint()) return false;
+        if(!swerveStatemachine.transitioning()) return false;
+        return true;
+    }); //TODO
     private final FlipperStatemachine diverterStatemachine = new FlipperStatemachine(diverter, motionPlanner);
     private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber, () -> swerve.getGyroAngle().getX());
 
@@ -123,6 +130,8 @@ public class RobotContainer {
             // handle driver overrides
             TeleopInputs.getInstance().handleOverrides();
             MultiTracers.trace("RobotContainer::run", "TeleopInputs.getInstance().handleOverrides");
+            NoteTracker.update(teleopStatemachine.getState());
+            SmartDashboard.putString("Note tracket", NoteTracker.getLocation().name());
         }
 
         /* AUTONOMOUS */

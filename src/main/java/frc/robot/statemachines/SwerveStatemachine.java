@@ -254,12 +254,12 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             //use smooth auto heading for the first part of the motion before
             //locking on aggressively, to avoid excessive current draw
             var wantedAngle = aimPlanner.getTargetDrivetrainAngle().getRadians();
-            var error = Math.abs(driveTrain.getPose().getRotation().getRadians() - wantedAngle);
-            var headingTargetError = Math.abs(aimTargetHeading - wantedAngle);
-            if(headingTargetError > 0.5 || error < 0.5) aimTargetHeading = wantedAngle;
+            // var error = Math.abs(driveTrain.getPose().getRotation().getRadians() - wantedAngle);
+            // var headingTargetError = Math.abs(aimTargetHeading - wantedAngle);
+            // if(headingTargetError > 0.5 || error < 0.5) aimTargetHeading = wantedAngle;
 
-            request.withHeading(aimTargetHeading);
-            request.withLockHeading(error < 0.5);
+            request.withHeading(wantedAngle);
+            request.withLockHeading(true);
             request.withLockHeadingVelocity(Units.degreesToRadians(aimPlanner.getDrivetrainAngularVelocity()));
         }
 

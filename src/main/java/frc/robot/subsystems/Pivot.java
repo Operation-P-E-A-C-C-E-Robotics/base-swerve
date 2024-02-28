@@ -50,6 +50,11 @@ public class Pivot {
             "Couldn't configure pivot master"
         );
 
+        Reporter.report(
+            pivotFollower.getConfigurator().apply(pivotConfigs),
+            "Couldn't configure pivot follower"
+        );
+
         pivotMaster.setInverted(true);
         pivotFollower.setInverted(false);
 
@@ -64,7 +69,7 @@ public class Pivot {
         positionSignal = pivotEncoder.getPosition();
         velocitySignal = pivotEncoder.getVelocity();
         errorSignal = pivotMaster.getClosedLoopError();
-        BaseStatusSignal.setUpdateFrequencyForAll(100, positionSignal, velocitySignal, errorSignal);
+        BaseStatusSignal.setUpdateFrequencyForAll(100, positionSignal, velocitySignal, errorSignal, pivotMaster.getDutyCycle());
             
         Reporter.report(
             pivotFollower.setControl(new StrictFollower(pivotMaster.getDeviceID())),
@@ -112,6 +117,7 @@ public class Pivot {
     }
 
     public boolean atSetpoint () {
+        errorSignal.refresh();
         return Util.inRange(errorSignal.getValue(), pivotTolerance);
     }
 

@@ -4,6 +4,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.fasterxml.jackson.databind.JsonSerializable.Base;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -98,6 +99,9 @@ public class Shooter {
     private final BooleanPublisher shotDetectedPub = shooterTable.getBooleanTopic("Shot Detected").publish();
 
 
+    private double topSetpoint = 0;
+    private double bottomSetpoint = 0;
+
     private Shooter () {
         Reporter.report(
             topFlywheelMotor.getConfigurator().apply(flywheelConfigs), 
@@ -148,6 +152,9 @@ public class Shooter {
     public void setFlywheelVelocity (double top, double bottom) {
         var topVelocityCompensated = getTopFlywheelVelocity();
         var bottomVelocityCompensated = getBottomFlywheelVelocity();
+
+        topSetpoint = top;
+        bottomSetpoint = bottom;
 
         topVelocityPub.accept(topVelocityCompensated);
         bottomVelocityPub.accept(bottomVelocityCompensated);
@@ -211,7 +218,8 @@ public class Shooter {
      */
     public double getTopFlywheelVelocity () {
         topFlywheelVelocity.refresh();
-        return topFlywheelVelocity.getValue();
+        topFlywheelAcceleration.refresh();
+        return BaseStatusSignal.getLatencyCompensatedValue(topFlywheelVelocity, topFlywheelAcceleration);
     }
 
     /**
@@ -219,7 +227,8 @@ public class Shooter {
      */
     public double getBottomFlywheelVelocity () {
         bottomFlywheelVelocity.refresh();
-        return bottomFlywheelVelocity.getValue();
+        topFlywheelAcceleration.refresh();
+        return BaseStatusSignal.getLatencyCompensatedValue(bottomFlywheelVelocity, bottomFlywheelAcceleration);
     }
 
     /**
@@ -245,7 +254,8 @@ public class Shooter {
      * @return true if the flywheels are at their target velocity
      */
     public boolean flywheelAtTargetVelocity () {
-        return Util.inRange(topFlywheelLoop.getError(0), flywheelTolerance) && Util.inRange(bottomFlywheelLoop.getError(0), flywheelTolerance);
+        
+        return Util.inRange(Math.abs(topSetpoint - getTopFlywheelVelocity()), flywheelTolerance) && Util.inRange(Math.abs(bottomSetpoint - getBottomFlywheelVelocity()), flywheelTolerance);
     }
 
     /**
@@ -253,7 +263,7 @@ public class Shooter {
      * @return true if the limit switch is tripped
      */
     public boolean flywheelSwitchTripped () {
-        return flywheelSwitch.get();
+        return !flywheelSwitch.get();
     }
 
     /**
@@ -261,7 +271,7 @@ public class Shooter {
      * @return true if the limit switch is tripped
      */
     public boolean triggerSwitchTripped () {
-        return triggerSwitch.get();
+        return !triggerSwitch.get();
     }
 
     /**

@@ -52,7 +52,7 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
         
         if(state == TriggerIntakeState.INTAKE || state == TriggerIntakeState.EXTEND) {
             if(triggerIntake.getDeploymentAngle().getDegrees() > 135) {
-                triggerIntake.setDeploymentSpeed(0.01);
+                triggerIntake.setDeploymentSpeed(0.05);
             }
         }
     }

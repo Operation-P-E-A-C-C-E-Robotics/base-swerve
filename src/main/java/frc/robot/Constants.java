@@ -46,8 +46,8 @@ public final class Constants {
     public static final int lowerFlywheelMotorId = 29;
     public static final int triggerMotorId = 28;
 
-    public static final int flywheelSwitchId = 0;
-    public static final int triggerSwitchId = 1;
+    public static final int triggerSwitchId = 0;
+    public static final int flywheelSwitchId = 1;
 
     public static final double flywheelMaxControllableVelocity = 0; //rotations per second
     public static final double flywheelGearRatio = 1;
@@ -59,14 +59,14 @@ public final class Constants {
     public static final double flywheelControlEffort = 12;
     public static final double flywheelErrorTolerance = 5;
 
-    public static final double shotDetectionAccelerationThreshold = 2;
+    public static final double shotDetectionAccelerationThreshold = -70;
     public static final double shotDetectionTimeThreshold = 0.05;
-    public static final double shotDetectionMinVelocity = 5;
+    public static final double shotDetectionMinVelocity = 10;
     public static final double shotDetectionResetTime = 0.1;
 
     public static final TalonFXConfiguration flywheelConfigs = new TalonFXConfiguration();
     static {
-      flywheelConfigs.CurrentLimits.StatorCurrentLimit = 50;
+      flywheelConfigs.CurrentLimits.StatorCurrentLimit = 65;
       flywheelConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       flywheelConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast; //needs to be coast because we can override this to brake but not the other way around
 
@@ -78,7 +78,7 @@ public final class Constants {
     public static final boolean triggerMotorInverted = true;
 
     public static final double flywheelEfficiency = 0.5; // percentage of flywheel surface speed to exit velocity
-    public static final double flywheelTolerance = 0.1; //how close to the target velocity the flywheel needs to be considered ready
+    public static final double flywheelTolerance = 1; //how close to the target velocity the flywheel needs to be considered ready
   }
 
   public static final class FlywheelIntake {
@@ -119,8 +119,8 @@ public final class Constants {
     public static final boolean triggerIntakeDeployMotorInverted = false;
     public static final boolean triggerIntakeRollerMotorInverted = false;
 
-    public static final int triggerIntakeDeployFreeCurrentLimit = 5;
-    public static final int triggerIntakeDeployStallCurrentLimit = 2;
+    public static final int triggerIntakeDeployFreeCurrentLimit = 20;
+    public static final int triggerIntakeDeployStallCurrentLimit = 10;
   }
 
   public static final class Pivot {
@@ -134,27 +134,27 @@ public final class Constants {
     public static final double pivotMaxAngle = Units.degreesToRotations(90);
 
     public static final double pivotGearRatio = 0.01 * (16/24) * (16/24); // pivot rotations per motor rotation
-    public static final double pivotTolerance = 0.05; //how close to the target position the pivot needs to be considered ready
+    public static final double pivotTolerance = 2; //how close to the target position the pivot needs to be considered ready
 
     public static final double gravityFeedforwardkG = 0;
 
     public static final TalonFXConfiguration pivotConfigs = new TalonFXConfiguration();
     static {
-      pivotConfigs.CurrentLimits.StatorCurrentLimit = 40;
+      pivotConfigs.CurrentLimits.StatorCurrentLimit = 50;
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      pivotConfigs.Slot0.kP = 10;
+      pivotConfigs.Slot0.kP = 6;
       pivotConfigs.Slot0.kI = 0;
       pivotConfigs.Slot0.kD = 0;
       pivotConfigs.Slot0.kS = 0;
-      pivotConfigs.Slot0.kV = 15;
-      pivotConfigs.Slot0.kA = 0.3;
-      pivotConfigs.Slot0.kG = 0.2;
+      pivotConfigs.Slot0.kV = 14.5;
+      pivotConfigs.Slot0.kA = 0;
+      pivotConfigs.Slot0.kG = 0.25;
       pivotConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 20;
-      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 20;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 5;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 10;
       pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
 
       pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -170,7 +170,7 @@ public final class Constants {
 
     public static CANcoderConfiguration cancoderConfiguration = new CANcoderConfiguration();
     static {
-      cancoderConfiguration.MagnetSensor.MagnetOffset = -0.632080078125;
+      cancoderConfiguration.MagnetSensor.MagnetOffset = -0.613281;
       cancoderConfiguration.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
       cancoderConfiguration.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
     }
@@ -179,7 +179,7 @@ public final class Constants {
   public static final class Diverter {
     public static final int diverterRollerMotorId = 50;
     public static final int diverterDeployMotorId = 26;
-
+// 
     public static final double diverterDeployGearRatio = 1;
     public static final double diverterDeployTolerance = 0; //how close to the target position the deployer needs to be to be considered "deployed"
 
@@ -322,7 +322,7 @@ public final class Constants {
     public static final boolean useSoftHoldHeading = false;
     public static final double softHeadingCurrentLimit = 30;
 
-    public static final double aimTolerance = 0.5; //degrees
+    public static final double aimTolerance = 1; //degrees
 
     
     /* PATH FOLLOWING CONSTANTS */

@@ -30,10 +30,15 @@ public class AimPlanner {
         FieldConstants.Speaker.centerSpeakerOpening.getY()
     );
 
+    private final Translation2d apriltagTranslation = new Translation2d(
+        FieldConstants.aprilTags.getTagPose(7).get().getTranslation().getX(), 
+        FieldConstants.aprilTags.getTagPose(7).get().getTranslation().getY()
+    );
+
     private final double[][] distanceCalibrationData = {
-        {52, 35, 27, 24}, // pivot angles (deg)
-        {40, 50, 50, 50}, // flywheel speed rps
-        {1, 2, 2.5, 3}  //distances (m)
+        {57, 40, 33, 26.6}, // pivot angles (deg)
+        {40, 50, 60, 70}, // flywheel speed rps
+        {1, 2, 3, 4}  //distances (m)
     };
 
     private final LinearInterpolate pivotInterpolator = new LinearInterpolate(distanceCalibrationData[2], distanceCalibrationData[0]);
@@ -48,6 +53,8 @@ public class AimPlanner {
     private double drivetrainAngularVelocity = 0;
     private double pivotAngularVelocity = 0;
     private double shooterAngularAcceleration = 0;
+
+    private double limelighttXOffset = 0; //difference between tx and wanted rotation for target center
 
     /* TELEMETRY */ //note: SOTM = Shoot on the Move
     private final NetworkTable aimTable = NetworkTableInstance.getDefault().getTable("Aim Planner");
@@ -76,6 +83,10 @@ public class AimPlanner {
         double distanceToTarget = blueOriginPose.getTranslation().getDistance(blueTargetTranslation);
 
         Rotation2d angleToTarget = blueOriginPose.getTranslation().minus(blueTargetTranslation).getAngle();
+        Rotation2d angleToTag = blueOriginPose.getTranslation().minus(apriltagTranslation).getAngle();
+
+        limelighttXOffset = angleToTag.getDegrees() - angleToTarget.getDegrees();
+
         Rotation2d pivotAngle = Rotation2d.fromDegrees(pivotInterpolator.interpolate(distanceToTarget));
         double flywheelAngularVelocity = flywheelAngularVelocityInterpolater.interpolate(distanceToTarget);
         double exitVelocity = RPSToExitVelocity(flywheelAngularVelocity);
@@ -99,13 +110,13 @@ public class AimPlanner {
         ChassisSpeeds robotVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds.get(), blueOriginPose.getRotation());
         ShotAngle uncorrectedShotAngle = new ShotAngle(angleToTarget, pivotAngle, exitVelocity);
         ShotAngle correctedShotAngle = ShotAngle.correctFromChassisSpeeds(uncorrectedShotAngle, robotVelocity, blueOriginPose.getRotation());
-        this.pivotAngle = correctedShotAngle.getPivotAngle();
+        this.pivotAngle = Rotation2d.fromDegrees(180).minus(correctedShotAngle.getPivotAngle());
         this.flywheelAngularVelocity = exitVelocityToRPS(correctedShotAngle.getExitVelocity());
         this.drivetrainAngle = correctedShotAngle.getDrivetrainAngle();
 
-        sotmPivotAnglePublisher.accept(pivotAngle.getDegrees());
-        sotmExitVelocityPublisher.accept(uncorrectedShotAngle.getExitVelocity());
-        sotmDrivetrainAnglePublisher.accept(uncorrectedShotAngle.getDrivetrainAngle().getDegrees());
+        sotmPivotAnglePublisher.accept(correctedShotAngle.getPivotAngle().getDegrees());
+        sotmExitVelocityPublisher.accept(correctedShotAngle.getExitVelocity());
+        sotmDrivetrainAnglePublisher.accept(correctedShotAngle.getDrivetrainAngle().getDegrees());
 
         //calculate the angular velocities of the mechanisms
         //first get the robots velocity relative to the target
@@ -200,7 +211,7 @@ public class AimPlanner {
 
         public static ShotAngle correctFromChassisSpeeds (ShotAngle shotAngle, ChassisSpeeds speeds, Rotation2d heading) {
             var robotVelocity = new Translation3d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, 0);
-            var correctedVector = shotAngle.getFieldCentricVector(heading).minus(robotVelocity);
+            var correctedVector = shotAngle.getFieldCentricVector(heading).plus(robotVelocity);
             return fromFieldCentricVector(correctedVector, heading);
         }
 

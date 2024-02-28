@@ -4,6 +4,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.AllianceFlipUtil;
 import frc.robot.TeleopStatemachine.TeleopState;
+import frc.robot.planners.NoteTracker;
+import frc.robot.planners.NoteTracker.NoteLocation;
 import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.subsystems.Diverter;
 import frc.robot.subsystems.FlywheelIntake;
@@ -208,6 +210,7 @@ public class TeleopInputs {
     }
 
     private boolean wantsAim(Pose2d blueAlliancePose) {
+        if(NoteTracker.getLocation() != NoteLocation.SHOOTER) return false;
         if (blueAlliancePose.getX() < AUTO_AIM_X) return true;
         return false;
     }

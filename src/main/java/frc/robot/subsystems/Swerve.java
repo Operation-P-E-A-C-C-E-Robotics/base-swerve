@@ -135,8 +135,8 @@ public class Swerve extends SubsystemBase {
         swerve.applySteerConfigs(gains);
     }
 
-    private static final double xyStDevCoeff = 1;
-    private static final double thetaStDevCoeff = 100;
+    private static final double xyStDevCoeff = 0.5;
+    private static final double thetaStDevCoeff = 10;
 
     @Override
     public void periodic() {
@@ -149,7 +149,7 @@ public class Swerve extends SubsystemBase {
 
         var trustCoefficient = (frontLLPose.avgTagDist * frontLLPose.avgTagDist) / frontLLPose.tagCount;
 
-        if(frontLLPose.tagCount > 1) {
+        if(frontLLPose.tagCount > 0) {
             swerve.addVisionMeasurement(
                 frontLLPose.pose, 
                 frontLLPose.timestampSeconds,
