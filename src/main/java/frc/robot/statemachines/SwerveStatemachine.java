@@ -7,14 +7,12 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.state.StateMachine;
@@ -57,6 +55,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
     private Command pathCommand = null;
     private boolean pathInitialized = false;
     private boolean pathFinished = false;
+    private Timer pathTimer = new Timer();
 
     private final AimPlanner aimPlanner;
     private double aimTargetHeading = 0;
@@ -112,21 +111,17 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         } else {
             LimelightHelpers.setPipelineIndex(Constants.Cameras.rearLimelight, Constants.Cameras.apriltagPipeline);
         }
-
-        //handle command end function
-        if((this.state.isFollowingPath() || this.state.isPathFinding()) && pathCommand != null){
-            pathCommand.end(!pathFinished);
-        }
-        //reset the request heading to avoid erronious heading changes
-        // if((state == SwerveState.OPEN_LOOP_TELEOP || state == SwerveState.CLOSED_LOOP_TELEOP) && state != this.state) {
-        //     request.withHeading(driveTrain.getPose().getRotation().getRadians());
-        // }
-
+            
         //handle path following
-        if(state.isFollowingPath() || state.isPathFinding()){
-            pathCommand = state.isFollowingPath() ? state.getPathCommand() : state.getPathFindingCommand();
+        //handle command end function
+        if(this.state == SwerveState.FOLLOW_PATH && state != SwerveState.FOLLOW_PATH && pathCommand != null){
+            pathCommand.end(!pathFinished);
+            pathTimer.stop();
+        }
+        if(state == SwerveState.FOLLOW_PATH && this.state != SwerveState.FOLLOW_PATH){
             pathInitialized = false;
             pathFinished = false;
+            pathTimer.reset();
         }
         this.state = state;
     }
@@ -140,6 +135,16 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
                 requestState(SwerveState.OPEN_LOOP_TELEOP);
             }
         }
+    }
+
+    public void setPathCommand(Command command){
+        pathCommand = command;
+        pathInitialized = false;
+        pathFinished = false;
+    }
+
+    public double getPathTime() {
+        return pathTimer.get();
     }
 
     @Override
@@ -156,10 +161,11 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
 
         if(Robot.isSimulation()) driveTrain.simulationPeriodic();
         /* PATH FOLLOWING */
-        if(state.isFollowingPath() || state.isPathFinding()){
-
+        if(state == SwerveState.FOLLOW_PATH && pathCommand != null){
             if(!pathInitialized){
                 pathCommand.initialize();
+                pathTimer.reset();
+                pathTimer.start();
                 pathInitialized = true;
             }
             pathCommand.execute();
@@ -291,7 +297,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
 
     @Override
     public boolean transitioning(){
-        if(state.isFollowingPath() || state.isPathFinding()){
+        if(state == SwerveState.FOLLOW_PATH){
             return !pathFinished;
         }
         if(state == SwerveState.AIM) {
@@ -386,17 +392,12 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         LOCK_IN             (true, false, true, false),
         AIM,
         ALIGN_INTAKING, //align to the note with vision
-        TEST_PATH("Example Path"),
-        TEST_PATHFIND(new Pose2d());
+        FOLLOW_PATH;
 
-        private String path = "";
-        boolean followingPath = false;
-        boolean pathFinding = false;
         boolean openLoop = false;
         boolean robotCentric = false;
         boolean lockIn = false;
         boolean holdHeading;
-        Pose2d pathFindingTarget = null;
 
         private SwerveState(boolean openLoop, boolean robotCentric, boolean lockIn, boolean holdHeading){
             this.openLoop = openLoop;
@@ -405,47 +406,11 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             this.holdHeading = holdHeading;
         }
 
-        private SwerveState(String path){
-            this.path = path;
-            followingPath = true;
-        }
-
-        private SwerveState(Pose2d target){
-            pathFindingTarget = target;
-            pathFinding = true;
-        }
-
         private SwerveState() {
-            followingPath = false;
-            pathFinding = false;
             openLoop = true;
             robotCentric = false;
             lockIn = false;
             holdHeading = true;
-        }
-
-        public PathPlannerPath getPath(){
-            return PathPlannerPath.fromPathFile(path);
-        }
-
-        public Command getPathCommand(){
-            return AutoBuilder.followPath(getPath());
-        }
-
-        public Pose2d getPathFindingTarget(){
-            return pathFindingTarget;
-        }
-
-        public Command getPathFindingCommand(){
-            return AutoBuilder.pathfindToPose(pathFindingTarget, Constants.Swerve.autoMaxSpeed);
-        }
-
-        public boolean isFollowingPath(){
-            return followingPath;
-        }
-
-        public boolean isPathFinding(){
-            return pathFinding;
         }
 
         public boolean isOpenLoop(){
