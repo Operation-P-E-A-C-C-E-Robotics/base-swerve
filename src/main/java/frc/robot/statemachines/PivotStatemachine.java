@@ -13,6 +13,8 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
     private final Pivot pivot;
     private final AimPlanner aimPlanner;
 
+    private boolean restingBrake = false; //disable the motor and just use brake mode to conserve battery
+
     public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner, MotionPlanner intakeMotionPlanner){
         this.pivot = pivot;
         this.aimPlanner = aimPlanner;
@@ -37,6 +39,7 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
     @Override
     public void update(){
         // if (state == PivotState.INTAKE && !intakeMotionPlanner.canFlattenPivot()) state = PivotState.REST;
+        SmartDashboard.putString("Pivot State", state.name());
 
         if(state == PivotState.AUTO_AIM) {
             var angle = aimPlanner.getTargetPivotAngle();
@@ -44,7 +47,15 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
                 return;
         }
 
-        SmartDashboard.putString("Pivot State", state.name());
+        // if(state == PivotState.REST) {
+        //     if(pivot.getPivotPosition().getDegrees() < (state.getAngle().getDegrees() - 6)) restingBrake = false;
+        //     if(pivot.getPivotPosition().getDegrees() > (state.getAngle().getDegrees() - 2)) restingBrake = true;
+        //     if(restingBrake) {
+        //         pivot.setPivotPercent(0);
+        //         return;
+        //     }
+        // }
+
         pivot.setPivotPosition(state.getAngle());
     }
 
@@ -65,12 +76,12 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
 
     public enum PivotState {
         REST(Rotation2d.fromDegrees(40)),
-        INTAKE(Rotation2d.fromDegrees(15)),
+        INTAKE(Rotation2d.fromDegrees(20)),
         STOW(Rotation2d.fromDegrees(20)),
         AMP(Rotation2d.fromDegrees(30)),
         PRE_CLIMB(Rotation2d.fromDegrees(30)),
         CLIMB(Rotation2d.fromDegrees(30)),
-        AIM_LAYUP(Rotation2d.fromDegrees(49)),
+        AIM_LAYUP(Rotation2d.fromDegrees(55)),
         AIM_PROTECTED(Rotation2d.fromDegrees(15)),
         AUTO_AIM(Rotation2d.fromDegrees(30));
 

@@ -29,18 +29,11 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
      * e.g. intaking to indexing when the gamepiece is detected
      */
     private void updateState(){
-        // switch (state) {
-        //     case RAMP_DOWN:
-        //         if(shooter.flywheelSwitchTripped() || shooter.triggerSwitchTripped()) state = ShooterState.INDEX;
-        //     case INTAKE:
-        //         if(shooter.flywheelSwitchTripped()) state = ShooterState.INDEX;
-        //     case SHOOT:
-        //         if(!alignedToShoot.getAsBoolean()) state = lastAimingState;
-        //     case INDEX:
-        //         if(!(shooter.triggerSwitchTripped() || shooter.flywheelSwitchTripped())) state = ShooterState.RAMP_DOWN;
-        //     default:
-        //         break;
-        // }
+        SmartDashboard.putBoolean("flywheel switch", shooter.flywheelSwitchTripped());
+        SmartDashboard.putBoolean("trigger switch", shooter.triggerSwitchTripped());
+        if(state == ShooterState.RAMP_DOWN) if(shooter.flywheelSwitchTripped() || shooter.triggerSwitchTripped()) state = ShooterState.INDEX;
+        else if(state == ShooterState.INTAKE) if(shooter.flywheelSwitchTripped()) state = ShooterState.INDEX;
+        else if(state == ShooterState.INDEX) if(!(shooter.triggerSwitchTripped() || shooter.flywheelSwitchTripped())) state = ShooterState.RAMP_DOWN;
         if (
               (state == ShooterState.AUTO_AIM
             ||state == ShooterState.AIM_LAYUP
@@ -135,7 +128,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         RAMP_DOWN(0.0,0.0),
         COAST (0.0, 0.0),
         INTAKE(-10.0,1.0), //NOTE: this should fold flat if the flywheel-side intake is out
-        INDEX(-5.0,0.4),
+        INDEX(-5.0,0.3),
         HANDOFF(20.0,1.0), //to diverter
         AIM_LAYUP(40.0,0.0),
         AIM_PROTECTED(80.0,0.0),

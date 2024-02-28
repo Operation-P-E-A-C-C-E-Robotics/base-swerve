@@ -184,7 +184,8 @@ public class PeaccyRequest implements SwerveRequest {
             //Update the set heading to the current heading. This means that when there is no rotational rate requested,
             //the robot will hold its current heading if HoldHeading or SoftHoldHeading is true,
             //unless Heading is explicitly set to something else.
-            Heading = parameters.currentPose.getRotation().getRadians();
+            Heading = Swerve.getInstance().getPose().getRotation().getRadians();
+            if(AllianceFlipUtil.shouldFlip()) Heading += Math.PI;
         }
 
         //very standard ChassisSpeeds blah blah blah.
