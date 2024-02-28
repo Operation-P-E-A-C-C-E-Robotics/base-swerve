@@ -272,7 +272,7 @@ public final class Constants {
 
 
     /* CTRE SWERVE CONSTANTS */
-    public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(24.75), Units.inchesToMeters(18.75));
+    public static final Dimensions dimensions = new Dimensions(Units.inchesToMeters(18.75), Units.inchesToMeters(18.75));
 
     /*change from dev drivebase
      * front left -> rear right
