@@ -58,7 +58,6 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
     private Timer pathTimer = new Timer();
 
     private final AimPlanner aimPlanner;
-    private double aimTargetHeading = 0;
 
     /**
      * PeaccyDrive is a swerve drive command designed to handle all the different
@@ -126,17 +125,6 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         this.state = state;
     }
 
-    private void updateState() {
-        //unlock the wheels if we wanna move
-        if(state == SwerveState.LOCK_IN){
-            if(Math.abs(xVelocitySup.getAsDouble()) > Constants.Swerve.teleopLinearSpeedDeadband || 
-                Math.abs(yVelocitySup.getAsDouble()) > Constants.Swerve.teleopLinearSpeedDeadband || 
-                Math.abs(angularVelocitySup.getAsDouble()) > Constants.Swerve.teleopAngularVelocityDeadband){
-                requestState(SwerveState.OPEN_LOOP_TELEOP);
-            }
-        }
-    }
-
     public void setPathCommand(Command command){
         pathCommand = command;
         pathInitialized = false;
@@ -147,6 +135,16 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         return pathTimer.get();
     }
 
+    private void updateState() {
+        //unlock the wheels if we wanna move
+        if(state == SwerveState.LOCK_IN){
+            if(Math.abs(xVelocitySup.getAsDouble()) > Constants.Swerve.teleopLinearSpeedDeadband || 
+                Math.abs(yVelocitySup.getAsDouble()) > Constants.Swerve.teleopLinearSpeedDeadband || 
+                Math.abs(angularVelocitySup.getAsDouble()) > Constants.Swerve.teleopAngularVelocityDeadband){
+                requestState(SwerveState.OPEN_LOOP_TELEOP);
+            }
+        }
+    }
     @Override
     public SwerveState getState(){
         return state;
@@ -392,7 +390,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
         LOCK_IN             (true, false, true, false),
         AIM,
         ALIGN_INTAKING, //align to the note with vision
-        FOLLOW_PATH;
+        FOLLOW_PATH; // follow the path thats been set with setPathCommand
 
         boolean openLoop = false;
         boolean robotCentric = false;

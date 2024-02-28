@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.ControlSystemTelemetry;
-import frc.lib.telemetry.MultiTracers;
-import frc.robot.planners.NoteTracker;
 import frc.robot.subsystems.Swerve;
 
 public class Robot extends TimedRobot {

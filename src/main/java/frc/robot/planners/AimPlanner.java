@@ -138,6 +138,10 @@ public class AimPlanner {
         return drivetrainAngle;
     }
 
+    public Rotation2d getLimelightTXOffset() {
+        return Rotation2d.fromDegrees(limelighttXOffset);
+    }
+
     public Rotation2d getTargetPivotAngle() {
         return pivotAngle;
     }

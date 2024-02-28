@@ -13,8 +13,6 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
     private final Pivot pivot;
     private final AimPlanner aimPlanner;
 
-    private boolean restingBrake = false; //disable the motor and just use brake mode to conserve battery
-
     public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner, MotionPlanner intakeMotionPlanner){
         this.pivot = pivot;
         this.aimPlanner = aimPlanner;
@@ -46,15 +44,6 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
                 pivot.setPivotPosition(angle);
                 return;
         }
-
-        // if(state == PivotState.REST) {
-        //     if(pivot.getPivotPosition().getDegrees() < (state.getAngle().getDegrees() - 6)) restingBrake = false;
-        //     if(pivot.getPivotPosition().getDegrees() > (state.getAngle().getDegrees() - 2)) restingBrake = true;
-        //     if(restingBrake) {
-        //         pivot.setPivotPercent(0);
-        //         return;
-        //     }
-        // }
 
         pivot.setPivotPosition(state.getAngle());
     }
