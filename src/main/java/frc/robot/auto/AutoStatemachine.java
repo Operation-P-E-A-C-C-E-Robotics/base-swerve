@@ -16,7 +16,7 @@ public class AutoStatemachine {
 
     public static final AutoMode testAuto = new AutoMode(
         new AutoSegment(
-            Path.WHATEVER,
+            Path.TEST_PATH,
             new TimedRobotState(TeleopState.INTAKE_FRONT, 0, 0.5),
             new TimedRobotState(TeleopState.SHOOT, 0.5, 5, () -> Shooter.getInstance().shotDetected())
         )
@@ -106,7 +106,7 @@ public class AutoStatemachine {
     }
 
     public static enum Path {
-        WHATEVER("YO", 1);
+        TEST_PATH("test path", 1);
     
         public final String pathName;
         public final double duration;
