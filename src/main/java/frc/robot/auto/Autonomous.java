@@ -12,7 +12,7 @@ import frc.robot.statemachines.SwerveStatemachine;
 import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.subsystems.Shooter;
 
-public class AutoStatemachine {
+public class Autonomous {
 
     public static final AutoMode testAuto = new AutoMode(
         new AutoSegment(

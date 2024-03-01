@@ -19,6 +19,7 @@ import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.telemetry.SwerveTelemetry;
+import frc.lib.util.AllianceFlipUtil;
 import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
 
@@ -53,7 +54,7 @@ public class Swerve extends SubsystemBase {
         swerve.setSteerCurrentLimit(steerMotorCurrentLimit);
 
         //pathplanner config
-        AutoBuilder.configureHolonomic(this::getPose, this::resetOdometry, this::getChassisSpeeds, this::drive, pathFollowerConfig, () -> false, this);
+        AutoBuilder.configureHolonomic(this::getPose, this::resetOdometry, this::getChassisSpeeds, this::drive, pathFollowerConfig, AllianceFlipUtil::shouldFlip, this);
 
         //log swerve state data as fast as it comes in
         swerve.registerTelemetry((SwerveDriveState state) -> {
