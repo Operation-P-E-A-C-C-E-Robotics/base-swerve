@@ -36,9 +36,9 @@ public class AimPlanner {
     );
 
     private final double[][] distanceCalibrationData = {
-        {57, 40, 33, 26.6}, // pivot angles (deg)
-        {40, 50, 60, 70}, // flywheel speed rps
-        {1, 2, 3, 4}  //distances (m)
+        {60, 39, 28.5, 25, 22}, // pivot angles (deg)
+        {40, 43, 47, 50, 53}, // flywheel speed rps
+        {1, 2, 3, 4, 5}  //distances (m)
     };
 
     private final LinearInterpolate pivotInterpolator = new LinearInterpolate(distanceCalibrationData[2], distanceCalibrationData[0]);
@@ -104,19 +104,20 @@ public class AimPlanner {
             this.pivotAngle = pivotAngle;
             this.flywheelAngularVelocity = flywheelAngularVelocity;
             this.drivetrainAngle = angleToTarget;
-            return;
         }
 
         ChassisSpeeds robotVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds.get(), blueOriginPose.getRotation());
+        robotVelocity.vxMetersPerSecond = -robotVelocity.vxMetersPerSecond;
         ShotAngle uncorrectedShotAngle = new ShotAngle(angleToTarget, pivotAngle, exitVelocity);
         ShotAngle correctedShotAngle = ShotAngle.correctFromChassisSpeeds(uncorrectedShotAngle, robotVelocity, blueOriginPose.getRotation());
-        this.pivotAngle = Rotation2d.fromDegrees(180).minus(correctedShotAngle.getPivotAngle());
-        this.flywheelAngularVelocity = exitVelocityToRPS(correctedShotAngle.getExitVelocity());
-        this.drivetrainAngle = correctedShotAngle.getDrivetrainAngle();
-
         sotmPivotAnglePublisher.accept(correctedShotAngle.getPivotAngle().getDegrees());
         sotmExitVelocityPublisher.accept(correctedShotAngle.getExitVelocity());
         sotmDrivetrainAnglePublisher.accept(correctedShotAngle.getDrivetrainAngle().getDegrees());
+        if(!shootWhileMoving.getAsBoolean()) return;
+        this.pivotAngle = correctedShotAngle.getPivotAngle();
+        this.flywheelAngularVelocity = exitVelocityToRPS(correctedShotAngle.getExitVelocity());
+        this.drivetrainAngle = correctedShotAngle.getDrivetrainAngle();
+
 
         //calculate the angular velocities of the mechanisms
         //first get the robots velocity relative to the target
@@ -194,16 +195,20 @@ public class AimPlanner {
         }
 
         public Translation3d getRobotCentricVector () {
-            return new Translation3d(exitVelocity, new Rotation3d(0, -pivotAngle.getRadians(), drivetrainAngle.getRadians()));
+            var vector = new Translation3d(exitVelocity, new Rotation3d(0, -pivotAngle.getRadians(), AllianceFlipUtil.apply(drivetrainAngle).getRadians()));
+            // System.out.println("Robot aiming vector: " + vector.toString());
+            return vector;
         }
 
         public Translation3d getFieldCentricVector (Rotation2d robotAngle) {
-            return getRobotCentricVector().rotateBy(new Rotation3d(0, 0, robotAngle.getRadians()));
+            var vector =  getRobotCentricVector().rotateBy(new Rotation3d(0, 0, robotAngle.getRadians()));
+            // System.out.println("field centric vector: " + vector.toString());
+            return vector;
         }
 
         public static ShotAngle fromRobotCentricVector (Translation3d vector) {
             return new ShotAngle(
-                new Rotation2d(vector.getX(), vector.getY()),
+                AllianceFlipUtil.apply(new Rotation2d(vector.getX(), vector.getY())),
                 new Rotation2d(vector.getX(), vector.getZ()),
                 vector.getNorm()
             );

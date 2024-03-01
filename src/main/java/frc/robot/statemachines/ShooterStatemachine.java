@@ -53,6 +53,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
      */
     @Override
     public void requestState(ShooterState state){
+        if(state == ShooterState.AUTO_AIM && this.state == ShooterState.SHOOT) return;
         this.state = state;
     }
 

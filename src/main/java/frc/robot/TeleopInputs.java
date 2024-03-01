@@ -27,7 +27,7 @@ public class TeleopInputs {
     private ClimbMode climbMode = ClimbMode.ALIGN;
     private boolean aiming = false;
 
-    private final double AUTO_AIM_X = 5; // distance from left wall to start aiming.
+    private final double AUTO_AIM_X = 7; // distance from left wall to start aiming.
     private final double AMP_HANDOFF_X = 5; // distance from left wall to start handoff.
     private final double AMP_ALIGN_X = 3; // distance from left wall to start aligning.
     private final double AMP_ALIGN_Y = 3; // distance from bottom wall to start aligning.
@@ -112,7 +112,7 @@ public class TeleopInputs {
                 case CLIMB:
                     if(climbMode == ClimbMode.RETRACT) return TeleopState.PLACE_TRAP;
                 case SPEAKER:
-                    return TeleopState.SHOOT;
+                    // return TeleopState.SHOOT;
                 default:
                     break;
             }
@@ -142,7 +142,7 @@ public class TeleopInputs {
                 return TeleopState.ALIGN_CLIMB;
             case SPEAKER:
                 aiming = wantsAim(blueAlliancePose); // stored for use in swerve state
-                if(OI.Inputs.wantsShoot.getAsBoolean()) return TeleopState.SHOOT;
+                // if(OI.Inputs.wantsShoot.getAsBoolean()) return TeleopState.SHOOT;
                 if(aiming) {
                     return TeleopState.AUTO_AIM;
                 }

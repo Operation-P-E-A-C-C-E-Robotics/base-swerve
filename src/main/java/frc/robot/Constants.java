@@ -53,7 +53,7 @@ public final class Constants {
     public static final double flywheelGearRatio = 1;
     public static final double flywheelDiameter = Units.inchesToMeters(5);
     public static final double flywheelKv = 0.115;
-    public static final double flywheelKa = 0.00001;
+    public static final double flywheelKa = 0.001;
     public static final double flywheelModelStDev = 3;
     public static final double flywheelEncoderStDev = 0.01;
     public static final double flywheelControlEffort = 12;
@@ -77,8 +77,8 @@ public final class Constants {
     public static final boolean bottomFlywheelMotorInverted = true;
     public static final boolean triggerMotorInverted = true;
 
-    public static final double flywheelEfficiency = 0.5; // percentage of flywheel surface speed to exit velocity
-    public static final double flywheelTolerance = 1; //how close to the target velocity the flywheel needs to be considered ready
+    public static final double flywheelEfficiency = 2.4; // percentage of flywheel surface speed to exit velocity
+    public static final double flywheelTolerance = 0.7; //how close to the target velocity the flywheel needs to be considered ready
   }
 
   public static final class FlywheelIntake {
@@ -134,7 +134,7 @@ public final class Constants {
     public static final double pivotMaxAngle = Units.degreesToRotations(90);
 
     public static final double pivotGearRatio = 0.01 * (16/24) * (16/24); // pivot rotations per motor rotation
-    public static final double pivotTolerance = 2; //how close to the target position the pivot needs to be considered ready
+    public static final double pivotTolerance = 1.4; //how close to the target position the pivot needs to be considered ready
 
     public static final double gravityFeedforwardkG = 0;
 
@@ -150,7 +150,7 @@ public final class Constants {
       pivotConfigs.Slot0.kS = 0;
       pivotConfigs.Slot0.kV = 14.5;
       pivotConfigs.Slot0.kA = 0;
-      pivotConfigs.Slot0.kG = 0.25;
+      pivotConfigs.Slot0.kG = 0.23;
       pivotConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
       pivotConfigs.MotionMagic.MotionMagicExpo_kA = 5;
@@ -287,7 +287,7 @@ public final class Constants {
     public static final CANIDs rearRightIDs =   new CANIDs(10,   11,   12); //module 2
     public static final CANIDs frontRightIDs =    new CANIDs(13,  14,   15); //module 3
 
-    public static final Gearing gearing = new Gearing(DriveGearRatios.SDSMK4i_L2, ((150.0 / 7.0) / 1.0), (3.85/2), 0);
+    public static final Gearing gearing = new Gearing(DriveGearRatios.SDSMK4i_L2, ((150.0 / 7.0) / 1.0), (3.807/2), 0);
     // public static final EncoderOffsets offsets = new EncoderOffsets(-0.488770, -0.225342, -0.224609, -0.906738); //todo these offsets are very wrong.
     public static final EncoderOffsets offsets = new EncoderOffsets(
       -0.409424, //Front Left, module 0
@@ -322,7 +322,7 @@ public final class Constants {
     public static final boolean useSoftHoldHeading = false;
     public static final double softHeadingCurrentLimit = 30;
 
-    public static final double aimTolerance = 1; //degrees
+    public static final double aimTolerance = 0.7; //degrees
 
     
     /* PATH FOLLOWING CONSTANTS */

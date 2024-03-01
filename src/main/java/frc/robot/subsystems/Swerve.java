@@ -135,8 +135,8 @@ public class Swerve extends SubsystemBase {
         swerve.applySteerConfigs(gains);
     }
 
-    private static final double xyStDevCoeff = 0.5;
-    private static final double thetaStDevCoeff = 10;
+    private static final double xyStDevCoeff = 0.1;
+    private static final double thetaStDevCoeff = 15;
 
     @Override
     public void periodic() {
@@ -147,7 +147,7 @@ public class Swerve extends SubsystemBase {
 
         var frontLLPose = LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.Cameras.frontLimelight);
 
-        var trustCoefficient = (frontLLPose.avgTagDist * frontLLPose.avgTagDist) / frontLLPose.tagCount;
+        var trustCoefficient = Math.pow(frontLLPose.avgTagDist, 4) / frontLLPose.tagCount; //6.458 242
 
         if(frontLLPose.tagCount > 0) {
             swerve.addVisionMeasurement(

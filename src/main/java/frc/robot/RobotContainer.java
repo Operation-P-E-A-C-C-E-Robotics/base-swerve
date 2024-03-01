@@ -55,6 +55,8 @@ public class RobotContainer {
         if(!shooter.flywheelAtTargetVelocity()) return false;
         if(!pivot.atSetpoint()) return false;
         if(!swerveStatemachine.transitioning()) return false;
+        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.1 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.1) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
+        if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
         return true;
     }); //TODO
     private final FlipperStatemachine diverterStatemachine = new FlipperStatemachine(diverter, motionPlanner);
