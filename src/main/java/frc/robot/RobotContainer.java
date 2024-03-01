@@ -4,6 +4,7 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.MultiTracers;
+import frc.robot.auto.Autonomous;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
 import frc.robot.planners.NoteTracker;
@@ -138,7 +139,7 @@ public class RobotContainer {
 
         /* AUTONOMOUS */
         if(RobotState.isAutonomous()) {
-            //autoStatemachine.update();
+            Autonomous.testAuto.run(swerveStatemachine, teleopStatemachine);
         }
         MultiTracers.print("RobotContainer::run");
     }
