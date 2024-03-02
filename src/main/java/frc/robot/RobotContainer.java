@@ -59,7 +59,7 @@ public class RobotContainer {
         if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.1 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.1) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
         if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
         return true;
-    }); //TODO
+    });
     private final FlipperStatemachine diverterStatemachine = new FlipperStatemachine(diverter, motionPlanner);
     private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber, () -> swerve.getGyroAngle().getX());
 
@@ -119,8 +119,6 @@ public class RobotContainer {
             MultiTracers.trace("RobotContainer::run", "teleopStatemachine.update");
             swerveStatemachine.update();
             MultiTracers.trace("RobotContainer::run", "swerveStatemachine.update");
-            // flywheelIntakeStatemachine.update();
-            // MultiTracers.trace("RobotContainer::run", "flywheelIntakeStatemachine.update");
             triggerIntakeStatemachine.update();
             MultiTracers.trace("RobotContainer::run", "triggerIntakeStatemachine.update");
             pivotStatemachine.update();
@@ -128,7 +126,9 @@ public class RobotContainer {
             shooterStatemachine.update();
             MultiTracers.trace("RobotContainer::run", "shooterStatemachine.update");
             // diverterStatemachine.update();
+            // MultiTracers.trace("RobotContainer::run", "diverterStatemachine.update");
             // climberStatemachine.update();
+            // MultiTracers.trace("RobotContainer::run", "climberStatemachine.update");
             
             // handle driver overrides
             TeleopInputs.getInstance().handleOverrides();

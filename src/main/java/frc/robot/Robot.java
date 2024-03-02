@@ -4,35 +4,31 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.ControlSystemTelemetry;
+import frc.lib.telemetry.MultiTracers;
 import frc.robot.subsystems.Swerve;
 
 public class Robot extends TimedRobot {
-  // private PowerDistribution pdp = new PowerDistribution(ControlSystem.PDPCanId, ControlSystem.PDPModuleType);
-  private Timer scheduleTimer = new Timer();
+  private Timer scheduleTimer = new Timer(); //used to log loop time
 
   public Robot() {
-    super(Constants.period);
-    RobotContainer.getInstance();
-    SmartDashboard.updateValues();
+    super(Constants.period); // use a custom loop time
+    RobotContainer.getInstance(); // make sure RobotContainer is initialized
   }
 
   @Override
   public void robotInit() {
-    // MultiTracers.enable();
+    MultiTracers.disable(); //change to enable to print timing debugging info to the console
     //log data from network tables (SmartDashboard, etc.)
     DataLogManager.start();
-    DataLogManager.logNetworkTables(false);
+    //only log network tables data when the robot is enabled, to keep the logs from taking forever to open
+    DataLogManager.logNetworkTables(false); 
     DriverStation.startDataLog(DataLogManager.getLog());
 
-    //log current draw
-    // SmartDashboard.putData("PDP", pdp);
     System.out.println("Robot Initialized");
     System.out.println("yay the software didn't crash yet");
   }
@@ -43,15 +39,15 @@ public class Robot extends TimedRobot {
     scheduleTimer.reset();
     scheduleTimer.start();
 
-    RobotContainer.getInstance().run();
+    RobotContainer.getInstance().run(); // This does all the important stuff
 
+    //log loop time and other RIO data
     ControlSystemTelemetry.update(null, scheduleTimer.get());
   }
 
   @Override
   public void disabledInit() {
-    DataLogManager.logNetworkTables(false);
-    SignalLogger.stop();
+    DataLogManager.logNetworkTables(false); //stop logging network tables data when the robot is disabled
     System.out.println("Robot Disabled");
     System.out.println("let's hope it doesn't move lol");
   }
@@ -64,25 +60,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    DataLogManager.logNetworkTables(true);
-    SignalLogger.start();
+    DataLogManager.logNetworkTables(true); //start logging network tables data when the robot is enabled
     System.out.println("Robot Autonomous");
     System.out.println("EVERYBODY PANIC PEACCY IS RUNNING AUTONOMOUS AND HE DOESN'T KNOW WHAT HE'S DOING");
   }
 
   @Override
-  public void autonomousPeriodic() {}
-
-  @Override
   public void teleopInit() {
-    DataLogManager.logNetworkTables(true);
-    // SignalLogger.start();
+    DataLogManager.logNetworkTables(true); //start logging network tables data when the robot is enabled
     System.out.println("Robot Teleop");
     System.out.println("EVERYBODY RUN PEACCY IS DRIVING THE ROBOT AND HE WILL CRASH IT VERY SOON");
   }
-
-  @Override
-  public void teleopPeriodic() {}
 
   @Override
   public void testInit() {
@@ -90,13 +78,4 @@ public class Robot extends TimedRobot {
     System.out.println("Robot Test");
     System.out.println("ok but what are yall doing i don't even know why you'd be running in test mode");
   }
-  
-  @Override
-  public void simulationInit() {
-    System.out.println("Robot Simulation");
-    System.out.println("Simulation is stupid, good luck when you actually get a robot to test this on lol");
-  }
-
-  @Override
-  public void simulationPeriodic() {}
 }
