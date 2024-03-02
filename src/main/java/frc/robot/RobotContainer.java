@@ -119,8 +119,8 @@ public class RobotContainer {
             MultiTracers.trace("RobotContainer::run", "teleopStatemachine.update");
             swerveStatemachine.update();
             MultiTracers.trace("RobotContainer::run", "swerveStatemachine.update");
-            flywheelIntakeStatemachine.update();
-            MultiTracers.trace("RobotContainer::run", "flywheelIntakeStatemachine.update");
+            // flywheelIntakeStatemachine.update();
+            // MultiTracers.trace("RobotContainer::run", "flywheelIntakeStatemachine.update");
             triggerIntakeStatemachine.update();
             MultiTracers.trace("RobotContainer::run", "triggerIntakeStatemachine.update");
             pivotStatemachine.update();
@@ -140,6 +140,12 @@ public class RobotContainer {
         /* AUTONOMOUS */
         if(RobotState.isAutonomous()) {
             Autonomous.testAuto.run(swerveStatemachine, teleopStatemachine);
+            teleopStatemachine.update();
+            swerveStatemachine.update();
+            // flywheelIntakeStatemachine.update();
+            triggerIntakeStatemachine.update();
+            pivotStatemachine.update();
+            shooterStatemachine.update();
         }
         MultiTracers.print("RobotContainer::run");
     }

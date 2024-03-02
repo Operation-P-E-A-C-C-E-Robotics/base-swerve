@@ -105,6 +105,7 @@ public class AimPlanner {
             this.flywheelAngularVelocity = flywheelAngularVelocity;
             this.drivetrainAngle = angleToTarget;
         }
+        if(!shootWhileMoving.getAsBoolean()) return;
 
         ChassisSpeeds robotVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds.get(), blueOriginPose.getRotation());
         robotVelocity.vxMetersPerSecond = -robotVelocity.vxMetersPerSecond;
@@ -113,7 +114,6 @@ public class AimPlanner {
         sotmPivotAnglePublisher.accept(correctedShotAngle.getPivotAngle().getDegrees());
         sotmExitVelocityPublisher.accept(correctedShotAngle.getExitVelocity());
         sotmDrivetrainAnglePublisher.accept(correctedShotAngle.getDrivetrainAngle().getDegrees());
-        if(!shootWhileMoving.getAsBoolean()) return;
         this.pivotAngle = correctedShotAngle.getPivotAngle();
         this.flywheelAngularVelocity = exitVelocityToRPS(correctedShotAngle.getExitVelocity());
         this.drivetrainAngle = correctedShotAngle.getDrivetrainAngle();
@@ -227,10 +227,5 @@ public class AimPlanner {
         public String toString () {
             return String.format("Drivetrain Angle: %f, Pivot Angle: %f, Exit Velocity: %f", drivetrainAngle.getDegrees(), pivotAngle.getDegrees(), exitVelocity);
         }
-    }
-
-    public boolean readyToShoot() {
-        // TODO Auto-generated method stub
-        return false;
     }
 }

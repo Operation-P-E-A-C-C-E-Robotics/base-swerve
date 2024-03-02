@@ -15,6 +15,8 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import frc.lib.util.Reporter;
 import frc.lib.util.Util;
+
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import com.revrobotics.RelativeEncoder;
@@ -95,6 +97,8 @@ public class TriggerIntake {
             deployMotor.burnFlash(),
             "Couldn't burn flash on rear intake deploy motor"
         );
+
+        rollerMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, triggerIntakeCurrentLimit, triggerIntakeCurrentLimit, 0.01));
     }
 
     /**

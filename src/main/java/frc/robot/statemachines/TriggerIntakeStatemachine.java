@@ -51,8 +51,8 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
         triggerIntake.setRollerSpeed(state.speed);
         
         if(state == TriggerIntakeState.INTAKE || state == TriggerIntakeState.EXTEND) {
-            if(triggerIntake.getDeploymentAngle().getDegrees() > 135) {
-                triggerIntake.setDeploymentSpeed(0.05);
+            if(triggerIntake.getDeploymentAngle().getDegrees() > 145) {
+                triggerIntake.setDeploymentSpeed(0.1);
             }
         }
     }
@@ -75,10 +75,10 @@ public class TriggerIntakeStatemachine extends StateMachine<TriggerIntakeStatema
     public enum TriggerIntakeState{
         //TODO
         RETRACT(Rotation2d.fromDegrees(0),0.0),
-        EXTEND(Rotation2d.fromDegrees(145),0.0),
-        INTAKE(Rotation2d.fromDegrees(145),1.0),
+        EXTEND(Rotation2d.fromDegrees(150),0.0),
+        INTAKE(Rotation2d.fromDegrees(150),1.0),
         AVOID(Rotation2d.fromDegrees(50),0.0),
-        EJECT(Rotation2d.fromDegrees(140),0.0);
+        EJECT(Rotation2d.fromDegrees(140),-1.0);
         
         private Rotation2d deployAngle;
         private Double speed;

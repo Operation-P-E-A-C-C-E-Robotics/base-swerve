@@ -106,7 +106,7 @@ public final class Constants {
     public static final int triggerIntakeRollerMotorId = 16;
     public static final int triggerIntakeDeployMotorId = 19;
 
-    public static final double triggerIntakeDeployKp = 3;
+    public static final double triggerIntakeDeployKp = 4;
     public static final double triggerIntakeDeployKi = 0;
     public static final double triggerIntakeDeployKd = 0;
 
@@ -119,8 +119,10 @@ public final class Constants {
     public static final boolean triggerIntakeDeployMotorInverted = false;
     public static final boolean triggerIntakeRollerMotorInverted = false;
 
-    public static final int triggerIntakeDeployFreeCurrentLimit = 20;
+    public static final int triggerIntakeDeployFreeCurrentLimit = 15;
     public static final int triggerIntakeDeployStallCurrentLimit = 10;
+
+    public static final double triggerIntakeCurrentLimit = 20;
   }
 
   public static final class Pivot {
@@ -299,10 +301,10 @@ public final class Constants {
     public static final Inversion inversion = new Inversion(false, true, false, true);
 
     //inertia only used for simulation
-    public static final Physics physics = new Physics(0.05,0.01, Robot.isReal() ? 80 : 800, 7);
+    public static final Physics physics = new Physics(0.05,0.01, Robot.isReal() ? 40 : 800, 7);
     public static final double steerMotorCurrentLimit = Robot.isReal() ? 40 : 120; //amps
     
-    public static final PidGains driveGains = new PidGains(0.35, 0, 0, 0.11, 0.3); 
+    public static final PidGains driveGains = new PidGains(0.2, 0, 0, 0.2, 0.3); 
     public static final PidGains angleGains = new PidGains(90, 0, 0.001, 0, 0);
 
     public static final int pigeonCANId = 3;
@@ -344,7 +346,7 @@ public final class Constants {
     );
 
     public static final HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(
-      new PIDConstants(10, 0, 0), 
+      new PIDConstants(3, 0, 0), 
       new PIDConstants(5, 0, 0), 
       pathfollowingMaxVelocity, 
       dimensions.frontLeft.getNorm(), //drive radius

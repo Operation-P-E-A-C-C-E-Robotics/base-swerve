@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -126,9 +127,14 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
     }
 
     public void setPathCommand(Command command){
+        if(command == pathCommand) return;
         pathCommand = command;
         pathInitialized = false;
         pathFinished = false;
+    }
+
+    public void resetPathTimer() {
+        pathTimer.reset();
     }
 
     public double getPathTime() {
@@ -159,7 +165,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
 
         if(Robot.isSimulation()) driveTrain.simulationPeriodic();
         /* PATH FOLLOWING */
-        if(state == SwerveState.FOLLOW_PATH && pathCommand != null){
+        if(state == SwerveState.FOLLOW_PATH && pathCommand != null && RobotState.isEnabled()){
             if(!pathInitialized){
                 pathCommand.initialize();
                 pathTimer.reset();

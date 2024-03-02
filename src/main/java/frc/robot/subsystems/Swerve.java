@@ -22,6 +22,7 @@ import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
+import frc.robot.OI;
 
 import static frc.robot.Constants.Swerve.*;
 
@@ -82,6 +83,9 @@ public class Swerve extends SubsystemBase {
      * @param speeds the chassis speeds to apply to the drivetrain.
      */
     public void drive(ChassisSpeeds speeds) {
+        // if(speeds.vxMetersPerSecond < 0.01 && speeds.vyMetersPerSecond < 0.01) {
+        //     speeds = new ChassisSpeeds();
+        // }
         drive(autonomousRequest.withSpeeds(speeds));
     }
 
@@ -137,7 +141,7 @@ public class Swerve extends SubsystemBase {
     }
 
     private static final double xyStDevCoeff = 0.1;
-    private static final double thetaStDevCoeff = 15;
+    private static final double thetaStDevCoeff = 20;
 
     @Override
     public void periodic() {
@@ -148,7 +152,9 @@ public class Swerve extends SubsystemBase {
 
         var frontLLPose = LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.Cameras.frontLimelight);
 
-        var trustCoefficient = Math.pow(frontLLPose.avgTagDist, 4) / frontLLPose.tagCount; //6.458 242
+        var trustCoefficient = Math.pow(frontLLPose.avgTagDist, 3) / frontLLPose.tagCount; //6.458 242
+
+        if(OI.Swerve.isZeroOdometry.getAsBoolean()) trustCoefficient /= 50;
 
         if(frontLLPose.tagCount > 0) {
             swerve.addVisionMeasurement(
