@@ -9,6 +9,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,9 +23,14 @@ import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
+import frc.robot.FieldConstants;
 import frc.robot.OI;
 
 import static frc.robot.Constants.Swerve.*;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class Swerve extends SubsystemBase {
     protected final PeaccefulSwerve swerve;
@@ -32,6 +38,18 @@ public class Swerve extends SubsystemBase {
     private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds()
                                                                                         .withDriveRequestType(DriveRequestType.Velocity);
     private final SendableChooser<Pose2d> poseSeedChooser = new SendableChooser<>();
+
+    private static final double xyStDevCoeff = 0.1;
+    private static final double thetaStDevCoeff = 20;
+
+    private final PhotonCamera leftPhoton = new PhotonCamera("leftcamera");
+    private final PhotonCamera rightPhoton = new PhotonCamera("rightcamera");
+
+    private final Transform3d robotToLeftCamera = new Transform3d();
+    private final Transform3d robotToRightCamera = new Transform3d();
+
+    private final PhotonPoseEstimator leftPoseEstimator = new PhotonPoseEstimator(FieldConstants.aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, leftPhoton, robotToLeftCamera);
+    private final PhotonPoseEstimator rightPoseEstimator = new PhotonPoseEstimator(FieldConstants.aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, rightPhoton, robotToRightCamera);
 
     // private LimelightHelper limelight;
 
@@ -66,6 +84,9 @@ public class Swerve extends SubsystemBase {
         poseSeedChooser.addOption("test", new Pose2d(1, 1, new Rotation2d()));
         SmartDashboard.putData("POSE SEED", poseSeedChooser);
         SmartDashboard.putBoolean("seed pose", false);
+
+        leftPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+        rightPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
 
         System.out.println("DriveTrain Initialized");
     }
@@ -140,8 +161,7 @@ public class Swerve extends SubsystemBase {
         swerve.applySteerConfigs(gains);
     }
 
-    private static final double xyStDevCoeff = 0.1;
-    private static final double thetaStDevCoeff = 20;
+    
 
     @Override
     public void periodic() {
@@ -166,6 +186,35 @@ public class Swerve extends SubsystemBase {
                     trustCoefficient*thetaStDevCoeff
                 )
             ); //todo right timestamp?
+        }
+
+        var leftPose = leftPoseEstimator.update();
+        var rightPose = rightPoseEstimator.update();
+
+        if(leftPose.isPresent()) {
+            var pose = leftPose.get().estimatedPose;
+            var pose2d = new Pose2d(pose.getX(), pose.getY(), new Rotation2d(pose.getRotation().getZ()));
+            swerve.addVisionMeasurement(
+                pose2d, 
+                leftPose.get().timestampSeconds,
+                VecBuilder.fill(
+                    5.0/leftPose.get().targetsUsed.size(),
+                    5.0/leftPose.get().targetsUsed.size(),
+                    15.0/leftPose.get().targetsUsed.size()
+                ));
+        }
+
+        if(rightPose.isPresent()) {
+            var pose = rightPose.get().estimatedPose;
+            var pose2d = new Pose2d(pose.getX(), pose.getY(), new Rotation2d(pose.getRotation().getZ()));
+            swerve.addVisionMeasurement(
+                pose2d, 
+                rightPose.get().timestampSeconds,
+                VecBuilder.fill(
+                    5.0/rightPose.get().targetsUsed.size(),
+                    5.0/rightPose.get().targetsUsed.size(),
+                    15.0/rightPose.get().targetsUsed.size()
+                ));
         }
 
         //TODO: update limelight telemetry
