@@ -3,12 +3,11 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.AllianceFlipUtil;
-import frc.robot.TeleopStatemachine.TeleopState;
+import frc.robot.RobotStatemachine.SuperstructureState;
 import frc.robot.planners.NoteTracker;
 import frc.robot.planners.NoteTracker.NoteLocation;
 import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.subsystems.Diverter;
-import frc.robot.subsystems.FlywheelIntake;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
@@ -32,13 +31,10 @@ public class TeleopInputs {
     private final double AMP_ALIGN_X = 3; // distance from left wall to start aligning.
     private final double AMP_ALIGN_Y = 3; // distance from bottom wall to start aligning.
 
-    private final double INTAKE_TRANSITION_VELOCITY_THRESHOLD = 0.5; // m/s
-
+    //whether the joystick is overriding the pivot
     private boolean jogPivotMode = false;
 
     private TeleopInputs() {
-        // This is a singleton class, so the constructor is private to prevent
-        // instantiation from outside the class.
     }
 
 
@@ -72,7 +68,7 @@ public class TeleopInputs {
      * based on the joystick inputs and automated inputs.
      * @return
      */
-    public TeleopState getWantedTeleopState() {
+    public SuperstructureState getWantedTeleopState() {
         var blueAlliancePose = AllianceFlipUtil.apply(Swerve.getInstance().getPose()); //robot pose for automation
 
         // change the mode based on the operator inputs
@@ -89,28 +85,28 @@ public class TeleopInputs {
         SmartDashboard.putString("Climb Mode", climbMode.name());
 
         // operator overrides - these take precedence over everything else
-        if(OI.Inputs.wantsStow.getAsBoolean())  return TeleopState.STOW;
-        if(OI.Overrides.forceHandoff.getAsBoolean()) return TeleopState.HANDOFF;
-        if(OI.Overrides.forceAmp.getAsBoolean()) return TeleopState.ALIGN_AMP;
-        if(OI.Overrides.forceAim.getAsBoolean()) return TeleopState.AUTO_AIM;
+        if(OI.Inputs.wantsStow.getAsBoolean())  return SuperstructureState.STOW;
+        if(OI.Overrides.forceHandoff.getAsBoolean()) return SuperstructureState.HANDOFF;
+        if(OI.Overrides.forceAmp.getAsBoolean()) return SuperstructureState.ALIGN_AMP;
+        if(OI.Overrides.forceAim.getAsBoolean()) return SuperstructureState.AUTO_AIM;
 
         //handle the drivers' intaking requests, these take precedence over modes & automation
         intakingMode = wantedIntakeMode();
         SmartDashboard.putString("Intaking Mode", intakingMode.name());
         if(intakingMode != IntakingMode.NONE) {
-            return intakingMode == IntakingMode.FRONT ? TeleopState.INTAKE_FRONT : TeleopState.INTAKE_BACK;
+            return intakingMode == IntakingMode.FRONT ? SuperstructureState.INTAKE_FRONT : SuperstructureState.INTAKE_BACK;
         }
 
-        if(OI.Inputs.wantsAimLayup.getAsBoolean()) return TeleopState.AIM_LAYUP;
-        if(OI.Inputs.wantsAimProtected.getAsBoolean()) return TeleopState.AIM_PROTECTED;
+        if(OI.Inputs.wantsAimLayup.getAsBoolean()) return SuperstructureState.AIM_LAYUP;
+        if(OI.Inputs.wantsAimProtected.getAsBoolean()) return SuperstructureState.AIM_PROTECTED;
 
         //handle the driver's request to "place" (a button that does different things based on the mode)
         if(OI.Inputs.wantsPlace.getAsBoolean()) {
             switch (mode) {
                 case AMP:
-                    return TeleopState.PLACE_AMP;
+                    return SuperstructureState.PLACE_AMP;
                 case CLIMB:
-                    if(climbMode == ClimbMode.RETRACT) return TeleopState.PLACE_TRAP;
+                    if(climbMode == ClimbMode.RETRACT) return SuperstructureState.PLACE_TRAP;
                 case SPEAKER:
                     // return TeleopState.SHOOT;
                 default:
@@ -118,7 +114,7 @@ public class TeleopInputs {
             }
         }
 
-        if(mode == TeleopMode.PANIC) return TeleopState.REST;
+        if(mode == TeleopMode.PANIC) return SuperstructureState.REST;
 
 
         //handle mode-specific automation
@@ -126,45 +122,50 @@ public class TeleopInputs {
             case AMP:
                 aiming = false;
                 if(wantsHandoff(blueAlliancePose)) {
-                    return TeleopState.HANDOFF;
+                    return SuperstructureState.HANDOFF;
                 }
                 if(wantsAlignAmp(blueAlliancePose)) {
-                    return TeleopState.ALIGN_AMP;
+                    return SuperstructureState.ALIGN_AMP;
                 }
-                return TeleopState.REST;
+                return SuperstructureState.REST;
             case CLIMB:
                 aiming = false;
                 climbMode = wantedClimbMode();
-                if(climbMode == ClimbMode.ALIGN) return TeleopState.ALIGN_CLIMB;
-                if(climbMode == ClimbMode.EXTEND) return TeleopState.CLIMB_EXTEND;
-                if(climbMode == ClimbMode.RETRACT) return TeleopState.CLIMB_RETRACT;
-                if(climbMode == ClimbMode.BALANCE) return TeleopState.CLIMB_BALANCE;
-                return TeleopState.ALIGN_CLIMB;
+                if(climbMode == ClimbMode.ALIGN) return SuperstructureState.ALIGN_CLIMB;
+                if(climbMode == ClimbMode.EXTEND) return SuperstructureState.CLIMB_EXTEND;
+                if(climbMode == ClimbMode.RETRACT) return SuperstructureState.CLIMB_RETRACT;
+                if(climbMode == ClimbMode.BALANCE) return SuperstructureState.CLIMB_BALANCE;
+                return SuperstructureState.ALIGN_CLIMB;
             case SPEAKER:
                 aiming = wantsAim(blueAlliancePose); // stored for use in swerve state
                 // if(OI.Inputs.wantsShoot.getAsBoolean()) return TeleopState.SHOOT;
                 if(aiming) {
-                    return TeleopState.AUTO_AIM;
+                    return SuperstructureState.AUTO_AIM;
                 }
-                return TeleopState.REST;
+                return SuperstructureState.REST;
             default:
                 aiming = false;
                 break;
         }
 
 
-        return TeleopState.REST;
+        return SuperstructureState.REST;
     }
 
+    /**
+     * Handle operator overrides that directly set subsystems,
+     * These should take precedence over the state machines and automation.
+     * Call this method after the state machines have been updated.
+     */
     public void handleOverrides() {
         if(OI.Overrides.forceTrigger.getAsBoolean()) {
             Shooter.getInstance().setTrigerPercent(1);
         }
+
         if(OI.Overrides.eject.getAsBoolean()) {
-            FlywheelIntake.getInstance().setRollerSpeed(-1);
             TriggerIntake.getInstance().setRollerSpeed(-1);
             Shooter.getInstance().setTrigerPercent(-1);
-            Shooter.getInstance().setFlywheelPercent(1);
+            Shooter.getInstance().setFlywheelVelocity(10);
             Diverter.getInstance().setDiverterRoller(1);
         }
 
@@ -173,7 +174,6 @@ public class TeleopInputs {
 
         if(OI.ManualInputs.resetManualInputs.getAsBoolean()) {
             jogPivotMode = false;
-            // jogTriggerMode = false;
         }
 
         if(jogPivotMode || Math.abs(manualPivot) > 0.2) {
@@ -223,12 +223,7 @@ public class TeleopInputs {
         // if the driver doesn't want to intake, return NONE
         // otherwise, default to the back intake
         if(!OI.Inputs.wantsIntake.getAsBoolean()) return IntakingMode.NONE;
-        else if(intakingMode == IntakingMode.NONE)intakingMode = IntakingMode.BACK;
-
-        //automated transitions between front and back intakes
-        var xVelocity = Swerve.getInstance().getChassisSpeeds().vxMetersPerSecond;
-        if(xVelocity < -INTAKE_TRANSITION_VELOCITY_THRESHOLD) return IntakingMode.BACK;
-        else if(xVelocity > INTAKE_TRANSITION_VELOCITY_THRESHOLD) return IntakingMode.FRONT;
+        else if(NoteTracker.getLocation() == NoteLocation.NONE)intakingMode = IntakingMode.BACK;
 
         return intakingMode;
     }

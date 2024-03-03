@@ -63,7 +63,7 @@ public class RobotContainer {
     private final FlipperStatemachine diverterStatemachine = new FlipperStatemachine(diverter, motionPlanner);
     private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber, () -> swerve.getGyroAngle().getX());
 
-    private final TeleopStatemachine teleopStatemachine = new TeleopStatemachine(
+    private final RobotStatemachine teleopStatemachine = new RobotStatemachine(
         swerveStatemachine,
         flywheelIntakeStatemachine,
         triggerIntakeStatemachine,
@@ -80,7 +80,7 @@ public class RobotContainer {
         return instance;
     }
 
-    public TeleopStatemachine getTeleopStatemachine() {
+    public RobotStatemachine getTeleopStatemachine() {
         return teleopStatemachine;
     }
 

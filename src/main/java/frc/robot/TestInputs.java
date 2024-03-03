@@ -3,7 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.EnumSendableChooser;
-import frc.robot.TeleopStatemachine.TeleopState;
+import frc.robot.RobotStatemachine.SuperstructureState;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.FlipperStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine;
@@ -23,7 +23,7 @@ import frc.robot.statemachines.TriggerIntakeStatemachine;
 public class TestInputs {
     private TestInputs() {}
 
-    EnumSendableChooser<TeleopStatemachine.TeleopState> robotStateChooser = new EnumSendableChooser<>(TeleopState.values());
+    EnumSendableChooser<RobotStatemachine.SuperstructureState> robotStateChooser = new EnumSendableChooser<>(SuperstructureState.values());
     EnumSendableChooser<SwerveState> swerveStateChooser = new EnumSendableChooser<>(SwerveState.values());
     EnumSendableChooser<FlywheelIntakeState> flywheelIntakeStateChooser = new EnumSendableChooser<>(FlywheelIntakeState.values());
     EnumSendableChooser<TriggerIntakeStatemachine.TriggerIntakeState> triggerIntakeStateChooser = new EnumSendableChooser<>(TriggerIntakeStatemachine.TriggerIntakeState.values());
@@ -58,7 +58,7 @@ public class TestInputs {
         SmartDashboard.putNumber("Pivot Angle Deg", 0);
     }
 
-    public void update (TeleopStatemachine teleopStatemachine, 
+    public void update (RobotStatemachine teleopStatemachine, 
                         SwerveStatemachine swerveStatemachine,
                         FlywheelIntakeStatemachine flywheelIntakeStatemachine,
                         TriggerIntakeStatemachine triggerIntakeStatemachine,

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.state.StateMachine;
 import frc.lib.telemetry.MultiTracers;
 import frc.robot.planners.AimPlanner;
@@ -24,8 +25,8 @@ import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
  * TeleopStatemachine controls the state of the whole robot by setting the states
  * of all the subsystems' state machines.
  */
-public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopState>{
-    private TeleopState state = TeleopState.REST;
+public class RobotStatemachine extends StateMachine<RobotStatemachine.SuperstructureState>{
+    private SuperstructureState state = SuperstructureState.REST;
     
     private final SwerveStatemachine swerveStatemachine;
     private final FlywheelIntakeStatemachine flywheelIntakeStatemachine;
@@ -39,7 +40,7 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
     // private final AimPlanner aimPlanner;
     //private final StageAvoidancePlanner stageAvoidancePlanner;
 
-    public TeleopStatemachine (SwerveStatemachine swerveStatemachine, 
+    public RobotStatemachine (SwerveStatemachine swerveStatemachine, 
                             FlywheelIntakeStatemachine flywheelIntakeStatemachine, 
                             TriggerIntakeStatemachine triggerIntakeStatemachine, 
                             ShooterStatemachine shooterStatemachine, 
@@ -67,13 +68,13 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
      * @param state
      */
     @Override
-    public void requestState(TeleopState state){
+    public void requestState(SuperstructureState state){
         //no intaking while climbing
-        if(state == TeleopState.INTAKE_FRONT && this.state == TeleopState.CLIMB_RETRACT) return;
-        if(state == TeleopState.INTAKE_BACK && this.state == TeleopState.CLIMB_RETRACT) return;
+        if(state == SuperstructureState.INTAKE_FRONT && this.state == SuperstructureState.CLIMB_RETRACT) return;
+        if(state == SuperstructureState.INTAKE_BACK && this.state == SuperstructureState.CLIMB_RETRACT) return;
 
         //cant place trap until we are done climbing
-        if(state == TeleopState.PLACE_TRAP && this.state != TeleopState.CLIMB_RETRACT) return;
+        if(state == SuperstructureState.PLACE_TRAP && this.state != SuperstructureState.CLIMB_RETRACT) return;
         
         this.state = state;
     }
@@ -84,6 +85,11 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
      */
     public void requestSwerveState(SwerveState state){
         swerveStatemachine.requestState(state);
+    }
+
+    public void requestSwervePath(Command pathCommand) {
+        swerveStatemachine.setPathCommand(pathCommand);
+        requestSwerveState(SwerveState.FOLLOW_PATH);
     }
 
     /**
@@ -113,7 +119,7 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
      * executed by the state machine
      */
     @Override
-    public TeleopState getState(){
+    public SuperstructureState getState(){
         return state;
     }
 
@@ -131,7 +137,7 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
     }
     
 
-    public enum TeleopState {
+    public enum SuperstructureState {
         REST,
         STOW(
             FlywheelIntakeState.RETRACT,
@@ -250,7 +256,7 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
             return climberState;
         }
 
-        private TeleopState (FlywheelIntakeState flywheelIntakeState,
+        private SuperstructureState (FlywheelIntakeState flywheelIntakeState,
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState,
                                 PivotState pivotState,
@@ -264,32 +270,32 @@ public class TeleopStatemachine extends StateMachine<TeleopStatemachine.TeleopSt
             this.climberState = climberState;
         }
 
-        private TeleopState(FlywheelIntakeState flywheelIntakeState,
+        private SuperstructureState(FlywheelIntakeState flywheelIntakeState,
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState) {
             this(flywheelIntakeState, triggerIntakeState, shooterState, PivotState.REST, FlipperState.RETRACT, ClimberState.RETRACT);
         }
 
-        private TeleopState(FlywheelIntakeState flywheelIntakeState,
+        private SuperstructureState(FlywheelIntakeState flywheelIntakeState,
                                 TriggerIntakeState triggerIntakeState,
                                 ShooterState shooterState,
                                 PivotState pivotState) {
             this(flywheelIntakeState, triggerIntakeState, shooterState, pivotState, FlipperState.RETRACT, ClimberState.RETRACT);
         }
 
-        private TeleopState(ShooterState shooterState, PivotState pivotState){
+        private SuperstructureState(ShooterState shooterState, PivotState pivotState){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, FlipperState.RETRACT, ClimberState.RETRACT);
         }
 
-        private TeleopState(ShooterState shooterState, PivotState pivotState, FlipperState diverterState){
+        private SuperstructureState(ShooterState shooterState, PivotState pivotState, FlipperState diverterState){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, shooterState, pivotState, diverterState, ClimberState.RETRACT);
         }
 
-        private TeleopState(TriggerIntakeState triggerIntakeState, PivotState pivotState, FlipperState diverterState, ClimberState climberState){
+        private SuperstructureState(TriggerIntakeState triggerIntakeState, PivotState pivotState, FlipperState diverterState, ClimberState climberState){
             this(FlywheelIntakeState.RETRACT, triggerIntakeState, ShooterState.RAMP_DOWN, pivotState, diverterState, climberState);
         }
 
-        private TeleopState(){
+        private SuperstructureState(){
             this(FlywheelIntakeState.RETRACT, TriggerIntakeState.RETRACT, ShooterState.RAMP_DOWN, PivotState.REST, FlipperState.RETRACT, ClimberState.RETRACT);
         }
     }

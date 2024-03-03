@@ -1,6 +1,6 @@
 package frc.robot.planners;
 
-import frc.robot.TeleopStatemachine.TeleopState;
+import frc.robot.RobotStatemachine.SuperstructureState;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -11,7 +11,7 @@ import frc.robot.subsystems.Shooter;
 public class NoteTracker {
     private static NoteLocation location = NoteLocation.NONE;
 
-    public static void update (TeleopState state) {
+    public static void update (SuperstructureState state) {
         if(Shooter.getInstance().flywheelSwitchTripped() || Shooter.getInstance().triggerSwitchTripped()) {
             location = NoteLocation.INDEXING;
         } else {
@@ -22,11 +22,11 @@ public class NoteTracker {
             location = NoteLocation.NONE;
         }
 
-        if(state == TeleopState.HANDOFF) {
+        if(state == SuperstructureState.HANDOFF) {
             location = NoteLocation.FLIPPER;
         }
 
-        if(state == TeleopState.PLACE_AMP || state == TeleopState.PLACE_TRAP) {
+        if(state == SuperstructureState.PLACE_AMP || state == SuperstructureState.PLACE_TRAP) {
             location = NoteLocation.NONE;
         }
 

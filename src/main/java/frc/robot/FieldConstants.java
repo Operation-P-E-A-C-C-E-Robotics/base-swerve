@@ -9,7 +9,6 @@ import java.io.IOException;
 
 
 //This is 100% stolen from 6328. Thank you 6328 <3
-//TODO update this if 6328 makes it better.
 /**
  * Contains various field dimensions and useful reference points. Dimensions are in meters, and sets
  * of corners start in the lower left moving clockwise. <b>All units in Meters</b> <br>

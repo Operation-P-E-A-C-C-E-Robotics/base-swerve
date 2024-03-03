@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.TeleopStatemachine;
-import frc.robot.TeleopStatemachine.TeleopState;
+import frc.robot.RobotStatemachine;
+import frc.robot.RobotStatemachine.SuperstructureState;
 import frc.robot.planners.NoteTracker;
 import frc.robot.planners.NoteTracker.NoteLocation;
 import frc.robot.statemachines.SwerveStatemachine;
@@ -22,15 +22,15 @@ public class Autonomous {
     public static final AutoMode testAuto = new AutoMode(
         new AutoSegment(
             null,
-            new TimedRobotState(TeleopState.AUTO_AIM, 0, 0.75),
-            new TimedRobotState(TeleopState.SHOOT, 0.75, 1, () -> Shooter.getInstance().shotDetected()),
-            new TimedRobotState(TeleopState.INTAKE_BACK, 1, 3)
+            new TimedRobotState(SuperstructureState.AUTO_AIM, 0, 0.75),
+            new TimedRobotState(SuperstructureState.SHOOT, 0.75, 1, () -> Shooter.getInstance().shotDetected()),
+            new TimedRobotState(SuperstructureState.INTAKE_BACK, 1, 3)
         ),
         new AutoSegment(
             Path.DRIVE_OFF_LINE,
-            new TimedRobotState(TeleopState.INTAKE_BACK, 0, 5, () -> NoteTracker.getLocation() == NoteLocation.INDEXING),
-            new TimedRobotState(TeleopState.REST, 5, 5.5),
-            new TimedRobotState(TeleopState.AUTO_AIM, 5.5, 10)
+            new TimedRobotState(SuperstructureState.INTAKE_BACK, 0, 5, () -> NoteTracker.getLocation() == NoteLocation.INDEXING),
+            new TimedRobotState(SuperstructureState.REST, 5, 5.5),
+            new TimedRobotState(SuperstructureState.AUTO_AIM, 5.5, 10)
         ),
         new AutoSegment(
             null
@@ -38,19 +38,19 @@ public class Autonomous {
     );
 
     public static class TimedRobotState {
-        public final TeleopState teleopState;
+        public final SuperstructureState teleopState;
         public final double startPercent;
         public final double endPercent;
         public final BooleanSupplier endCondition;
 
-        public TimedRobotState(TeleopState teleopState, double startPercent, double endPercent, BooleanSupplier endCondition) {
+        public TimedRobotState(SuperstructureState teleopState, double startPercent, double endPercent, BooleanSupplier endCondition) {
             this.teleopState = teleopState;
             this.startPercent = startPercent;
             this.endPercent = endPercent;
             this.endCondition = endCondition;
         }
 
-        public TimedRobotState(TeleopState teleopState, double startPercent, double endPercent) {
+        public TimedRobotState(SuperstructureState teleopState, double startPercent, double endPercent) {
             this(teleopState, startPercent, endPercent, () -> false);
         }
         
@@ -69,13 +69,13 @@ public class Autonomous {
             this.timedStates = timedStates;
         }
 
-        public TeleopState getTeleopState(double time) {
+        public SuperstructureState getTeleopState(double time) {
             for (TimedRobotState state : timedStates) {
                 if (state.wantsRun(time)) {
                     return state.teleopState;
                 }
             }
-            return TeleopState.REST;
+            return SuperstructureState.REST;
         }
 
         public Path getPath() {
@@ -103,7 +103,7 @@ public class Autonomous {
             this.segments = segments;
         }
 
-        public void run(SwerveStatemachine swerve, TeleopStatemachine robot) {
+        public void run(SwerveStatemachine swerve, RobotStatemachine robot) {
             SmartDashboard.putNumber("auto segment", currentSegment);
             if(RobotState.isDisabled()) {
                 currentSegment = 0;
@@ -137,13 +137,13 @@ public class Autonomous {
             }
 
             if(current.getPath() == null) {
-                if(current.getTeleopState(time) == TeleopState.AUTO_AIM) robot.requestSwerveState(SwerveState.AIM);
+                if(current.getTeleopState(time) == SuperstructureState.AUTO_AIM) robot.requestSwerveState(SwerveState.AIM);
                 robot.requestSwerveState(SwerveState.LOCK_IN);
                 return;
             }
 
             if(time > current.getPath().duration) {
-                if(current.getTeleopState(time) == TeleopState.AUTO_AIM) robot.requestSwerveState(SwerveState.AIM);
+                if(current.getTeleopState(time) == SuperstructureState.AUTO_AIM) robot.requestSwerveState(SwerveState.AIM);
                 else robot.requestSwerveState(SwerveState.LOCK_IN);
             }
         }
