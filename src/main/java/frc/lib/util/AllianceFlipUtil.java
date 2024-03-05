@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
@@ -86,9 +87,17 @@ public class AllianceFlipUtil {
         }
     }
 
+    private static boolean lastShouldFlip = false;
+    private static Timer flipRecheckTimer = new Timer();
+
     public static boolean shouldFlip() {
-        var alliance = DriverStation.getAlliance();
-        if(alliance.isEmpty()) return false;
-        return alliance.get() == Alliance.Red;
+        flipRecheckTimer.start();
+        if (flipRecheckTimer.hasElapsed(10)) {
+            var alliance = DriverStation.getAlliance();
+            if(alliance.isEmpty()) return false;
+            lastShouldFlip = alliance.get() == Alliance.Red;
+            flipRecheckTimer.reset();
+        }
+        return lastShouldFlip;
     }
 }
