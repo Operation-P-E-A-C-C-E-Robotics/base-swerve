@@ -7,6 +7,7 @@ import frc.robot.RobotStatemachine.SuperstructureState;
 import frc.robot.planners.NoteTracker;
 import frc.robot.planners.NoteTracker.NoteLocation;
 import frc.robot.statemachines.SwerveStatemachine.SwerveState;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Diverter;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
@@ -33,6 +34,8 @@ public class TeleopInputs {
 
     //whether the joystick is overriding the pivot
     private boolean jogPivotMode = false;
+    private boolean jogClimberMode = false;
+    private boolean jogFlipperMode = false;
 
     private TeleopInputs() {
     }
@@ -171,14 +174,29 @@ public class TeleopInputs {
 
         var manualPivot = OI.ManualInputs.jogPivot.getAsDouble() * 0.35;
         var manualTrigger = OI.ManualInputs.jogTrigger.getAsDouble();
+        var manualClimberLeft = OI.ManualInputs.jogClimberLeft.getAsDouble();
+        var manualClimberRight = OI.ManualInputs.jogClimberRight.getAsDouble();
+        var manualFlipper = OI.ManualInputs.jogFlipper.getAsDouble();
 
         if(OI.ManualInputs.resetManualInputs.getAsBoolean()) {
             jogPivotMode = false;
+            jogClimberMode = false;
+            jogFlipperMode = false;
         }
 
         if(jogPivotMode || Math.abs(manualPivot) > 0.2) {
             jogPivotMode = true;
             Pivot.getInstance().setPivotPercent(manualPivot);
+        }
+
+        if(jogClimberMode || Math.abs(manualClimberLeft) > 0.2 || Math.abs(manualClimberRight) > 0.2) {
+            jogClimberMode = true;
+            Climber.getInstance().setClimberPercent(manualClimberLeft, manualClimberRight);
+        }
+
+        if(jogFlipperMode || Math.abs(manualFlipper) > 0.2) {
+            jogFlipperMode = true;
+            Diverter.getInstance().setDiverterExtensionPercent(manualFlipper);
         }
 
         if(Math.abs(manualTrigger) > 0.1) {

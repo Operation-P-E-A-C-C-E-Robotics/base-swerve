@@ -25,6 +25,10 @@ public class Diverter {
         Reporter.log(deployMotor.setControl(deployControl.withPosition(position)), "set diverter extension");
     }
 
+    public void setDiverterExtensionPercent (double percent) {
+        deployMotor.set(percent);
+    }
+
     public void setDiverterRoller (double speed) {
         rollerMotor.set(speed);
     }

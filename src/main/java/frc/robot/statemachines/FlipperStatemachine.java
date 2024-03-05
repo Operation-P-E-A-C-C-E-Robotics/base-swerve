@@ -48,13 +48,13 @@ public class FlipperStatemachine extends StateMachine<FlipperStatemachine.Flippe
     }
 
     public enum FlipperState {
-        RETRACT(0.0,0.0),
+        RETRACT(1.0,0.0),
         HANDOFF(0.0,0.0), //from shooter
-        ALIGN_AMP(0.0,0.0),
-        ALIGN_TRAP(0.0,0.0),
-        PLACE_AMP(0.0,1.0),
-        CLIMB(0.0,0.0),
-        PLACE_TRAP(0.0,1.0);
+        ALIGN_AMP(5.0,0.0),
+        ALIGN_TRAP(5.0,0.0),
+        PLACE_AMP(5.0,1.0),
+        CLIMB(5.0,0.0),
+        PLACE_TRAP(5.0,1.0);
 
         private Double extension, rollerSpeed;
 

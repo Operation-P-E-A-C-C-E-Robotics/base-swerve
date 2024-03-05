@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.Climber.*;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -16,6 +18,8 @@ public class Climber {
 
     private PositionVoltage leftControl = new PositionVoltage(0);
     private PositionVoltage rightControl = new PositionVoltage(0);
+
+    private StatusSignal <Double> leftPosition, rightPosition;
 
     private double setpoint = 0.0;
 
@@ -37,6 +41,15 @@ public class Climber {
             rightMotor.getConfigurator().apply(climberConfigs.withMotorOutput(rightInversionConfig)), 
             "climber right motor config failed"
         );
+
+        leftPosition = leftMotor.getPosition();
+        rightPosition = rightMotor.getPosition();
+
+        leftMotor.optimizeBusUtilization();
+        rightMotor.optimizeBusUtilization();
+
+        BaseStatusSignal.setUpdateFrequencyForAll(100, leftPosition, rightPosition);
+
     }
 
     /**
@@ -59,9 +72,28 @@ public class Climber {
         Reporter.log(rightMotor.setControl(rightControl.withPosition(right)), "setting right climber position");
     }
 
+    public void setClimberPercent (double percent) {
+        setClimberPercent(percent, percent);
+    }
+
+    public void setClimberPercent(double left, double right){
+        leftMotor.set(left);
+        rightMotor.set(right);
+    }
+
     //i changed this from a double to void so i could grab both values and store them in different variables.
     public double getClimberPosition(){
-        return (leftMotor.getPosition().getValue() + rightMotor.getPosition().getValue()) / 2;
+        return (getLeftPosition() + getRightPosition()) / 2;
+    }
+
+    public double getLeftPosition(){
+        leftPosition.refresh();
+        return leftPosition.getValue();
+    }
+
+    public double getRightPosition(){
+        rightPosition.refresh();
+        return rightPosition.getValue();
     }
 
     /**

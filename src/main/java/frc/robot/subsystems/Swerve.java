@@ -9,6 +9,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
@@ -51,6 +52,7 @@ public class Swerve extends SubsystemBase {
     private final PhotonPoseEstimator leftPoseEstimator = new PhotonPoseEstimator(FieldConstants.aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, leftPhoton, robotToLeftCamera);
     private final PhotonPoseEstimator rightPoseEstimator = new PhotonPoseEstimator(FieldConstants.aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, rightPhoton, robotToRightCamera);
 
+    private Transform2d visionDiscrepancy = new Transform2d();
     // private LimelightHelper limelight;
 
     private Swerve() {
@@ -120,6 +122,10 @@ public class Swerve extends SubsystemBase {
         return pose;
     }
 
+    public Transform2d getVisionDiscrepancy() {
+        return visionDiscrepancy;
+    }
+
     /**
      * this missile even knows how fast it's traveling. it knows this because it knows how fast it isn't traveling.
      * @return the chassis speeds of the robot.
@@ -169,6 +175,9 @@ public class Swerve extends SubsystemBase {
             resetOdometry(poseSeedChooser.getSelected());
             SmartDashboard.putBoolean("seed pose", false);
         }
+        var currentPose = getPose();
+        leftPoseEstimator.setReferencePose(currentPose);
+        rightPoseEstimator.setReferencePose(currentPose);
 
         var frontLLPose = LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.Cameras.frontLimelight);
 
@@ -177,6 +186,7 @@ public class Swerve extends SubsystemBase {
         if(OI.Swerve.isZeroOdometry.getAsBoolean()) trustCoefficient /= 50;
 
         if(frontLLPose.tagCount > 0) {
+            visionDiscrepancy = getPose().minus(frontLLPose.pose);
             swerve.addVisionMeasurement(
                 frontLLPose.pose, 
                 frontLLPose.timestampSeconds,

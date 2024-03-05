@@ -86,6 +86,7 @@ public class OI {
         public static final DoubleSupplier jogPivot = () -> -operatorJoystick.getRawAxis(3);
         public static final DoubleSupplier jogClimberLeft = () -> 0.0;
         public static final DoubleSupplier jogClimberRight = () -> 0.0;
+        public static final DoubleSupplier jogFlipper = () -> 0.0;
 
         public static final BooleanSupplier resetManualInputs = () -> operatorJoystick.getRawButton(7);
     }

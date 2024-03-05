@@ -43,6 +43,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         ) {
             lastAimingState = state;
             state = ShooterState.SHOOT;
+            printShotData();
         }
     }
 
@@ -55,6 +56,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     @Override
     public void requestState(ShooterState state){
         if(state == ShooterState.AUTO_AIM && this.state == ShooterState.SHOOT) return;
+        if(state == ShooterState.SHOOT && this.state != ShooterState.SHOOT) printShotData();
         this.state = state;
     }
 
@@ -124,6 +126,17 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
 
     public boolean hasNote(){
         return hasNote;
+    }
+
+    private int shotsFired = 0;
+    private void printShotData() {
+        shotsFired++;
+        System.out.println("Firing Shot!");
+        System.out.println("Shots Fired: " + shotsFired);
+        System.out.println("Wanted Shot Angle: " + aimPlanner.getWantedShotAngle());
+        System.out.println("Measured Shot Angle: " + aimPlanner.getMeasuredShotAngle());
+        System.out.println("Using Shoot-on-the-move: " + aimPlanner.isSotm());
+        System.out.println("Localization Strategy: " + (aimPlanner.isSimpleLocalizer() ? "limelight tx/ty" : "pose estimation"));
     }
 
     public enum ShooterState{

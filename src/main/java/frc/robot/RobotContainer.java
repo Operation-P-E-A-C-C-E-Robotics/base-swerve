@@ -4,6 +4,7 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.MultiTracers;
+import frc.lib.telemetry.StrategyTelemetry;
 import frc.robot.auto.Autonomous;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
@@ -56,7 +57,7 @@ public class RobotContainer {
         if(!shooter.flywheelAtTargetVelocity()) return false;
         if(!pivot.atSetpoint()) return false;
         if(!swerveStatemachine.transitioning()) return false;
-        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.1 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.1) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
+        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.04 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.04) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
         if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
         return true;
     });
@@ -100,6 +101,8 @@ public class RobotContainer {
         MultiTracers.trace("RobotContainer::run", "motionPlanner.update");
         aimPlanner.update();
         MultiTracers.trace("RobotContainer::run", "aimPlanner.update");
+        StrategyTelemetry.update();
+        MultiTracers.trace("RobotContainer::run", "StrategyTelemetry.update");
 
         /* TEST DASHBOARD */
         if(RobotState.isTest()) {
@@ -134,7 +137,7 @@ public class RobotContainer {
             TeleopInputs.getInstance().handleOverrides();
             MultiTracers.trace("RobotContainer::run", "TeleopInputs.getInstance().handleOverrides");
             NoteTracker.update(teleopStatemachine.getState());
-            SmartDashboard.putString("Note tracket", NoteTracker.getLocation().name());
+            SmartDashboard.putString("Note Location", NoteTracker.getLocation().name());
         }
 
         /* AUTONOMOUS */

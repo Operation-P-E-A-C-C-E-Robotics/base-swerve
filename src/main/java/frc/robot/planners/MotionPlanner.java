@@ -20,7 +20,7 @@ public class MotionPlanner {
     public static final Rotation2d flywheelIntakeMinExtensionToFlatten = Rotation2d.fromDegrees(0); //threshold for the pivot to be allowed to flatten
     public static final Rotation2d triggerIntakeMaxExtensionToFlatten = Rotation2d.fromDegrees(0); //threshold for the pivot to be allowed to flatten
     public static final Rotation2d allowIntakeLowerPivotAngle = Rotation2d.fromDegrees(0); //threshold for the flywheel intake to be allowed to intake
-    public static final Rotation2d canDiverterExtendMinPivotAngle = Rotation2d.fromDegrees(0); //threshold for the flipper to be allowed to extend
+    public static final Rotation2d canDiverterExtendMinPivotAngle = Rotation2d.fromDegrees(90); //threshold for the flipper to be allowed to extend
 
     private boolean canFlattenPivot = false;
     private boolean shouldFlywheelIntakeAvoid = false;

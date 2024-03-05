@@ -1,6 +1,5 @@
 package frc.robot.auto;
 
-import frc.robot.RobotContainer;
 import frc.robot.RobotStatemachine;
 import frc.robot.RobotStatemachine.SuperstructureState;
 import frc.robot.planners.NoteTracker;

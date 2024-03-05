@@ -14,8 +14,12 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.LinearInterpolate;
+import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
+import frc.robot.subsystems.Pivot;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Swerve;
 
 /**
  * In charge of calculating the correct angles for the pivot and drivetrain,
@@ -24,6 +28,13 @@ import frc.robot.FieldConstants;
 public class AimPlanner {
     private final Supplier<ChassisSpeeds> robotRelativeChassisSpeeds;
     private final BooleanSupplier shootWhileMoving; // enable correction for drivetrain velocity
+
+    private ShotAngle correctedShotAngle = new ShotAngle(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0);
+    private ShotAngle uncorrectedShotAngle = new ShotAngle(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0);
+    private ShotAngle measuredShotAngle = new ShotAngle(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0);
+
+    private boolean isSotm = false;
+    private boolean isSimpleLocalizer = false;
 
     private final Translation2d targetCenterTranslation = new Translation2d(
         FieldConstants.Speaker.centerSpeakerOpening.getX(),
@@ -34,6 +45,10 @@ public class AimPlanner {
         FieldConstants.aprilTags.getTagPose(7).get().getTranslation().getX(), 
         FieldConstants.aprilTags.getTagPose(7).get().getTranslation().getY()
     );
+
+    private final double TARGET_HEIGHT = Units.inchesToMeters(98.25); //TODO: get actual height
+    private final double CAMERA_HEIGHT = Units.inchesToMeters(30.5); //TODO: get actual height
+    private final double CAMERA_ANGLE = Units.degreesToRadians(30); //TODO: get actual angle
 
     private final double[][] distanceCalibrationData = {
         {60, 39, 28.5, 25, 22}, // pivot angles (deg)
@@ -78,14 +93,27 @@ public class AimPlanner {
     }
 
     public void update() {
-        Pose2d blueOriginPose = frc.robot.subsystems.Swerve.getInstance().getPose();
+        var blueOriginPose = Swerve.getInstance().getPose();
         var blueTargetTranslation = AllianceFlipUtil.apply(targetCenterTranslation);
         double distanceToTarget = blueOriginPose.getTranslation().getDistance(blueTargetTranslation);
 
         Rotation2d angleToTarget = blueOriginPose.getTranslation().minus(blueTargetTranslation).getAngle();
         Rotation2d angleToTag = blueOriginPose.getTranslation().minus(apriltagTranslation).getAngle();
+        isSimpleLocalizer = false;
 
         limelighttXOffset = angleToTag.getDegrees() - angleToTarget.getDegrees();
+
+        //experimental: use the old-style limelight targeting to get the angle and distance to the target
+        //to aim faster with accumulated odometry error
+        var targetingResults = LimelightHelpers.getLatestResults(Constants.Cameras.frontLimelight);
+        for(var result : targetingResults.targetingResults.targets_Fiducials) {
+            if(result.fiducialID == 7) { //TODO make this work on both sides
+                angleToTarget = blueOriginPose.getRotation().plus(Rotation2d.fromDegrees(result.tx + limelighttXOffset));
+                distanceToTarget = (TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(CAMERA_ANGLE + Units.degreesToRadians(result.ty));
+                isSimpleLocalizer = true;
+            }
+        }
+
 
         Rotation2d pivotAngle = Rotation2d.fromDegrees(pivotInterpolator.interpolate(distanceToTarget));
         double flywheelAngularVelocity = flywheelAngularVelocityInterpolater.interpolate(distanceToTarget);
@@ -97,6 +125,13 @@ public class AimPlanner {
         shooterVelocityPublisher.accept(flywheelAngularVelocity);
         exitVelocityPublisher.accept(exitVelocity);
 
+        uncorrectedShotAngle = new ShotAngle(angleToTarget, pivotAngle, exitVelocity);
+        measuredShotAngle = new ShotAngle(
+            blueOriginPose.getRotation(), 
+            Pivot.getInstance().getPivotPosition(), 
+            RPSToExitVelocity(Shooter.getInstance().getFlywheelVelocity())
+        );
+
         if(!shootWhileMoving.getAsBoolean()) {
             drivetrainAngularVelocity = 0;
             pivotAngularVelocity = 0;
@@ -104,13 +139,16 @@ public class AimPlanner {
             this.pivotAngle = pivotAngle;
             this.flywheelAngularVelocity = flywheelAngularVelocity;
             this.drivetrainAngle = angleToTarget;
+            isSotm = false;
         }
         if(!shootWhileMoving.getAsBoolean()) return;
+        isSotm = true;
 
         ChassisSpeeds robotVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds.get(), blueOriginPose.getRotation());
-        robotVelocity.vxMetersPerSecond = -robotVelocity.vxMetersPerSecond;
-        ShotAngle uncorrectedShotAngle = new ShotAngle(angleToTarget, pivotAngle, exitVelocity);
-        ShotAngle correctedShotAngle = ShotAngle.correctFromChassisSpeeds(uncorrectedShotAngle, robotVelocity, blueOriginPose.getRotation());
+        if(AllianceFlipUtil.shouldFlip()) robotVelocity.vxMetersPerSecond *= -1;
+        robotVelocity.vxMetersPerSecond *= 0.5; //avoid overcorrecting x velocity
+
+        correctedShotAngle = ShotAngle.correctFromChassisSpeeds(uncorrectedShotAngle, robotVelocity, blueOriginPose.getRotation());
         sotmPivotAnglePublisher.accept(correctedShotAngle.getPivotAngle().getDegrees());
         sotmExitVelocityPublisher.accept(correctedShotAngle.getExitVelocity());
         sotmDrivetrainAnglePublisher.accept(correctedShotAngle.getDrivetrainAngle().getDegrees());
@@ -145,6 +183,22 @@ public class AimPlanner {
 
     public Rotation2d getTargetPivotAngle() {
         return pivotAngle;
+    }
+
+    public ShotAngle getWantedShotAngle() {
+        return isSotm ? correctedShotAngle : uncorrectedShotAngle;
+    }
+
+    public ShotAngle getMeasuredShotAngle() {
+        return measuredShotAngle;
+    }
+
+    public boolean isSotm() {
+        return isSotm;
+    }
+
+    public boolean isSimpleLocalizer() {
+        return isSimpleLocalizer;
     }
 
     public double getTargetFlywheelVelocityRPS() {
