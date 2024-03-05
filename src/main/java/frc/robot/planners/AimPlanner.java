@@ -107,7 +107,7 @@ public class AimPlanner {
         //to aim faster with accumulated odometry error
         var targetingResults = LimelightHelpers.getLatestResults(Constants.Cameras.frontLimelight);
         for(var result : targetingResults.targetingResults.targets_Fiducials) {
-            if(result.fiducialID == 7) { //TODO make this work on both sides
+            if(result.fiducialID == (AllianceFlipUtil.shouldFlip() ? 4 : 7)) { //TODO make this work on both sides
                 angleToTarget = blueOriginPose.getRotation().plus(Rotation2d.fromDegrees(result.tx + limelighttXOffset));
                 distanceToTarget = (TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(CAMERA_ANGLE + Units.degreesToRadians(result.ty));
                 isSimpleLocalizer = true;
