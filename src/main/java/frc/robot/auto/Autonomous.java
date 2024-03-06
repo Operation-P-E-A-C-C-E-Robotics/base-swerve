@@ -28,7 +28,7 @@ public class Autonomous {
             new TimedRobotState(SuperstructureState.INTAKE_BACK, 1, 1.5)
         ),
         new AutoSegment(
-            Path.DRIVE_OFF_LINE,
+            Path.DRIVE_OFF_LINE_CENTER,
             new TimedRobotState(SuperstructureState.INTAKE_BACK, 0, 5, () -> NoteTracker.getLocation() == NoteLocation.INDEXING || NoteTracker.getLocation() == NoteLocation.SHOOTER),
             new TimedRobotState(SuperstructureState.REST, 3, 5.5, () -> NoteTracker.getLocation() == NoteLocation.SHOOTER),
             new TimedRobotState(SuperstructureState.AUTO_AIM, 3.5, 6.5, () -> RobotContainer.getInstance().readyToShoot()),
@@ -153,8 +153,12 @@ public class Autonomous {
 
     public static enum Path {
         TEST_PATH("test path", 3),
-        DRIVE_OFF_LINE("drive off line", 1.5);
-    
+        DRIVE_OFF_LINE_CENTER("drive off line center", 2.1),
+        DRIVE_OFF_LINE_AMPSIDE("drive off line ampside", 2.0),
+        DRIVE_OFF_LINE_STAGESIDE("drive off line stageside", 1.8),
+        AMPSIDE_NOTE_TO_CENTER_NOTE("ampside note to center note", 2.6),
+        CENTERSIDE_NOTE_TO_STAGESIDE_NOTE("center note to stageside note", 2.0);
+
         public final String pathName;
         public final double duration;
         public final Command command;
