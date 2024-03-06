@@ -22,7 +22,7 @@
                     "isInitialGuess": false,
                     "translationConstrained": true,
                     "headingConstrained": true,
-                    "controlIntervalCount": 15
+                    "controlIntervalCount": 28
                 },
                 {
                     "x": 2.792626142501831,
@@ -31,7 +31,7 @@
                     "isInitialGuess": false,
                     "translationConstrained": true,
                     "headingConstrained": true,
-                    "controlIntervalCount": 15
+                    "controlIntervalCount": 28
                 },
                 {
                     "x": 4.013168811798096,

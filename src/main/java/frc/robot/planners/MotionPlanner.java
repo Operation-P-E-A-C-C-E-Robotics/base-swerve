@@ -1,7 +1,6 @@
 package frc.robot.planners;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.subsystems.FlywheelIntake;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.TriggerIntake;
@@ -21,6 +20,8 @@ public class MotionPlanner {
     public static final Rotation2d triggerIntakeMaxExtensionToFlatten = Rotation2d.fromDegrees(0); //threshold for the pivot to be allowed to flatten
     public static final Rotation2d allowIntakeLowerPivotAngle = Rotation2d.fromDegrees(0); //threshold for the flywheel intake to be allowed to intake
     public static final Rotation2d canDiverterExtendMinPivotAngle = Rotation2d.fromDegrees(90); //threshold for the flipper to be allowed to extend
+    public static final Rotation2d canPivotFlipMinIntakeExtension = Rotation2d.fromDegrees(40); 
+
 
     private boolean canFlattenPivot = false;
     private boolean shouldFlywheelIntakeAvoid = false;
@@ -28,24 +29,31 @@ public class MotionPlanner {
     private boolean readyToIntake = false;
     private boolean canDiverterExtend = false;
 
+    private boolean canFlipPivot = false;
+
     public MotionPlanner () {
     }
 
     public void update() {
         var pivotRadians = Pivot.getInstance().getPivotPosition().getRadians();
-        var flywheelIntakeExtension = FlywheelIntake.getInstance().getDeploymentAngle().getRadians();
+        // var flywheelIntakeExtension = FlywheelIntake.getInstance().getDeploymentAngle().getRadians();
         var triggerIntakeExtension = TriggerIntake.getInstance().getDeploymentAngle().getRadians();
-        canFlattenPivot = flywheelIntakeExtension < flywheelIntakeMinExtensionToFlatten.getRadians()
+        canFlattenPivot = true//flywheelIntakeExtension < flywheelIntakeMinExtensionToFlatten.getRadians()
                         && triggerIntakeExtension < triggerIntakeMaxExtensionToFlatten.getRadians();
         shouldFlywheelIntakeAvoid = pivotRadians < interferenceLowerPivotAngle.getRadians();
         shouldTriggerIntakeAvoid = pivotRadians > interferenceUpperPivotAngle.getRadians() ||
                                     pivotRadians < interferenceLowerPivotAngle.getRadians();
         readyToIntake = pivotRadians < allowIntakeLowerPivotAngle.getRadians();
         canDiverterExtend = pivotRadians > canDiverterExtendMinPivotAngle.getRadians();
+        canFlipPivot = triggerIntakeExtension > canPivotFlipMinIntakeExtension.getRadians();
     }
 
     public boolean canFlattenPivot() {
         return canFlattenPivot;
+    }
+
+    public boolean canFlipPivot() {
+        return canFlipPivot;
     }
 
     public boolean shouldFlywheelIntakeAvoid() {

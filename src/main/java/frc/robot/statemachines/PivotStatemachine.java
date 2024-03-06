@@ -12,10 +12,12 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
 
     private final Pivot pivot;
     private final AimPlanner aimPlanner;
+    private final MotionPlanner motionPlanner;
 
-    public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner, MotionPlanner intakeMotionPlanner){
+    public PivotStatemachine(Pivot pivot, AimPlanner aimPlanner, MotionPlanner motionPlanner){
         this.pivot = pivot;
         this.aimPlanner = aimPlanner;
+        this.motionPlanner = motionPlanner;
 
         SmartDashboard.putNumber("pivot sim debug", 0);
     }
@@ -44,8 +46,10 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
                 pivot.setPivotPosition(angle);
                 return;
         }
+        var angle = state.getAngle();
+        if(angle.getDegrees() > 80 && !motionPlanner.canFlipPivot()) angle = Rotation2d.fromDegrees(80);
 
-        pivot.setPivotPosition(state.getAngle());
+        pivot.setPivotPosition(angle);
     }
 
     @Override
