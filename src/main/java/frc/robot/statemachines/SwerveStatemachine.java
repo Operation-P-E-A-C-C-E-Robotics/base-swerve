@@ -63,7 +63,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
 
     private final AimPlanner aimPlanner;
 
-    private final LinearFilter noteTrackingFliter = LinearFilter.movingAverage(10);
+    private final LinearFilter noteTrackingFliter = LinearFilter.movingAverage(4);
 
     /**
      * PeaccyDrive is a swerve drive command designed to handle all the different
@@ -277,7 +277,7 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             var results = LimelightHelpers.getLatestResults(Constants.Cameras.rearLimelight).targetingResults.targets_Detector;
             if(results.length > 0){
                 var heading = Swerve.getInstance().getPose().getRotation().getRadians() - Units.degreesToRadians(results[0].tx * 0.5);
-                heading = noteTrackingFliter.calculate(AllianceFlipUtil.shouldFlip() ? heading - Math.PI : heading);
+                heading = noteTrackingFliter.calculate(AllianceFlipUtil.shouldFlip() ? heading - Math.PI - 0.06 : heading - 0.06);
                 request.withHeading(heading);
 
                 request.withLockHeading(true);

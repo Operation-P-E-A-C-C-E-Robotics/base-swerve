@@ -38,7 +38,7 @@ public final class Constants {
     public static final String frontLimelight = "limelight-front";
     public static final String rearLimelight = "limelight-rear";
     public static final int apriltagPipeline = 0;
-    public static final int noteDectionPipeline = 1;
+    public static final int noteDectionPipeline = 0;
   }
 
   public static final class Shooter {
@@ -52,7 +52,7 @@ public final class Constants {
     public static final double flywheelMaxControllableVelocity = 0; //rotations per second
     public static final double flywheelGearRatio = 1;
     public static final double flywheelDiameter = Units.inchesToMeters(5);
-    public static final double flywheelKv = 0.115;
+    public static final double flywheelKv = 0.13;//0.115;
     public static final double flywheelKa = 0.001;
     public static final double flywheelModelStDev = 3;
     public static final double flywheelEncoderStDev = 0.01;
@@ -78,7 +78,7 @@ public final class Constants {
     public static final boolean triggerMotorInverted = true;
 
     public static final double flywheelEfficiency = 2.4; // percentage of flywheel surface speed to exit velocity
-    public static final double flywheelTolerance = 0.7; //how close to the target velocity the flywheel needs to be considered ready
+    public static final double flywheelTolerance = 1; //how close to the target velocity the flywheel needs to be considered ready
   }
 
   public static final class FlywheelIntake {
@@ -146,17 +146,17 @@ public final class Constants {
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      pivotConfigs.Slot0.kP = 6;
+      pivotConfigs.Slot0.kP = 8;//6;
       pivotConfigs.Slot0.kI = 0;
-      pivotConfigs.Slot0.kD = 0;
+      pivotConfigs.Slot0.kD = 0.04;//0;
       pivotConfigs.Slot0.kS = 0;
-      pivotConfigs.Slot0.kV = 14.5;
-      pivotConfigs.Slot0.kA = 0;
-      pivotConfigs.Slot0.kG = 0.23;
+      pivotConfigs.Slot0.kV = 18;//14.5;
+      pivotConfigs.Slot0.kA = 0.05;//0;
+      pivotConfigs.Slot0.kG = 0.35;//0.23;
       pivotConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 5;
-      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 10;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 10;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 20;
       pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
 
       pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;

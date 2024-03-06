@@ -77,8 +77,8 @@ public class Shooter {
     private final LinearSystemLoop<N1, N1, N1> bottomFlywheelLoop = new LinearSystemLoop<>(bottomFlywheelSystem, bottomFlywheelController, bottomFlywheelObserver, 12.0, Constants.period);
    
     /* CONTROL REQUESTS */
-    private final VoltageOut topControl = new VoltageOut(0);
-    private final VoltageOut bottomControl = new VoltageOut(0);
+    private final VoltageOut topControl = new VoltageOut(0).withEnableFOC(true);
+    private final VoltageOut bottomControl = new VoltageOut(0).withEnableFOC(true);
 
     /* STATUS SIGNALS */
     private final StatusSignal <Double> topFlywheelVelocity;

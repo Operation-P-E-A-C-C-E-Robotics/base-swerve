@@ -55,7 +55,7 @@ public class AimPlanner {
     private final double CAMERA_ANGLE = Units.degreesToRadians(34.311); //TODO: get actual angle
 
     private final double[][] distanceCalibrationData = {
-        {60, 39, 28.5, 25, 22}, // pivot angles (deg)
+        {54, 39, 28.5, 25, 22}, // pivot angles (deg)
         {40, 43, 47, 50, 53}, // flywheel speed rps
         {1, 2, 3, 4, 5}  //distances (m)
     };
@@ -115,7 +115,7 @@ public class AimPlanner {
                 angleToTarget = AllianceFlipUtil.apply(Swerve.getInstance().getPose()).getRotation().plus(Rotation2d.fromDegrees((AllianceFlipUtil.shouldFlip() ? 1 : -1) *(result.tx*0.8) - 180 /*- limelighttXOffset*/));
                 angleToTarget = new Rotation2d(llAngleFilter.calculate((AllianceFlipUtil.shouldFlip() ? -1 : 1) * angleToTarget.getRadians()));
                 if(AllianceFlipUtil.shouldFlip()) angleToTarget = angleToTarget.minus(Rotation2d.fromDegrees(180));
-                distanceToTarget = ((TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(CAMERA_ANGLE + Units.degreesToRadians(result.ty))) - 0.1;
+                distanceToTarget = ((TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(CAMERA_ANGLE + Units.degreesToRadians(result.ty))) - 0.3;
                 isSimpleLocalizer = true;
             }
         }

@@ -82,10 +82,10 @@ public class OI {
         //Direct joystick inputs for critical systems. These are somewhat dangerous since they override most safety features.
         //They are persistent so the robot won't return to automated control until the reset button is pressed.
         //(well the trigger might but the pivot and climber won't)
-        public static final DoubleSupplier jogClimberLeft = () -> -operatorJoystick.getRawAxis(1);
-        public static final DoubleSupplier jogClimberRight = () -> -operatorJoystick.getRawAxis(3);
-        public static final DoubleSupplier jogTrigger = () -> 0.0;
-        public static final DoubleSupplier jogPivot = () -> 0.0;
+        public static final DoubleSupplier jogTrigger = () -> -operatorJoystick.getRawAxis(1);
+        public static final DoubleSupplier jogPivot = () -> -operatorJoystick.getRawAxis(3);
+        public static final DoubleSupplier jogClimberLeft = () -> 0.0;
+        public static final DoubleSupplier jogClimberRight = () -> 0.0;
         public static final DoubleSupplier jogFlipper = () -> 0.0;
 
         public static final BooleanSupplier resetManualInputs = () -> operatorJoystick.getRawButton(7);
