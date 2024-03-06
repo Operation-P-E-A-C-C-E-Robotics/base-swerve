@@ -112,8 +112,8 @@ public class AimPlanner {
         var targetingResults = LimelightHelpers.getLatestResults(Constants.Cameras.frontLimelight);
         for(var result : targetingResults.targetingResults.targets_Fiducials) {
             if(result.fiducialID == (AllianceFlipUtil.shouldFlip() ? 4 : 7)) { //TODO make this work on both sides
-                angleToTarget = AllianceFlipUtil.apply(Swerve.getInstance().getPose()).getRotation().plus(Rotation2d.fromDegrees(-(result.tx*0.8) - 180 /*- limelighttXOffset*/));
-                angleToTarget = new Rotation2d(llAngleFilter.calculate(angleToTarget.getRadians()));
+                angleToTarget = AllianceFlipUtil.apply(Swerve.getInstance().getPose()).getRotation().plus(Rotation2d.fromDegrees((AllianceFlipUtil.shouldFlip() ? 1 : -1) *(result.tx*0.8) - 180 /*- limelighttXOffset*/));
+                angleToTarget = new Rotation2d(llAngleFilter.calculate((AllianceFlipUtil.shouldFlip() ? -1 : 1) * angleToTarget.getRadians()));
                 if(AllianceFlipUtil.shouldFlip()) angleToTarget = angleToTarget.minus(Rotation2d.fromDegrees(180));
                 distanceToTarget = ((TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(CAMERA_ANGLE + Units.degreesToRadians(result.ty))) - 0.1;
                 isSimpleLocalizer = true;
