@@ -51,7 +51,7 @@ public class TeleopInputs {
             return SwerveState.AIM;
         }
 
-        if(intakingMode == IntakingMode.BACK) {
+        if(intakingMode == IntakingMode.BACK || RobotContainer.getInstance().getTeleopStatemachine().getState() == SuperstructureState.INTAKE_BACK) {
             return SwerveState.ALIGN_INTAKING;
         }
 

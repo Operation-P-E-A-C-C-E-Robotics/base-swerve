@@ -53,14 +53,7 @@ public class RobotContainer {
     private final FlywheelIntakeStatemachine flywheelIntakeStatemachine = new FlywheelIntakeStatemachine(flywheelIntake, motionPlanner);
     private final TriggerIntakeStatemachine triggerIntakeStatemachine = new TriggerIntakeStatemachine(triggerIntake, motionPlanner);
     private final PivotStatemachine pivotStatemachine = new PivotStatemachine(pivot, aimPlanner, motionPlanner);
-    private final ShooterStatemachine shooterStatemachine = new ShooterStatemachine(shooter, aimPlanner, () -> {
-        if(!shooter.flywheelAtTargetVelocity()) return false;
-        if(!pivot.atSetpoint()) return false;
-        if(!swerveStatemachine.transitioning()) return false;
-        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.04 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.04) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
-        if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
-        return true;
-    });
+    private final ShooterStatemachine shooterStatemachine = new ShooterStatemachine(shooter, aimPlanner, this::readyToShoot);
     private final FlipperStatemachine diverterStatemachine = new FlipperStatemachine(diverter, motionPlanner);
     private final ClimberStatemachine climberStatemachine = new ClimberStatemachine(climber, () -> swerve.getGyroAngle().getX());
 
@@ -79,6 +72,15 @@ public class RobotContainer {
     public static RobotContainer getInstance() {
         if(instance == null) instance = new RobotContainer();
         return instance;
+    }
+
+    public boolean readyToShoot(){
+        if(!shooter.flywheelAtTargetVelocity()) return false;
+        if(!pivot.atSetpoint()) return false;
+        if(!swerveStatemachine.transitioning()) return false;
+        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.04 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.04) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
+        if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
+        return true;
     }
 
     public RobotStatemachine getTeleopStatemachine() {
@@ -130,13 +132,12 @@ public class RobotContainer {
             MultiTracers.trace("RobotContainer::run", "shooterStatemachine.update");
             // diverterStatemachine.update();
             // MultiTracers.trace("RobotContainer::run", "diverterStatemachine.update");
-            // climberStatemachine.update();
-            // MultiTracers.trace("RobotContainer::run", "climberStatemachine.update");
+            climberStatemachine.update();
+            MultiTracers.trace("RobotContainer::run", "climberStatemachine.update");
             
             // handle driver overrides
             TeleopInputs.getInstance().handleOverrides();
             MultiTracers.trace("RobotContainer::run", "TeleopInputs.getInstance().handleOverrides");
-            NoteTracker.update(teleopStatemachine.getState());
             SmartDashboard.putString("Note Location", NoteTracker.getLocation().name());
         }
 
@@ -150,6 +151,8 @@ public class RobotContainer {
             pivotStatemachine.update();
             shooterStatemachine.update();
         }
+                    NoteTracker.update(teleopStatemachine.getState());
+
         MultiTracers.print("RobotContainer::run");
     }
 }

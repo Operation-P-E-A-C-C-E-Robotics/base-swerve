@@ -133,7 +133,7 @@ public final class Constants {
     public static final double restingAngle = 0.25; //rotations
 
     public static final double pivotMinAngle = Units.degreesToRotations(15);
-    public static final double pivotMaxAngle = Units.degreesToRotations(90);
+    public static final double pivotMaxAngle = Units.degreesToRotations(110);
 
     public static final double pivotGearRatio = 0.01 * (16/24) * (16/24); // pivot rotations per motor rotation
     public static final double pivotTolerance = 1.4; //how close to the target position the pivot needs to be considered ready
@@ -227,7 +227,7 @@ public final class Constants {
 
     public static final TalonFXConfiguration climberConfigs = new TalonFXConfiguration();
     static {
-      climberConfigs.CurrentLimits.StatorCurrentLimit = 20;
+      climberConfigs.CurrentLimits.StatorCurrentLimit = 80;
       climberConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 
       climberConfigs.Slot0.kP = 0;
@@ -242,7 +242,7 @@ public final class Constants {
       climberConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
     }
 
-    public static final InvertedValue climberLeftMotorIsInverted = InvertedValue.CounterClockwise_Positive;
+    public static final InvertedValue climberLeftMotorIsInverted = InvertedValue.Clockwise_Positive;
     public static final InvertedValue climberRightMotorIsInverted = InvertedValue.CounterClockwise_Positive;
     // todo delete this comment when sure the booleans are what we want
   }

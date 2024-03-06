@@ -2,6 +2,8 @@ package frc.robot.planners;
 
 import java.util.function.Supplier;
 import java.util.function.BooleanSupplier;
+
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -33,6 +35,8 @@ public class AimPlanner {
     private ShotAngle uncorrectedShotAngle = new ShotAngle(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0);
     private ShotAngle measuredShotAngle = new ShotAngle(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0);
 
+    private LinearFilter llAngleFilter = LinearFilter.movingAverage(20);
+    
     private boolean isSotm = false;
     private boolean isSimpleLocalizer = false;
 
@@ -46,9 +50,9 @@ public class AimPlanner {
         FieldConstants.aprilTags.getTagPose(7).get().getTranslation().getY()
     );
 
-    private final double TARGET_HEIGHT = Units.inchesToMeters(98.25); //TODO: get actual height
-    private final double CAMERA_HEIGHT = Units.inchesToMeters(30.5); //TODO: get actual height
-    private final double CAMERA_ANGLE = Units.degreesToRadians(30); //TODO: get actual angle
+    private final double TARGET_HEIGHT = Units.inchesToMeters(57.5); //TODO: get actual height
+    private final double CAMERA_HEIGHT = Units.inchesToMeters(6.5); //TODO: get actual height
+    private final double CAMERA_ANGLE = Units.degreesToRadians(34.311); //TODO: get actual angle
 
     private final double[][] distanceCalibrationData = {
         {60, 39, 28.5, 25, 22}, // pivot angles (deg)
@@ -108,10 +112,16 @@ public class AimPlanner {
         var targetingResults = LimelightHelpers.getLatestResults(Constants.Cameras.frontLimelight);
         for(var result : targetingResults.targetingResults.targets_Fiducials) {
             if(result.fiducialID == (AllianceFlipUtil.shouldFlip() ? 4 : 7)) { //TODO make this work on both sides
-                angleToTarget = blueOriginPose.getRotation().plus(Rotation2d.fromDegrees(result.tx + limelighttXOffset));
-                distanceToTarget = (TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(CAMERA_ANGLE + Units.degreesToRadians(result.ty));
+                angleToTarget = AllianceFlipUtil.apply(Swerve.getInstance().getPose()).getRotation().plus(Rotation2d.fromDegrees(-(result.tx*0.8) - 180 /*- limelighttXOffset*/));
+                angleToTarget = new Rotation2d(llAngleFilter.calculate(angleToTarget.getRadians()));
+                if(AllianceFlipUtil.shouldFlip()) angleToTarget = angleToTarget.minus(Rotation2d.fromDegrees(180));
+                distanceToTarget = ((TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(CAMERA_ANGLE + Units.degreesToRadians(result.ty))) - 0.1;
                 isSimpleLocalizer = true;
             }
+        }
+
+        if(!isSimpleLocalizer) {
+            llAngleFilter.reset();
         }
 
 
@@ -174,7 +184,7 @@ public class AimPlanner {
     }
 
     public Rotation2d getTargetDrivetrainAngle() {
-        return drivetrainAngle;
+        return drivetrainAngle.plus(Rotation2d.fromDegrees(AllianceFlipUtil.shouldFlip() ? 0 : 180));
     }
 
     public Rotation2d getLimelightTXOffset() {
@@ -258,7 +268,7 @@ public class AimPlanner {
             var vector =  getRobotCentricVector().rotateBy(new Rotation3d(0, 0, robotAngle.getRadians()));
             // System.out.println("field centric vector: " + vector.toString());
             return vector;
-        }
+        } //57.5
 
         public static ShotAngle fromRobotCentricVector (Translation3d vector) {
             return new ShotAngle(

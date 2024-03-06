@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.RobotStatemachine;
 import frc.robot.RobotStatemachine.SuperstructureState;
 import frc.robot.planners.NoteTracker;
@@ -22,15 +23,16 @@ public class Autonomous {
     public static final AutoMode testAuto = new AutoMode(
         new AutoSegment(
             null,
-            new TimedRobotState(SuperstructureState.AUTO_AIM, 0, 0.75),
+            new TimedRobotState(SuperstructureState.AIM_LAYUP, 0, 0.75),
             new TimedRobotState(SuperstructureState.SHOOT, 0.75, 1, () -> Shooter.getInstance().shotDetected()),
-            new TimedRobotState(SuperstructureState.INTAKE_BACK, 1, 3)
+            new TimedRobotState(SuperstructureState.INTAKE_BACK, 1, 1.5)
         ),
         new AutoSegment(
             Path.DRIVE_OFF_LINE,
-            new TimedRobotState(SuperstructureState.INTAKE_BACK, 0, 5, () -> NoteTracker.getLocation() == NoteLocation.INDEXING),
-            new TimedRobotState(SuperstructureState.REST, 5, 5.5),
-            new TimedRobotState(SuperstructureState.AUTO_AIM, 5.5, 10)
+            new TimedRobotState(SuperstructureState.INTAKE_BACK, 0, 5, () -> NoteTracker.getLocation() == NoteLocation.INDEXING || NoteTracker.getLocation() == NoteLocation.SHOOTER),
+            new TimedRobotState(SuperstructureState.REST, 3, 5.5, () -> NoteTracker.getLocation() == NoteLocation.SHOOTER),
+            new TimedRobotState(SuperstructureState.AUTO_AIM, 3.5, 6.5, () -> RobotContainer.getInstance().readyToShoot()),
+            new TimedRobotState(SuperstructureState.SHOOT, 6.5, 7)
         ),
         new AutoSegment(
             null

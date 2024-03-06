@@ -68,9 +68,9 @@ public class PivotStatemachine extends StateMachine<PivotStatemachine.PivotState
         INTAKE(Rotation2d.fromDegrees(19)),
         STOW(Rotation2d.fromDegrees(20)),
         AMP(Rotation2d.fromDegrees(100)),
-        PRE_CLIMB(Rotation2d.fromDegrees(30)),
+        PRE_CLIMB(Rotation2d.fromDegrees(110)),
         CLIMB(Rotation2d.fromDegrees(30)),
-        AIM_LAYUP(Rotation2d.fromDegrees(55)),
+        AIM_LAYUP(Rotation2d.fromDegrees(53)),
         AIM_PROTECTED(Rotation2d.fromDegrees(15)),
         AUTO_AIM(Rotation2d.fromDegrees(30));
 
