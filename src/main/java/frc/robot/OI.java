@@ -5,6 +5,9 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import frc.robot.RobotStatemachine.SuperstructureState;
+import frc.robot.planners.NoteTracker;
+import frc.robot.planners.NoteTracker.NoteLocation;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -95,13 +98,14 @@ public class OI {
     private static final double swerveCurrentRumbleScalar = 40; //Amps, how much current gives 100% rumble (0.5 on each side)
 
     public void updateRumble () {
+        var driveCurrent = frc.robot.subsystems.Swerve.getInstance().getTotalDriveCurrent();
         if(Shooter.getInstance().shotDetected()) {
             driverJoystick.setRumble(RumbleType.kBothRumble, 0.5);
             operatorJoystick.setRumble(RumbleType.kBothRumble, 0.5);
-        }
-
-        var driveCurrent = frc.robot.subsystems.Swerve.getInstance().getTotalDriveCurrent();
-        if(driveCurrent > swerveCurrentRumbleThreshold) {
+        } else if(RobotContainer.getInstance().getTeleopStatemachine().getState() == SuperstructureState.INTAKE_BACK && NoteTracker.getLocation() == NoteLocation.INDEXING) {
+            driverJoystick.setRumble(RumbleType.kBothRumble, 0.5);
+            operatorJoystick.setRumble(RumbleType.kBothRumble, 0.5);
+        } else if(driveCurrent > swerveCurrentRumbleThreshold) {
             var rumble = (driveCurrent - swerveCurrentRumbleThreshold) / swerveCurrentRumbleScalar;
             //divide based on strafe amount
             var left = rumble * (0.5 - (Swerve.strafe.getAsDouble() / 2));
@@ -109,6 +113,9 @@ public class OI {
 
             driverJoystick.setRumble(RumbleType.kLeftRumble, left);
             driverJoystick.setRumble(RumbleType.kRightRumble, right);
+        } else {
+            driverJoystick.setRumble(RumbleType.kBothRumble, 0);
+            operatorJoystick.setRumble(RumbleType.kBothRumble, 0);
         }
     }
 }
