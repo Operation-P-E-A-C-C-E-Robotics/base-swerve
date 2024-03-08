@@ -110,12 +110,6 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
                 return;
             }
         }
-
-        if (state == SwerveState.ALIGN_INTAKING) {
-            LimelightHelpers.setPipelineIndex(Constants.Cameras.rearLimelight, Constants.Cameras.noteDectionPipeline);
-        } else {
-            LimelightHelpers.setPipelineIndex(Constants.Cameras.rearLimelight, Constants.Cameras.apriltagPipeline);
-        }
             
         //handle path following
         //handle command end function
