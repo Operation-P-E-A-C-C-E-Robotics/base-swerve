@@ -29,7 +29,7 @@ public class Pivot {
     private final CANcoder pivotEncoder = new CANcoder(pivotConfigs.Feedback.FeedbackRemoteSensorID);
 
     /* CONTROLLERS / CONTROL REQUESTS */
-    private final MotionMagicExpoVoltage pivotControl = new MotionMagicExpoVoltage(restingAngle).withEnableFOC(true);
+    private final MotionMagicExpoVoltage pivotControl = new MotionMagicExpoVoltage(restingAngle).withEnableFOC(false);
     private final ArmFeedforward gravityFeedforward = new ArmFeedforward(0, gravityFeedforwardkG, 0);
 
     /* TELEMETRY */

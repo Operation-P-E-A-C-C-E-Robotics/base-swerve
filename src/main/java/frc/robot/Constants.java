@@ -32,7 +32,7 @@ import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.util.JoystickCurves;
 
 public final class Constants {
-  public static final double period = 0.01;
+  public static final double period = 0.015;
 
   public static final class Cameras {
     public static final String frontLimelight = "limelight-front";
@@ -52,8 +52,8 @@ public final class Constants {
     public static final double flywheelMaxControllableVelocity = 0; //rotations per second
     public static final double flywheelGearRatio = 1;
     public static final double flywheelDiameter = Units.inchesToMeters(5);
-    public static final double flywheelKv = 0.13;//0.115;
-    public static final double flywheelKa = 0.001;
+    public static final double flywheelKv = 0.12;//0.115;
+    public static final double flywheelKa = 0.0001;
     public static final double flywheelModelStDev = 3;
     public static final double flywheelEncoderStDev = 0.01;
     public static final double flywheelControlEffort = 12;
@@ -136,7 +136,7 @@ public final class Constants {
     public static final double pivotMaxAngle = Units.degreesToRotations(110);
 
     public static final double pivotGearRatio = 0.01 * (16/24) * (16/24); // pivot rotations per motor rotation
-    public static final double pivotTolerance = 1.4; //how close to the target position the pivot needs to be considered ready
+    public static final double pivotTolerance = 2; //how close to the target position the pivot needs to be considered ready
 
     public static final double gravityFeedforwardkG = 0;
 
@@ -146,17 +146,17 @@ public final class Constants {
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      pivotConfigs.Slot0.kP = 8;//6;
+      pivotConfigs.Slot0.kP = 6;//8;//6;
       pivotConfigs.Slot0.kI = 0;
-      pivotConfigs.Slot0.kD = 0.04;//0;
+      pivotConfigs.Slot0.kD = 0.0;//0;
       pivotConfigs.Slot0.kS = 0;
-      pivotConfigs.Slot0.kV = 18;//14.5;
-      pivotConfigs.Slot0.kA = 0.05;//0;
-      pivotConfigs.Slot0.kG = 0.35;//0.23;
+      pivotConfigs.Slot0.kV = 14.5;//20;//14.5;
+      pivotConfigs.Slot0.kA = 0;//0.01;//0;
+      pivotConfigs.Slot0.kG = 0.23;//0.25;//0.23;
       pivotConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 10;
-      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 20;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 5;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 10;
       pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
 
       pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -324,7 +324,7 @@ public final class Constants {
     public static final boolean useSoftHoldHeading = false;
     public static final double softHeadingCurrentLimit = 30;
 
-    public static final double aimTolerance = 0.7; //degrees
+    public static final double aimTolerance = 1; //degrees
 
     
     /* PATH FOLLOWING CONSTANTS */

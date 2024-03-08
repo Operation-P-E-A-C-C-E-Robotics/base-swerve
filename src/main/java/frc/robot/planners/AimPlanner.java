@@ -60,6 +60,12 @@ public class AimPlanner {
         {1, 2, 3, 4, 5}  //distances (m)
     };
 
+    // private final double[][] distanceCalibrationData = {
+    //     {54, 42, 32.5, 29, 26}, // pivot angles (deg)
+    //     {40, 43, 47, 50, 53}, // flywheel speed rps
+    //     {1, 2, 3, 4, 5}  //distances (m)
+    // };
+
     private final LinearInterpolate pivotInterpolator = new LinearInterpolate(distanceCalibrationData[2], distanceCalibrationData[0]);
     private final LinearInterpolate flywheelAngularVelocityInterpolater = new LinearInterpolate(distanceCalibrationData[2], distanceCalibrationData[1]);
 

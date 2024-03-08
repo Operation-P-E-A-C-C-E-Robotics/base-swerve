@@ -4,6 +4,7 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
+import frc.robot.OI;
 import frc.robot.planners.AimPlanner;
 import frc.robot.subsystems.Shooter;
 
@@ -105,6 +106,13 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
             return;
         }
 
+        if(state == ShooterState.HANDOFF) {
+            shooter.setFlywheelVelocity(20, 5);
+            if(OI.Inputs.wantsPlace.getAsBoolean()) shooter.setTrigerPercent(1);
+            else shooter.setTrigerPercent(0);
+            return;
+        }
+
         shooter.setFlywheelVelocity(state.getFlywheelVelocity());
         shooter.setTrigerPercent(state.getTriggerPercent());
     }
@@ -144,7 +152,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         COAST (0.0, 0.0),
         INTAKE(-10.0,1.0), //NOTE: this should fold flat if the flywheel-side intake is out
         INDEX(-5.0,0.3),
-        HANDOFF(20.0,1.0), //to diverter
+        HANDOFF(10.0,1.0), //to diverter
         AIM_LAYUP(40.0,0.0),
         AIM_PROTECTED(80.0,0.0),
         AUTO_AIM(0.0,0.0),
