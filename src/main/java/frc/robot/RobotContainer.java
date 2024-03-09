@@ -2,10 +2,12 @@ package frc.robot;
 
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.MultiTracers;
 import frc.lib.telemetry.StrategyTelemetry;
 import frc.robot.auto.Autonomous;
+import frc.robot.auto.Autonomous.AutoMode;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
 import frc.robot.planners.NoteTracker;
@@ -68,6 +70,13 @@ public class RobotContainer {
         motionPlanner,
         aimPlanner
     );
+
+    private SendableChooser<AutoMode> autoChooser = new SendableChooser<>();
+
+    private RobotContainer() {
+        autoChooser.addOption("two-note center", Autonomous.testAuto);
+        autoChooser.setDefaultOption("do nothing", Autonomous.doNothing);
+    }
 
     public static RobotContainer getInstance() {
         if(instance == null) instance = new RobotContainer();
@@ -144,7 +153,7 @@ public class RobotContainer {
 
         /* AUTONOMOUS */
         if(RobotState.isAutonomous()) {
-            Autonomous.testAuto.run(swerveStatemachine, teleopStatemachine);
+            autoChooser.getSelected().run(swerveStatemachine, teleopStatemachine);
             teleopStatemachine.update();
             swerveStatemachine.update();
             // flywheelIntakeStatemachine.update();

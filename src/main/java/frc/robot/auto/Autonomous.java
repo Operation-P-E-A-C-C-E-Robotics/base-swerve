@@ -39,6 +39,12 @@ public class Autonomous {
         )
     );
 
+    public static final AutoMode doNothing = new AutoMode(
+        new AutoSegment(
+            null
+        )
+    );
+
     public static class TimedRobotState {
         public final SuperstructureState teleopState;
         public final double startPercent;
