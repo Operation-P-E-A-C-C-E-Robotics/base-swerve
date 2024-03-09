@@ -39,6 +39,17 @@ public class Autonomous {
         )
     );
 
+    public static final AutoMode layupOnly = new AutoMode(
+        new AutoSegment(
+            null,
+            new TimedRobotState(SuperstructureState.AIM_LAYUP, 0, 0.75),
+            new TimedRobotState(SuperstructureState.SHOOT, 0.75, 1, () -> Shooter.getInstance().shotDetected())
+        ),
+        new AutoSegment(
+            null
+        )
+    );
+
     public static final AutoMode doNothing = new AutoMode(
         new AutoSegment(
             null

@@ -74,8 +74,9 @@ public class RobotContainer {
     private SendableChooser<AutoMode> autoChooser = new SendableChooser<>();
 
     private RobotContainer() {
-        autoChooser.addOption("two-note center", Autonomous.twoNoteCenter);
         autoChooser.setDefaultOption("do nothing", Autonomous.doNothing);
+        autoChooser.addOption("two-note center", Autonomous.twoNoteCenter);
+        autoChooser.addOption("layup only", Autonomous.layupOnly);
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
