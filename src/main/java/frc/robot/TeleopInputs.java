@@ -124,13 +124,13 @@ public class TeleopInputs {
         switch (mode) {
             case AMP:
                 aiming = false;
-                if(wantsHandoff(blueAlliancePose)) {
-                    return SuperstructureState.HANDOFF;
-                }
-                if(wantsAlignAmp(blueAlliancePose)) {
-                    return SuperstructureState.ALIGN_AMP;
-                }
-                return SuperstructureState.REST;
+                // if(wantsHandoff(blueAlliancePose)) {
+                //     return SuperstructureState.HANDOFF;
+                // }
+                // if(wantsAlignAmp(blueAlliancePose)) {
+                //     return SuperstructureState.ALIGN_AMP;
+                // }
+                return SuperstructureState.HANDOFF;
             case CLIMB:
                 aiming = false;
                 climbMode = wantedClimbMode();
@@ -178,28 +178,33 @@ public class TeleopInputs {
         var manualClimberRight = OI.ManualInputs.jogClimberRight.getAsDouble();
         var manualFlipper = OI.ManualInputs.jogFlipper.getAsDouble();
 
+        if(mode != TeleopMode.CLIMB) {
+            manualClimberRight = 0;
+            manualClimberLeft = 0;
+        }
+
         if(OI.ManualInputs.resetManualInputs.getAsBoolean()) {
             jogPivotMode = false;
             jogClimberMode = false;
             jogFlipperMode = false;
         }
 
-        if(jogPivotMode || Math.abs(manualPivot) > 0.2) {
+        if(jogPivotMode || Math.abs(manualPivot) > 0.2 && mode != TeleopMode.CLIMB) {
             jogPivotMode = true;
             Pivot.getInstance().setPivotPercent(manualPivot);
         }
 
-        if(jogClimberMode || Math.abs(manualClimberLeft) > 0.2 || Math.abs(manualClimberRight) > 0.2) {
+        if(jogClimberMode || Math.abs(manualClimberLeft) > 0.2 || Math.abs(manualClimberRight) > 0.2 && mode == TeleopMode.CLIMB) {
             jogClimberMode = true;
             Climber.getInstance().setClimberPercent(manualClimberLeft, manualClimberRight);
         }
 
-        if(jogFlipperMode || Math.abs(manualFlipper) > 0.2) {
+        if(jogFlipperMode || Math.abs(manualFlipper) > 0.2 && mode != TeleopMode.CLIMB) {
             jogFlipperMode = true;
             Diverter.getInstance().setDiverterExtensionPercent(manualFlipper);
         }
 
-        if(Math.abs(manualTrigger) > 0.1) {
+        if(Math.abs(manualTrigger) > 0.1 && mode != TeleopMode.CLIMB) {
             // jogTriggerMode = true;
             Shooter.getInstance().setTrigerPercent(manualTrigger/2);
             if(manualTrigger < 0) {

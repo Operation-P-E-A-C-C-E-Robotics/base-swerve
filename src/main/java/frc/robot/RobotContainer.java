@@ -2,10 +2,12 @@ package frc.robot;
 
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.MultiTracers;
 import frc.lib.telemetry.StrategyTelemetry;
 import frc.robot.auto.Autonomous;
+import frc.robot.auto.Autonomous.AutoMode;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
 import frc.robot.planners.NoteTracker;
@@ -69,18 +71,28 @@ public class RobotContainer {
         aimPlanner
     );
 
+    private SendableChooser<AutoMode> autoChooser = new SendableChooser<>();
+
+    private RobotContainer() {
+        autoChooser.setDefaultOption("do nothing", Autonomous.doNothing);
+        autoChooser.addOption("two-note center", Autonomous.twoNoteCenter);
+        autoChooser.addOption("layup only", Autonomous.layupOnly);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+    }
+
     public static RobotContainer getInstance() {
         if(instance == null) instance = new RobotContainer();
         return instance;
     }
 
     public boolean readyToShoot(){
-        if(!shooter.flywheelAtTargetVelocity()) return false;
-        if(!pivot.atSetpoint()) return false;
-        if(!swerveStatemachine.transitioning()) return false;
-        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.04 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.04) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
-        if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
-        return true;
+        // if(!shooter.flywheelAtTargetVelocity()) return false;
+        // if(!pivot.atSetpoint()) return false;
+        // if(!swerveStatemachine.transitioning()) return false;
+        // if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.1 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.1) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
+        // if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
+        // return true;
+        return OI.Inputs.wantsPlace.getAsBoolean();
     }
 
     public RobotStatemachine getTeleopStatemachine() {
@@ -143,7 +155,7 @@ public class RobotContainer {
 
         /* AUTONOMOUS */
         if(RobotState.isAutonomous()) {
-            Autonomous.testAuto.run(swerveStatemachine, teleopStatemachine);
+            autoChooser.getSelected().run(swerveStatemachine, teleopStatemachine);
             teleopStatemachine.update();
             swerveStatemachine.update();
             // flywheelIntakeStatemachine.update();
@@ -151,8 +163,8 @@ public class RobotContainer {
             pivotStatemachine.update();
             shooterStatemachine.update();
         }
-                    NoteTracker.update(teleopStatemachine.getState());
+        NoteTracker.update(teleopStatemachine.getState());
 
-        MultiTracers.print("RobotContainer::run");
+        MultiTracers.print("RobotContainer::run (end)");
     }
 }

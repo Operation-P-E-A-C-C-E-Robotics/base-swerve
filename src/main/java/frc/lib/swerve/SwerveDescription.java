@@ -59,7 +59,7 @@ public class SwerveDescription {
                                                     .withCANbusName("rio");
         SwerveModuleConstantsFactory globalModuleConstants = new SwerveModuleConstantsFactory()
                                     .withDriveMotorGearRatio(gearing.driveRatio)
-                                    .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.TorqueCurrentFOC)
+                                    .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
                                     .withSteerMotorGearRatio(gearing.steerRatio)
                                     .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
                                     .withWheelRadius(gearing.wheelRadius)

@@ -20,7 +20,7 @@ import frc.robot.subsystems.Shooter;
 
 public class Autonomous {
 
-    public static final AutoMode testAuto = new AutoMode(
+    public static final AutoMode twoNoteCenter = new AutoMode(
         new AutoSegment(
             null,
             new TimedRobotState(SuperstructureState.AIM_LAYUP, 0, 0.75),
@@ -34,6 +34,23 @@ public class Autonomous {
             new TimedRobotState(SuperstructureState.AUTO_AIM, 3.5, 6.5, () -> RobotContainer.getInstance().readyToShoot()),
             new TimedRobotState(SuperstructureState.SHOOT, 6.5, 7)
         ),
+        new AutoSegment(
+            null
+        )
+    );
+
+    public static final AutoMode layupOnly = new AutoMode(
+        new AutoSegment(
+            null,
+            new TimedRobotState(SuperstructureState.AIM_LAYUP, 0, 0.75),
+            new TimedRobotState(SuperstructureState.SHOOT, 0.75, 1, () -> Shooter.getInstance().shotDetected())
+        ),
+        new AutoSegment(
+            null
+        )
+    );
+
+    public static final AutoMode doNothing = new AutoMode(
         new AutoSegment(
             null
         )
