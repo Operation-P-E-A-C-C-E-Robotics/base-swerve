@@ -274,8 +274,8 @@ public class Shooter {
     }
 
     /**
-     * Check if a shot has been detected
-     * @return true if a shot has been detected
+     * Check if a shot has been detected based on the acceleration of the flywheels
+     * @return true if a shot has been detected in the past 0.1 seconds
      */
     public boolean shotDetected() {
         if (getFlywheelVelocity() > shotDetectionMinVelocity && getFlywheelAcceleration() < shotDetectionAccelerationThreshold) {
