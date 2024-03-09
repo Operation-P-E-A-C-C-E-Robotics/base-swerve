@@ -240,6 +240,10 @@ public final class Constants {
       climberConfigs.MotionMagic.MotionMagicExpo_kA = 0;
       climberConfigs.MotionMagic.MotionMagicExpo_kV = 0;
       climberConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
+
+      climberConfigs.HardwareLimitSwitch.ReverseLimitEnable = true;
+      climberConfigs.HardwareLimitSwitch.ReverseLimitAutosetPositionEnable = true;
+      climberConfigs.HardwareLimitSwitch.ReverseLimitAutosetPositionValue = 0;
     }
 
     public static final InvertedValue climberLeftMotorIsInverted = InvertedValue.Clockwise_Positive;
