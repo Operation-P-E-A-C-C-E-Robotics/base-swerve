@@ -20,7 +20,7 @@ import frc.robot.subsystems.Shooter;
 
 public class Autonomous {
 
-    public static final AutoMode testAuto = new AutoMode(
+    public static final AutoMode twoNoteCenter = new AutoMode(
         new AutoSegment(
             null,
             new TimedRobotState(SuperstructureState.AIM_LAYUP, 0, 0.75),

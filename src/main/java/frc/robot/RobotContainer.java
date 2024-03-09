@@ -74,8 +74,9 @@ public class RobotContainer {
     private SendableChooser<AutoMode> autoChooser = new SendableChooser<>();
 
     private RobotContainer() {
-        autoChooser.addOption("two-note center", Autonomous.testAuto);
+        autoChooser.addOption("two-note center", Autonomous.twoNoteCenter);
         autoChooser.setDefaultOption("do nothing", Autonomous.doNothing);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     public static RobotContainer getInstance() {
@@ -161,8 +162,8 @@ public class RobotContainer {
             pivotStatemachine.update();
             shooterStatemachine.update();
         }
-                    NoteTracker.update(teleopStatemachine.getState());
+        NoteTracker.update(teleopStatemachine.getState());
 
-        MultiTracers.print("RobotContainer::run");
+        MultiTracers.print("RobotContainer::run (end)");
     }
 }
