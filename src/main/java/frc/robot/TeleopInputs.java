@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.AllianceFlipUtil;
 import frc.robot.RobotStatemachine.SuperstructureState;
@@ -36,6 +37,8 @@ public class TeleopInputs {
     private boolean jogPivotMode = false;
     private boolean jogClimberMode = false;
     private boolean jogFlipperMode = false;
+
+    private Timer ampResetTimer = new Timer();
 
     private TeleopInputs() {
     }
@@ -74,6 +77,17 @@ public class TeleopInputs {
     public SuperstructureState getWantedTeleopState() {
         var blueAlliancePose = AllianceFlipUtil.apply(Swerve.getInstance().getPose()); //robot pose for automation
 
+        if(mode == TeleopMode.AMP) {
+            if(ampResetTimer.get() > 0.5) {
+                mode = TeleopMode.PANIC;
+            }
+            if(Shooter.getInstance().flywheelSwitchTripped()) {
+                ampResetTimer.start();
+            }
+        } else {
+            ampResetTimer.stop();
+            ampResetTimer.reset();
+        }
         // change the mode based on the operator inputs
         if(OI.Modes.wantsAmpMode.getAsBoolean()) mode = TeleopMode.AMP;
         if(OI.Modes.wantsClimbMode.getAsBoolean()) mode = TeleopMode.CLIMB;
@@ -102,6 +116,7 @@ public class TeleopInputs {
 
         if(OI.Inputs.wantsAimLayup.getAsBoolean()) return SuperstructureState.AIM_LAYUP;
         if(OI.Inputs.wantsAimProtected.getAsBoolean()) return SuperstructureState.AIM_PROTECTED;
+        if(OI.Inputs.wantsIntakeSource.getAsBoolean()) return SuperstructureState.INTAKE_SOURCE;
 
         //handle the driver's request to "place" (a button that does different things based on the mode)
         if(OI.Inputs.wantsPlace.getAsBoolean()) {
