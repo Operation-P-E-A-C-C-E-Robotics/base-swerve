@@ -107,7 +107,7 @@ public class TeleopInputs {
         if(OI.Inputs.wantsPlace.getAsBoolean()) {
             switch (mode) {
                 case AMP:
-                    return SuperstructureState.PLACE_AMP;
+                    // return SuperstructureState.PLACE_AMP;
                 case CLIMB:
                     if(climbMode == ClimbMode.RETRACT) return SuperstructureState.PLACE_TRAP;
                 case SPEAKER:
@@ -213,9 +213,9 @@ public class TeleopInputs {
             }
         }
 
-        if((OI.Inputs.wantsAimLayup.getAsBoolean() || OI.Inputs.wantsAimProtected.getAsBoolean()) && OI.Inputs.wantsPlace.getAsBoolean()) {
-            Shooter.getInstance().setTrigerPercent(1);
-        }
+        // if((OI.Inputs.wantsAimLayup.getAsBoolean() || OI.Inputs.wantsAimProtected.getAsBoolean()) && OI.Inputs.wantsPlace.getAsBoolean()) {
+        //     Shooter.getInstance().setTrigerPercent(1);
+        // }
     }
     
     public TeleopMode getMode() {
