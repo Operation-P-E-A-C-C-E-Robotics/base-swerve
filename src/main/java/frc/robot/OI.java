@@ -62,6 +62,8 @@ public class OI {
         public static final BooleanSupplier wantsAimLayup = () -> operatorJoystick.getPOV() == 0;
         public static final BooleanSupplier wantsAimProtected = () -> operatorJoystick.getPOV() == 180;
 
+        public static final BooleanSupplier wantsIntakeSource = () -> operatorJoystick.getPOV() == 90;
+
         //let the shooter get steezy. Applies extra smoothing to the drive inputs to make a SOTM shot easier.
         public static final BooleanSupplier enableShootWhileMoving = () -> driverJoystick.getRawButton(6);
     }
@@ -94,10 +96,10 @@ public class OI {
         public static final BooleanSupplier resetManualInputs = () -> operatorJoystick.getRawButton(7);
     }
 
-    private static final double swerveCurrentRumbleThreshold = 20; //Amps
-    private static final double swerveCurrentRumbleScalar = 40; //Amps, how much current gives 100% rumble (0.5 on each side)
+    private static final double swerveCurrentRumbleThreshold = 120; //Amps
+    private static final double swerveCurrentRumbleScalar = 200; //Amps, how much current gives 100% rumble (0.5 on each side)
 
-    public void updateRumble () {
+    public static void updateRumble () {
         var driveCurrent = frc.robot.subsystems.Swerve.getInstance().getTotalDriveCurrent();
         if(Shooter.getInstance().shotDetected()) {
             driverJoystick.setRumble(RumbleType.kBothRumble, 0.5);

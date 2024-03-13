@@ -107,8 +107,8 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         }
 
         if(state == ShooterState.HANDOFF) {
-            shooter.setFlywheelVelocity(20, 5);
-            if(OI.Inputs.wantsPlace.getAsBoolean()) shooter.setTrigerPercent(1);
+            shooter.setFlywheelVelocity(18.5, 4.3);
+            if(OI.Inputs.wantsPlace.getAsBoolean()) shooter.setTrigerPercent(0.4);
             else shooter.setTrigerPercent(0);
             return;
         }

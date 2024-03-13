@@ -223,6 +223,10 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.Superstruc
             ShooterState.RAMP_DOWN,
             PivotState.CLIMB,
             FlipperState.PLACE_TRAP
+        ),
+        INTAKE_SOURCE(
+            ShooterState.INTAKE,
+            PivotState.INTAKE_SOURCE
         );
 
         private FlywheelIntakeState flywheelIntakeState;

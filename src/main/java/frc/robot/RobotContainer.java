@@ -149,6 +149,9 @@ public class RobotContainer {
             
             // handle driver overrides
             TeleopInputs.getInstance().handleOverrides();
+
+            OI.updateRumble();
+
             MultiTracers.trace("RobotContainer::run", "TeleopInputs.getInstance().handleOverrides");
             SmartDashboard.putString("Note Location", NoteTracker.getLocation().name());
         }
