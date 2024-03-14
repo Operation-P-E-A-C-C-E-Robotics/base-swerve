@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,11 +47,16 @@ public class Swerve extends SubsystemBase {
     private final PhotonCamera leftPhoton = new PhotonCamera("leftcamera");
     private final PhotonCamera rightPhoton = new PhotonCamera("rightcamera");
 
-    private final Transform3d robotToLeftCamera = new Transform3d();
+    private final Transform3d robotToLeftCamera = new Transform3d(
+        Units.inchesToMeters(-9), 
+        Units.inchesToMeters(10), 
+        Units.inchesToMeters(8), 
+        new Rotation3d(0,Units.degreesToRadians(10),0)
+    );
     private final Transform3d robotToRightCamera = new Transform3d();
 
-    // private final PhotonPoseEstimator leftPoseEstimator = new PhotonPoseEstimator(FieldConstants.aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, leftPhoton, robotToLeftCamera);
-    // private final PhotonPoseEstimator rightPoseEstimator = new PhotonPoseEstimator(FieldConstants.aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, rightPhoton, robotToRightCamera);
+    private final PhotonPoseEstimator leftPoseEstimator = new PhotonPoseEstimator(FieldConstants.aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, leftPhoton, robotToLeftCamera);
+    private final PhotonPoseEstimator rightPoseEstimator = new PhotonPoseEstimator(FieldConstants.aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, rightPhoton, robotToRightCamera);
 
     private Transform2d visionDiscrepancy = new Transform2d();
     // private LimelightHelper limelight;
@@ -87,8 +93,8 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putData("POSE SEED", poseSeedChooser);
         SmartDashboard.putBoolean("seed pose", false);
 
-        // leftPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
-        // rightPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+        leftPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+        rightPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
 
         System.out.println("DriveTrain Initialized");
     }
@@ -176,8 +182,8 @@ public class Swerve extends SubsystemBase {
             SmartDashboard.putBoolean("seed pose", false);
         }
         var currentPose = getPose();
-        // leftPoseEstimator.setReferencePose(currentPose);
-        // rightPoseEstimator.setReferencePose(currentPose);
+        leftPoseEstimator.setReferencePose(currentPose);
+        rightPoseEstimator.setReferencePose(currentPose);
 
         var frontLLPose = LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.Cameras.frontLimelight);
 
@@ -198,34 +204,34 @@ public class Swerve extends SubsystemBase {
             ); //todo right timestamp?
         }
 
-        // var leftPose = leftPoseEstimator.update();
-        // var rightPose = rightPoseEstimator.update();
+        var leftPose = leftPoseEstimator.update();
+        var rightPose = rightPoseEstimator.update();
 
-        // if(leftPose.isPresent()) {
-        //     var pose = leftPose.get().estimatedPose;
-        //     var pose2d = new Pose2d(pose.getX(), pose.getY(), new Rotation2d(pose.getRotation().getZ()));
-        //     swerve.addVisionMeasurement(
-        //         pose2d, 
-        //         leftPose.get().timestampSeconds,
-        //         VecBuilder.fill(
-        //             5.0/leftPose.get().targetsUsed.size(),
-        //             5.0/leftPose.get().targetsUsed.size(),
-        //             15.0/leftPose.get().targetsUsed.size()
-        //         ));
-        // }
+        if(leftPose.isPresent()) {
+            var pose = leftPose.get().estimatedPose;
+            var pose2d = new Pose2d(pose.getX(), pose.getY(), new Rotation2d(pose.getRotation().getZ()));
+            swerve.addVisionMeasurement(
+                pose2d, 
+                leftPose.get().timestampSeconds,
+                VecBuilder.fill(
+                    5.0/leftPose.get().targetsUsed.size(),
+                    5.0/leftPose.get().targetsUsed.size(),
+                    15.0/leftPose.get().targetsUsed.size()
+                ));
+        }
 
-        // if(rightPose.isPresent()) {
-        //     var pose = rightPose.get().estimatedPose;
-        //     var pose2d = new Pose2d(pose.getX(), pose.getY(), new Rotation2d(pose.getRotation().getZ()));
-        //     swerve.addVisionMeasurement(
-        //         pose2d, 
-        //         rightPose.get().timestampSeconds,
-        //         VecBuilder.fill(
-        //             5.0/rightPose.get().targetsUsed.size(),
-        //             5.0/rightPose.get().targetsUsed.size(),
-        //             15.0/rightPose.get().targetsUsed.size()
-        //         ));
-        // }
+        if(rightPose.isPresent()) {
+            var pose = rightPose.get().estimatedPose;
+            var pose2d = new Pose2d(pose.getX(), pose.getY(), new Rotation2d(pose.getRotation().getZ()));
+            swerve.addVisionMeasurement(
+                pose2d, 
+                rightPose.get().timestampSeconds,
+                VecBuilder.fill(
+                    5.0/rightPose.get().targetsUsed.size(),
+                    5.0/rightPose.get().targetsUsed.size(),
+                    15.0/rightPose.get().targetsUsed.size()
+                ));
+        }
 
         //TODO: update limelight telemetry
         // LimelightTelemetry.update(Constants.Cameras.frontLimelight, swerve.getPose3d());
