@@ -78,7 +78,7 @@ public final class Constants {
     public static final boolean triggerMotorInverted = true;
 
     public static final double flywheelEfficiency = 2.4; // percentage of flywheel surface speed to exit velocity
-    public static final double flywheelTolerance = 1; //how close to the target velocity the flywheel needs to be considered ready
+    public static final double flywheelTolerance = 4; //how close to the target velocity the flywheel needs to be considered ready
   }
 
   public static final class FlywheelIntake {
@@ -135,7 +135,9 @@ public final class Constants {
     public static final double pivotMinAngle = Units.degreesToRotations(15);
     public static final double pivotMaxAngle = Units.degreesToRotations(110);
 
-    public static final double pivotGearRatio = 0.01 * (16/24) * (16/24); // pivot rotations per motor rotation
+    // public static final double pivotGearRatio = (1/35) * (16/24) * (16/48); // pivot rotations per motor rotation
+    public static final double pivotGearRatio = (48/16)*(24/16)*(35/1); // pivot rotations per motor rotation
+    
     public static final double pivotTolerance = 2; //how close to the target position the pivot needs to be considered ready
 
     public static final double gravityFeedforwardkG = 0;
@@ -146,17 +148,17 @@ public final class Constants {
       pivotConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
       pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      pivotConfigs.Slot0.kP = 6;//8;//6;
-      pivotConfigs.Slot0.kI = 0;
-      pivotConfigs.Slot0.kD = 0.0;//0;
-      pivotConfigs.Slot0.kS = 0;
-      pivotConfigs.Slot0.kV = 14.5;//20;//14.5;
-      pivotConfigs.Slot0.kA = 0;//0.01;//0;
-      pivotConfigs.Slot0.kG = 0.23;//0.25;//0.23;
+      pivotConfigs.Slot0.kP = 24;//6;//8;//6;
+      pivotConfigs.Slot0.kI = 6;//0;
+      pivotConfigs.Slot0.kD = 5;//0.0;//0;
+      pivotConfigs.Slot0.kS = 0.3;//0;
+      pivotConfigs.Slot0.kV = 16.5;//14.5;//20;//14.5;
+      pivotConfigs.Slot0.kA = 1.25;//0;//0.01;//0;
+      pivotConfigs.Slot0.kG = 0.17;//0.23;//0.25;//0.23;
       pivotConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 5;
-      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 10;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kA = 10;
+      pivotConfigs.MotionMagic.MotionMagicExpo_kV = 20;
       pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
 
       pivotConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -165,7 +167,7 @@ public final class Constants {
       pivotConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = pivotMinAngle;
 
       pivotConfigs.Feedback.FeedbackRemoteSensorID = pivotCANCoderID;
-      pivotConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+      pivotConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
       // pivotConfigs.Feedback.FeedbackRotorOffset = 0.371582;
       pivotConfigs.Feedback.RotorToSensorRatio = pivotGearRatio;
     }

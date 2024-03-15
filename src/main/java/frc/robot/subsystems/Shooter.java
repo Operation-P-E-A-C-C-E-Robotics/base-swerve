@@ -140,7 +140,7 @@ public class Shooter {
      * @param velocity the velocity to set the flywheels to in RPS
      */
     public void setFlywheelVelocity (double velocity) {
-        setFlywheelVelocity(velocity, velocity-4);
+        setFlywheelVelocity(velocity, velocity);
     }
 
     /**

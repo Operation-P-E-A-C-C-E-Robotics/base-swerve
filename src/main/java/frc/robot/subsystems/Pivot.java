@@ -29,7 +29,7 @@ public class Pivot {
     private final CANcoder pivotEncoder = new CANcoder(pivotConfigs.Feedback.FeedbackRemoteSensorID);
 
     /* CONTROLLERS / CONTROL REQUESTS */
-    private final MotionMagicExpoVoltage pivotControl = new MotionMagicExpoVoltage(restingAngle).withEnableFOC(false);
+    private final MotionMagicExpoVoltage pivotControl = new MotionMagicExpoVoltage(restingAngle).withEnableFOC(true);
     private final ArmFeedforward gravityFeedforward = new ArmFeedforward(0, gravityFeedforwardkG, 0);
 
     /* TELEMETRY */
@@ -69,7 +69,15 @@ public class Pivot {
         positionSignal = pivotEncoder.getPosition();
         velocitySignal = pivotEncoder.getVelocity();
         errorSignal = pivotMaster.getClosedLoopError();
-        BaseStatusSignal.setUpdateFrequencyForAll(100, positionSignal, velocitySignal, errorSignal, pivotMaster.getDutyCycle());
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            100, 
+            positionSignal, 
+            velocitySignal, 
+            errorSignal, 
+            pivotMaster.getDutyCycle(),
+            pivotMaster.getPosition(),
+            pivotMaster.getVelocity()
+        );
             
         Reporter.report(
             pivotFollower.setControl(new StrictFollower(pivotMaster.getDeviceID())),

@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.MultiTracers;
@@ -85,14 +86,27 @@ public class RobotContainer {
         return instance;
     }
 
+    Timer readyTimer = new Timer();
+    public boolean kindaReadyToShoot(){
+        if(!shooter.flywheelAtTargetVelocity()) return false;
+        if(!pivot.atSetpoint()) return false;
+        if(!swerveStatemachine.transitioning()) return false;
+        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.01 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.01) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
+        if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
+        return true;
+        // return OI.Inputs.wantsPlace.getAsBoolean();
+    }
+
     public boolean readyToShoot(){
-        // if(!shooter.flywheelAtTargetVelocity()) return false;
-        // if(!pivot.atSetpoint()) return false;
-        // if(!swerveStatemachine.transitioning()) return false;
-        // if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.1 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.1) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
-        // if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
-        // return true;
-        return OI.Inputs.wantsPlace.getAsBoolean();
+        if(kindaReadyToShoot()) {
+            readyTimer.start();
+        }
+        if(readyTimer.get() > aimPlanner.getDistanceToTarget()/3){
+            readyTimer.stop();
+            readyTimer.reset();
+            return true;
+        }
+        return false;
     }
 
     public RobotStatemachine getTeleopStatemachine() {

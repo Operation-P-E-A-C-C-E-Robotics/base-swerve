@@ -55,7 +55,7 @@ public class AimPlanner {
     private final double CAMERA_ANGLE = Units.degreesToRadians(34.311); //TODO: get actual angle
 
     private final double[][] distanceCalibrationData = {
-        {54, 39, 28.5, 25, 22}, // pivot angles (deg)
+        {54, 41, 29.5, 27, 24}, // pivot angles (deg)
         {40, 43, 47, 50, 53}, // flywheel speed rps
         {1, 2, 3, 4, 5}  //distances (m)
     };
@@ -78,6 +78,8 @@ public class AimPlanner {
     private double drivetrainAngularVelocity = 0;
     private double pivotAngularVelocity = 0;
     private double shooterAngularAcceleration = 0;
+
+    private double distanceToTarget = 0;
 
     private double limelighttXOffset = 0; //difference between tx and wanted rotation for target center
 
@@ -105,7 +107,7 @@ public class AimPlanner {
     public void update() {
         var blueOriginPose = Swerve.getInstance().getPose();
         var blueTargetTranslation = AllianceFlipUtil.apply(targetCenterTranslation);
-        double distanceToTarget = blueOriginPose.getTranslation().getDistance(blueTargetTranslation);
+        distanceToTarget = blueOriginPose.getTranslation().getDistance(blueTargetTranslation);
 
         Rotation2d angleToTarget = blueOriginPose.getTranslation().minus(blueTargetTranslation).getAngle();
         Rotation2d angleToTag = blueOriginPose.getTranslation().minus(apriltagTranslation).getAngle();
@@ -115,16 +117,16 @@ public class AimPlanner {
 
         //experimental: use the old-style limelight targeting to get the angle and distance to the target
         //to aim faster with accumulated odometry error
-        var targetingResults = LimelightHelpers.getLatestResults(Constants.Cameras.frontLimelight);
-        for(var result : targetingResults.targetingResults.targets_Fiducials) {
-            if(result.fiducialID == (AllianceFlipUtil.shouldFlip() ? 4 : 7)) { //TODO make this work on both sides
-                angleToTarget = AllianceFlipUtil.apply(Swerve.getInstance().getPose()).getRotation().plus(Rotation2d.fromDegrees((AllianceFlipUtil.shouldFlip() ? 1 : -1) *(result.tx*0.8) - 180 /*- limelighttXOffset*/));
-                angleToTarget = new Rotation2d(llAngleFilter.calculate((AllianceFlipUtil.shouldFlip() ? -1 : 1) * angleToTarget.getRadians()));
-                if(AllianceFlipUtil.shouldFlip()) angleToTarget = angleToTarget.minus(Rotation2d.fromDegrees(180));
-                distanceToTarget = ((TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(CAMERA_ANGLE + Units.degreesToRadians(result.ty))) - 0.3;
-                isSimpleLocalizer = true;
-            }
-        }
+        // var targetingResults = LimelightHelpers.getLatestResults(Constants.Cameras.frontLimelight);
+        // for(var result : targetingResults.targetingResults.targets_Fiducials) {
+        //     if(result.fiducialID == (AllianceFlipUtil.shouldFlip() ? 4 : 7)) { //TODO make this work on both sides
+        //         angleToTarget = AllianceFlipUtil.apply(Swerve.getInstance().getPose()).getRotation().plus(Rotation2d.fromDegrees((AllianceFlipUtil.shouldFlip() ? 1 : -1) *(result.tx*0.8) - 180 /*- limelighttXOffset*/));
+        //         angleToTarget = new Rotation2d(llAngleFilter.calculate((AllianceFlipUtil.shouldFlip() ? -1 : 1) * angleToTarget.getRadians()));
+        //         if(AllianceFlipUtil.shouldFlip()) angleToTarget = angleToTarget.minus(Rotation2d.fromDegrees(180));
+        //         distanceToTarget = ((TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(CAMERA_ANGLE + Units.degreesToRadians(result.ty))) - 0.3;
+        //         isSimpleLocalizer = true;
+        //     }
+        // }
 
         if(!isSimpleLocalizer) {
             llAngleFilter.reset();
@@ -235,6 +237,10 @@ public class AimPlanner {
 
     private double exitVelocityToRPS(double exitVelocity) {
         return (exitVelocity / (Constants.Shooter.flywheelDiameter * Math.PI) / Constants.Shooter.flywheelGearRatio) * Constants.Shooter.flywheelEfficiency;
+    }
+
+    public double getDistanceToTarget(){
+        return distanceToTarget;
     }
 
     private double RPSToExitVelocity(double rps) {
