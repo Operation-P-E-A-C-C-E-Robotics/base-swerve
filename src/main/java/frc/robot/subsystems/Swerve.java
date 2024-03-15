@@ -118,6 +118,18 @@ public class Swerve extends SubsystemBase {
         drive(autonomousRequest.withSpeeds(speeds));
     }
 
+    public void characterizeSteer(){
+        swerve.setControl(new SwerveRequest.SysIdSwerveSteerGains());
+    }
+
+    public void characterizeTranslation(){
+        swerve.setControl(new SwerveRequest.SysIdSwerveTranslation());
+    }
+
+    public void characterizeRotation(){
+        swerve.setControl(new SwerveRequest.SysIdSwerveRotation());
+    }
+
     /**
      * the missile knows where it is at all times. it knows this because it knows where it isn't.
      * @return the pose of the robot.
