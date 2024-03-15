@@ -6,6 +6,7 @@ import frc.lib.state.StateMachine;
 import frc.lib.telemetry.MultiTracers;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
+import frc.robot.planners.NoteTracker;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.FlipperStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine;
@@ -20,6 +21,7 @@ import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.statemachines.PivotStatemachine.PivotState;
 import frc.robot.statemachines.ShooterStatemachine.ShooterState;
 import frc.robot.statemachines.TriggerIntakeStatemachine.TriggerIntakeState;
+import frc.robot.subsystems.Shooter;
 
 /**
  * TeleopStatemachine controls the state of the whole robot by setting the states
@@ -111,6 +113,10 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.Superstruc
         MultiTracers.trace("TeleopStatemachine", "diverterStatemachine.requestState");
         climberStatemachine.requestState(state.getClimberState());
         MultiTracers.trace("TeleopStatemachine", "climberStatemachine.requestState");
+
+        if(state == SuperstructureState.INTAKE_N_AIM && Shooter.getInstance().triggerSwitchTripped()) {
+            pivotStatemachine.requestState(PivotState.AUTO_AIM);
+        }
         MultiTracers.print("TeleopStatemachine");
     }
 
@@ -173,11 +179,6 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.Superstruc
             ShooterState.SHOOT,
             PivotState.AUTO_AIM
         ),
-        ALIGN_AMP(
-            ShooterState.RAMP_DOWN,
-            PivotState.AMP,
-            FlipperState.ALIGN_AMP
-        ),
         PLACE_AMP(
             ShooterState.RAMP_DOWN,
             PivotState.AMP,
@@ -205,10 +206,10 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.Superstruc
             FlipperState.RETRACT,
             ClimberState.BALANCE
         ),
-        HANDOFF(
+        ALIGN_AMP(
             FlywheelIntakeState.RETRACT, 
             TriggerIntakeState.AVOID, 
-            ShooterState.HANDOFF, 
+            ShooterState.AMP, 
             PivotState.AMP, 
             FlipperState.HANDOFF, 
             ClimberState.RETRACT
@@ -227,6 +228,18 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.Superstruc
         INTAKE_SOURCE(
             ShooterState.INTAKE,
             PivotState.INTAKE_SOURCE
+        ),
+        INTAKE_N_AIM(
+            FlywheelIntakeState.RETRACT,
+            TriggerIntakeState.INTAKE,
+            ShooterState.INTAKE_N_AIM,
+            PivotState.INTAKE
+        ),
+        INTAKE_N_SHOOT(
+            FlywheelIntakeState.RETRACT,
+            TriggerIntakeState.INTAKE,
+            ShooterState.SHOOT,
+            PivotState.AUTO_AIM
         );
 
         private FlywheelIntakeState flywheelIntakeState;

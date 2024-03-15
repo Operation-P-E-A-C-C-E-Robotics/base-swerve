@@ -128,6 +128,18 @@ public class Swerve extends SubsystemBase {
         drive(autonomousRequest.withSpeeds(speeds));
     }
 
+    public void characterizeSteer(){
+        swerve.setControl(new SwerveRequest.SysIdSwerveSteerGains());
+    }
+
+    public void characterizeTranslation(){
+        swerve.setControl(new SwerveRequest.SysIdSwerveTranslation());
+    }
+
+    public void characterizeRotation(){
+        swerve.setControl(new SwerveRequest.SysIdSwerveRotation());
+    }
+
     /**
      * the missile knows where it is at all times. it knows this because it knows where it isn't.
      * @return the pose of the robot.
@@ -155,6 +167,16 @@ public class Swerve extends SubsystemBase {
      */
     public void resetOdometry() {
         swerve.seedFieldRelative();
+    }
+
+    /**
+     * Hopefully a potential workaround for CTRE's moronic zeroing behavior.
+     */
+    public void attemptProperFieldCentricZeroing() {
+        var cachedPose = getPose();
+        resetOdometry(AllianceFlipUtil.apply(new Pose2d()));
+        resetOdometry();
+        resetOdometry(cachedPose);
     }
 
     /**
@@ -199,7 +221,7 @@ public class Swerve extends SubsystemBase {
 
         var trustCoefficient = Math.pow(frontLLPose.avgTagDist, 3) / frontLLPose.tagCount; //6.458 242
 
-        if(OI.Swerve.isZeroOdometry.getAsBoolean()) trustCoefficient /= 50;
+        if(OI.Swerve.isFastVisionReset.getAsBoolean()) trustCoefficient /= 50;
 
         // if(frontLLPose.tagCount > 0) {
         //     visionDiscrepancy = getPose().minus(frontLLPose.pose);

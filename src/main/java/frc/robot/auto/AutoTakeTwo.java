@@ -1,8 +1,8 @@
 package frc.robot.auto;
 
+import frc.robot.RobotContainer;
 import frc.robot.RobotStatemachine;
 import frc.robot.RobotStatemachine.SuperstructureState;
-import frc.robot.planners.NoteTracker;
 import frc.robot.statemachines.SwerveStatemachine.SwerveState;
 import frc.robot.subsystems.Shooter;
 
@@ -17,15 +17,107 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class AutoTakeTwo {
 
-    public static final TimedAuto testAuto = new TimedAuto(
-        new Action(SuperstructureState.AUTO_AIM, 0, 0.75),
-        new Action(SuperstructureState.SHOOT, 0.75, 1, () -> Shooter.getInstance().shotDetected()),
-        new Action(SuperstructureState.INTAKE_BACK, 1, 3),
-        new Action(SuperstructureState.INTAKE_BACK, Path.DRIVE_OFF_LINE.command, 0.0, 5.0, () -> NoteTracker.getLocation() == NoteTracker.NoteLocation.INDEXING),
-        new Action(SuperstructureState.REST, 5, 5.5),
-        new Action(SuperstructureState.AUTO_AIM, 5.5, 10, () -> Shooter.getInstance().shotDetected())
-
+    public static final TimedAuto twoNoteCenter = new TimedAuto(
+        layupShot(),
+        intakeAndFollowPath(Path.DRIVE_OFF_LINE_CENTER),
+        shoot(),
+        end()
     );
+
+    public static final TimedAuto twoNoteAmpSide = new TimedAuto(
+        shoot(),
+        intakeAndFollowPath(Path.DRIVE_OFF_LINE_AMPSIDE),
+        shoot(),
+        end()
+    );
+
+    public static final TimedAuto twoNoteStageSide = new TimedAuto(
+        shoot(),
+        intakeAndFollowPath(Path.DRIVE_OFF_LINE_STAGESIDE),
+        shoot(),
+        end()
+    );
+
+    public static final TimedAuto fourNote = new TimedAuto(
+        shoot(),
+        intakeNShoot(Path.DRIVE_OFF_LINE_AMPSIDE),
+        intakeNShoot(Path.AMPSIDE_NOTE_TO_CENTER_NOTE),
+        intakeNShoot(Path.CENTERSIDE_NOTE_TO_STAGESIDE_NOTE),
+        end()
+    );
+
+    public static final TimedAuto threeNote = new TimedAuto(
+        shoot(),
+        intakeNShoot(Path.DRIVE_OFF_LINE_AMPSIDE),
+        intakeAndFollowPath(Path.AMPSIDE_NOTE_TO_CENTERLINE_NOTE),
+        followPathAndShoot(Path.CENTERLINE_NOTE_TO_SHOOT),
+        end()
+    );
+
+    public static final TimedAuto layupOnly = new TimedAuto(
+        layupShot(),
+        end()
+    );
+
+    public static final TimedAuto doNothing = new TimedAuto(
+        end()
+    );
+
+    private static Action[] layupShot(){
+        return new Action[]{
+            new Action(SuperstructureState.AIM_LAYUP, 0.75),
+            new Action(SuperstructureState.SHOOT, 0.25, () -> Shooter.getInstance().shotDetected())
+        };
+    }
+
+    private static Action[] intakeAndFollowPath(Path path){
+        return new Action[]{
+            new Action(SuperstructureState.INTAKE_BACK, 0.5),
+            new Action(SuperstructureState.INTAKE_BACK, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped())
+        };
+    }
+
+    private static Action[] followPathAndShoot(Path path) {
+        return new Action[] {
+            new Action(SuperstructureState.AUTO_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped()),
+            new Action(SuperstructureState.SHOOT, 0.25)
+        };
+    }
+
+    private static Action[] intakeNShoot(Path path) {
+        return new Action[] {
+            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped()),
+            new Action(SuperstructureState.INTAKE_N_AIM, 0.75),
+            new Action(SuperstructureState.INTAKE_N_SHOOT, 0.25)
+        };
+    }
+
+    private static Action[] intakeNAim(Path path) {
+        return new Action[] {
+            new Action(SuperstructureState.INTAKE_N_AIM, 0.5),
+            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped())
+        };
+    }
+
+    private static Action[] intakeNSotm(Path path) {
+        return new Action[] {
+            new Action(SuperstructureState.INTAKE_N_AIM, 0.5),
+            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped()),
+            // new Action(SuperstructureState.INTAKE_N_SOTM, 0.25)
+        };
+    }
+
+    private static Action[] shoot() {
+        return new Action[]{
+            new Action(SuperstructureState.REST, 0.5), //allow the shooter to index
+            new Action(SuperstructureState.AUTO_AIM, 3, RobotContainer.getInstance()::readyToShoot),
+            new Action(SuperstructureState.SHOOT, 0.5)
+        };
+    }
+
+    private static Action[] end(){
+        return new Action[]{new Action(15)};
+    }
 
     public static class TimedAuto {
         private final Action[] actions;
@@ -36,6 +128,22 @@ public class AutoTakeTwo {
             this.actions = actions;
         }
 
+        public TimedAuto(Action[]... actions){
+            //concatenate the arrays
+            int totalLength = 0;
+            for (Action[] action : actions) {
+                totalLength += action.length;
+            }
+            this.actions = new Action[totalLength];
+            int index = 0;
+            for (Action[] action : actions) {
+                for (Action action2 : action) {
+                    this.actions[index] = action2;
+                    index++;
+                }
+            }
+        }
+
         public void reset() {
             timer.reset();
             timer.start();
@@ -44,15 +152,24 @@ public class AutoTakeTwo {
 
         public void run(RobotStatemachine superstructure) {
             timer.start();
-            for (int i = currentAction; i < actions.length; i++) {
-                if (actions[i].wantsRun(timer.get())) {
-                    currentAction = i;
-                    superstructure.requestSwervePath(actions[i].getPath());
-                    superstructure.requestSwerveState(actions[i].getSwerveState());
-                    superstructure.requestState(actions[i].getState());
-                    return;
-                }
+            // for (int i = currentAction; i < actions.length; i++) {
+            //     if (actions[i].wantsRun(timer.get())) {
+            //         currentAction = i;
+            //         superstructure.requestSwervePath(actions[i].getPath());
+            //         superstructure.requestSwerveState(actions[i].getSwerveState());
+            //         superstructure.requestState(actions[i].getState());
+            //         return;
+            //     }
+            // }
+            if(actions[currentAction].isDone(timer.get()) && !(currentAction + 1 >= actions.length)) {
+                currentAction++;
+                timer.reset();
             }
+
+            var action = actions[currentAction];
+            superstructure.requestSwervePath(action.getPath());
+            superstructure.requestSwerveState(action.getSwerveState());
+            superstructure.requestState(action.getState());
         }
     }
 
@@ -60,68 +177,67 @@ public class AutoTakeTwo {
         private final SuperstructureState state;
         private final SwerveState swerveState;
         private final Command path;
-        private final double startTime, endTime;
+        private final double timeout;
         private final BooleanSupplier endCondition;
 
-        public Action(SuperstructureState state, SwerveState swerveState, Command path, double startTime, double endTime, BooleanSupplier endCondition) {
+        public Action(SuperstructureState state, SwerveState swerveState, Command path, double timeout, BooleanSupplier endCondition) {
             this.state = state;
             this.swerveState = swerveState;
             this.path = path;
-            this.startTime = startTime;
-            this.endTime = endTime;
+            this.timeout = timeout;
             this.endCondition = endCondition;
         }
 
-        public Action(SuperstructureState state, Command path, double startTime, double endTime) {
-            this(state, SwerveState.FOLLOW_PATH, path, startTime, endTime, () -> false);
+        public Action(SuperstructureState state, Command path, double timeout) {
+            this(state, SwerveState.FOLLOW_PATH, path, timeout, () -> false);
         }
 
-        public Action(RobotStatemachine.SuperstructureState state, Command path, double startTime, double endTime, BooleanSupplier endCondition) {
-            this(state, SwerveState.FOLLOW_PATH, path, startTime, endTime, endCondition);
+        public Action(RobotStatemachine.SuperstructureState state, Command path, double timeout, BooleanSupplier endCondition) {
+            this(state, SwerveState.FOLLOW_PATH, path, timeout, endCondition);
         }
 
-        public Action(SuperstructureState state, SwerveState swerveState, Command path, double startTime, double endTime) {
-            this(state, swerveState, path, startTime, endTime, () -> false);
+        public Action(SuperstructureState state, SwerveState swerveState, Command path, double timeout) {
+            this(state, swerveState, path, timeout, () -> false);
         }
 
-        public Action(SwerveState swerveState, double startTime, double endTime, BooleanSupplier endCondition) {
-            this(SuperstructureState.REST, swerveState, new InstantCommand(), startTime, endTime, endCondition);
+        public Action(SwerveState swerveState, double timeout, BooleanSupplier endCondition) {
+            this(SuperstructureState.REST, swerveState, new InstantCommand(), timeout, endCondition);
         }
 
-        public Action(SwerveState swerveState, double startTime, double endTime) {
-            this(swerveState, startTime, endTime, () -> false);
+        public Action(SwerveState swerveState, double timeout) {
+            this(swerveState, timeout, () -> false);
         }
 
-        public Action(Command path, double startTime, double endTime, BooleanSupplier endCondition) {
-            this(SuperstructureState.REST, SwerveState.LOCK_IN, path, startTime, endTime, endCondition);
+        public Action(Command path, double timeout, BooleanSupplier endCondition) {
+            this(SuperstructureState.REST, SwerveState.LOCK_IN, path, timeout, endCondition);
         }
 
-        public Action(Command path, double startTime, double endTime) {
-            this(path, startTime, endTime, () -> false);
+        public Action(Command path, double timeout) {
+            this(path, timeout, () -> false);
         }
 
-        public Action(SuperstructureState state, double startTime, double endTime, BooleanSupplier endCondition) {
+        public Action(SuperstructureState state, double timeout, BooleanSupplier endCondition) {
             this(
                 state, 
                 state == SuperstructureState.AUTO_AIM || state == SuperstructureState.SHOOT ? SwerveState.AIM : SwerveState.LOCK_IN, 
-                new InstantCommand(), startTime, endTime, endCondition
+                new InstantCommand(), timeout, endCondition
             );
         }
 
-        public Action(SuperstructureState state, double startTime, double endTime) {
-            this(state, startTime, endTime, () -> false);
+        public Action(SuperstructureState state, double timeout) {
+            this(state, timeout, () -> false);
         }
 
-        public Action(double startTime, double endTime, BooleanSupplier endCondition) {
-            this(SuperstructureState.REST, startTime, endTime, endCondition);
+        public Action(double timeout, BooleanSupplier endCondition) {
+            this(SuperstructureState.REST, timeout, endCondition);
         }
 
-        public Action(double startTime, double endTime) {
-            this(startTime, endTime, () -> false);
+        public Action(double timeout) {
+            this(timeout, () -> false);
         }
 
         public boolean wantsRun(double time) {
-            return time >= startTime && time <= endTime && !endCondition.getAsBoolean();
+            return time <= timeout && !endCondition.getAsBoolean();
         }
 
         public SuperstructureState getState() {
@@ -137,15 +253,11 @@ public class AutoTakeTwo {
         }
 
         public boolean isDone(double time) {
-            return time >= endTime && endCondition.getAsBoolean();
+            return time >= timeout || endCondition.getAsBoolean();
         }
 
-        public double getStartTime() {
-            return startTime;
-        }
-
-        public double getEndTime() {
-            return endTime;
+        public double gettimeout() {
+            return timeout;
         }
 
         public BooleanSupplier getEndCondition() {
@@ -155,13 +267,21 @@ public class AutoTakeTwo {
 
     public static enum Path {
         TEST_PATH("test path", 3),
-        DRIVE_OFF_LINE("drive off line", 1.5);
+        DRIVE_OFF_LINE_CENTER("drive off line center", 2.1),
+        DRIVE_OFF_LINE_AMPSIDE("drive off line ampside", 2.0),
+        DRIVE_OFF_LINE_STAGESIDE("drive off line stageside", 1.8),
+        AMPSIDE_NOTE_TO_CENTER_NOTE("ampside note to center note", 2.6),
+        CENTERSIDE_NOTE_TO_STAGESIDE_NOTE("center note to stageside note", 2.0),
+        AMPSIDE_NOTE_TO_CENTERLINE_NOTE("ampside note to centerline note", 3.5),
+        CENTERLINE_NOTE_TO_SHOOT("centerline note to shoot", 3.2);
     
         public final String pathName;
         public final Command command;
+        public final double duration;
     
         private Path(String pathName, double duration) {
             this.pathName = pathName;
+            this.duration = duration;
             this.command = AutoBuilder.followPath(PathPlannerPath.fromChoreoTrajectory(pathName));
         }
     }

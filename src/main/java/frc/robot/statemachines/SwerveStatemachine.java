@@ -197,6 +197,8 @@ public class SwerveStatemachine extends StateMachine<SwerveStatemachine.SwerveSt
             request.withHeading(driveTrain.getPose().getRotation().getRadians());
         }
 
+        if(OI.Swerve.isAttemptProperZero.getAsBoolean()) driveTrain.attemptProperFieldCentricZeroing();
+
         // handle smoothing and deadbanding
         Translation2d rawLinearVelocity = new Translation2d(xVelocity, yVelocity);
         Translation2d linearVelocity = smoothAndDeadband(rawLinearVelocity).times(Constants.Swerve.teleopLinearMultiplier);

@@ -1,8 +1,6 @@
 package frc.robot.planners;
 
-import frc.robot.RobotContainer;
 import frc.robot.RobotStatemachine.SuperstructureState;
-import frc.robot.statemachines.ShooterStatemachine;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -24,7 +22,7 @@ public class NoteTracker {
             location = NoteLocation.NONE;
         }
 
-        if(state == SuperstructureState.HANDOFF) {
+        if(state == SuperstructureState.ALIGN_AMP) {
             location = NoteLocation.FLIPPER;
         }
 
