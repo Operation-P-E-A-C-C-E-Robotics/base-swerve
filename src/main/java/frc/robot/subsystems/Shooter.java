@@ -87,6 +87,7 @@ public class Shooter {
     private final StatusSignal <Double> bottomFlywheelAcceleration;
 
     private final Timer shotTimer = new Timer();
+    private final Timer timeSinceTriggerRun = new Timer();
 
     /* TELEMETRY */
     private final NetworkTable shooterTable = NetworkTableInstance.getDefault().getTable("Shooter");
@@ -210,6 +211,10 @@ public class Shooter {
     public void setTrigerPercent (double percent) {
         triggerPub.accept(percent);
         triggerMotor.set(percent);
+        if(percent > 0.1){
+            timeSinceTriggerRun.start();
+            timeSinceTriggerRun.reset();
+        }
     }
 
     /**
@@ -278,7 +283,7 @@ public class Shooter {
      * @return true if a shot has been detected in the past 0.1 seconds
      */
     public boolean shotDetected() {
-        if (getFlywheelVelocity() > shotDetectionMinVelocity && getFlywheelAcceleration() < shotDetectionAccelerationThreshold) {
+        if (getFlywheelVelocity() > shotDetectionMinVelocity && getFlywheelAcceleration() < shotDetectionAccelerationThreshold && timeSinceTriggerRun.get() < 0.5) {
             shotTimer.start();
         } 
         if (shotTimer.hasElapsed(shotDetectionResetTime)) {

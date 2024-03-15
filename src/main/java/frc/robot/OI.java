@@ -96,8 +96,8 @@ public class OI {
         public static final BooleanSupplier resetManualInputs = () -> operatorJoystick.getRawButton(7);
     }
 
-    private static final double swerveCurrentRumbleThreshold = 120; //Amps
-    private static final double swerveCurrentRumbleScalar = 200; //Amps, how much current gives 100% rumble (0.5 on each side)
+    private static final double swerveCurrentRumbleThreshold = 60*4; //Amps
+    private static final double swerveCurrentRumbleScalar = 80*4; //Amps, how much current gives 100% rumble (0.5 on each side)
 
     public static void updateRumble () {
         var driveCurrent = frc.robot.subsystems.Swerve.getInstance().getTotalDriveCurrent();
@@ -107,7 +107,8 @@ public class OI {
         } else if(RobotContainer.getInstance().getTeleopStatemachine().getState() == SuperstructureState.INTAKE_BACK && NoteTracker.getLocation() == NoteLocation.INDEXING) {
             driverJoystick.setRumble(RumbleType.kBothRumble, 0.5);
             operatorJoystick.setRumble(RumbleType.kBothRumble, 0.5);
-        } else if(driveCurrent > swerveCurrentRumbleThreshold) {
+        } 
+        else if(driveCurrent > swerveCurrentRumbleThreshold) {
             var rumble = (driveCurrent - swerveCurrentRumbleThreshold) / swerveCurrentRumbleScalar;
             //divide based on strafe amount
             var left = rumble * (0.5 - (Swerve.strafe.getAsDouble() / 2));

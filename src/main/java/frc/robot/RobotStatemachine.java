@@ -173,11 +173,6 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.Superstruc
             ShooterState.SHOOT,
             PivotState.AUTO_AIM
         ),
-        ALIGN_AMP(
-            ShooterState.RAMP_DOWN,
-            PivotState.AMP,
-            FlipperState.ALIGN_AMP
-        ),
         PLACE_AMP(
             ShooterState.RAMP_DOWN,
             PivotState.AMP,
@@ -205,10 +200,10 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.Superstruc
             FlipperState.RETRACT,
             ClimberState.BALANCE
         ),
-        HANDOFF(
+        ALIGN_AMP(
             FlywheelIntakeState.RETRACT, 
             TriggerIntakeState.AVOID, 
-            ShooterState.HANDOFF, 
+            ShooterState.AMP, 
             PivotState.AMP, 
             FlipperState.HANDOFF, 
             ClimberState.RETRACT
@@ -227,6 +222,12 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.Superstruc
         INTAKE_SOURCE(
             ShooterState.INTAKE,
             PivotState.INTAKE_SOURCE
+        ),
+        INTAKE_N_SHOOT(
+            FlywheelIntakeState.RETRACT,
+            TriggerIntakeState.INTAKE,
+            ShooterState.INTAKE_N_AIM,
+            PivotState.INTAKE
         );
 
         private FlywheelIntakeState flywheelIntakeState;

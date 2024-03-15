@@ -84,6 +84,11 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
             shooter.setTrigerPercent(state.getTriggerPercent());
             return;
         }
+        if (state == ShooterState.INTAKE_N_AIM){
+            shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
+            shooter.setTrigerPercent(1.0);
+            return;
+        }
 
         if(state == ShooterState.INDEX){
             if(shooter.flywheelSwitchTripped() && !shooter.triggerSwitchTripped()) shooter.setTrigerPercent(-state.getTriggerPercent());
@@ -106,7 +111,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
             return;
         }
 
-        if(state == ShooterState.HANDOFF) {
+        if(state == ShooterState.AMP) {
             shooter.setFlywheelVelocity(18.5, 4.3);
             if(OI.Inputs.wantsPlace.getAsBoolean()) shooter.setTrigerPercent(0.4);
             else shooter.setTrigerPercent(0);
@@ -152,11 +157,12 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         COAST (0.0, 0.0),
         INTAKE(-10.0,1.0), //NOTE: this should fold flat if the flywheel-side intake is out
         INDEX(-5.0,0.3),
-        HANDOFF(10.0,1.0), //to diverter
+        AMP(10.0,1.0), //to diverter
         AIM_LAYUP(40.0,0.0),
         AIM_PROTECTED(80.0,0.0),
         AUTO_AIM(0.0,0.0),
-        SHOOT(0.0,1.0);
+        SHOOT(0.0,1.0),
+        INTAKE_N_AIM(0.0,1.0);
 
         private Double flywheelVelocity, triggerPercent;
 

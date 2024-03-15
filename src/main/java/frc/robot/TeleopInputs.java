@@ -103,8 +103,7 @@ public class TeleopInputs {
 
         // operator overrides - these take precedence over everything else
         if(OI.Inputs.wantsStow.getAsBoolean())  return SuperstructureState.STOW;
-        if(OI.Overrides.forceHandoff.getAsBoolean()) return SuperstructureState.HANDOFF;
-        if(OI.Overrides.forceAmp.getAsBoolean()) return SuperstructureState.ALIGN_AMP;
+        if(OI.Overrides.forceHandoff.getAsBoolean()) return SuperstructureState.ALIGN_AMP;
         if(OI.Overrides.forceAim.getAsBoolean()) return SuperstructureState.AUTO_AIM;
 
         //handle the drivers' intaking requests, these take precedence over modes & automation
@@ -145,7 +144,7 @@ public class TeleopInputs {
                 // if(wantsAlignAmp(blueAlliancePose)) {
                 //     return SuperstructureState.ALIGN_AMP;
                 // }
-                return SuperstructureState.HANDOFF;
+                return SuperstructureState.ALIGN_AMP;
             case CLIMB:
                 aiming = false;
                 climbMode = wantedClimbMode();
