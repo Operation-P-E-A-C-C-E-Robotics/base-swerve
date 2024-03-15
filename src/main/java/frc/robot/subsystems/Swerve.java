@@ -160,6 +160,16 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
+     * Hopefully a potential workaround for CTRE's moronic zeroing behavior.
+     */
+    public void attemptProperFieldCentricZeroing() {
+        var cachedPose = getPose();
+        resetOdometry(AllianceFlipUtil.apply(new Pose2d()));
+        resetOdometry();
+        resetOdometry(cachedPose);
+    }
+
+    /**
      * sometimes, we need to tell the missile where it is, and it's not even where it's been.
      * By subtracting where it's been from where it is, or where it's going from where it was, we get
      * where it should be.
