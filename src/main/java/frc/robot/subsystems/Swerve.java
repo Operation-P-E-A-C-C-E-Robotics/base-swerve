@@ -211,7 +211,7 @@ public class Swerve extends SubsystemBase {
 
         var trustCoefficient = Math.pow(frontLLPose.avgTagDist, 3) / frontLLPose.tagCount; //6.458 242
 
-        if(OI.Swerve.isZeroOdometry.getAsBoolean()) trustCoefficient /= 50;
+        if(OI.Swerve.isFastVisionReset.getAsBoolean()) trustCoefficient /= 50;
 
         if(frontLLPose.tagCount > 0) {
             visionDiscrepancy = getPose().minus(frontLLPose.pose);

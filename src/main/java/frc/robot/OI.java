@@ -27,6 +27,8 @@ public class OI {
         public static final BooleanSupplier isRobotCentric = () -> driverJoystick.getRawButton(7); //is forward always forward?
         public static final BooleanSupplier isLockIn = () -> driverJoystick.getRawButton(1); //make the wheels point in
         public static final BooleanSupplier isZeroOdometry = () -> driverJoystick.getRawButton(8); //zero the odometry
+        public static final BooleanSupplier isFastVisionReset = () -> driverJoystick.getRawButton(9); //reset pose from vision quickly
+        public static final BooleanSupplier isAttemptProperZero = () -> driverJoystick.getRawButton(10); //zero field centric properly
         public static final BooleanSupplier isOpenLoop = () -> true; //how hard should we try to actually follow the inputs (false = use the PID, which feels unnatural to me)
     }
     
