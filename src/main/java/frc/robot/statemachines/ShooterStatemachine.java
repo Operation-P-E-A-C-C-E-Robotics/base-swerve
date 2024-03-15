@@ -58,6 +58,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     public void requestState(ShooterState state){
         if(state == ShooterState.AUTO_AIM && this.state == ShooterState.SHOOT) return;
         if(state == ShooterState.SHOOT && this.state != ShooterState.SHOOT) printShotData();
+        if(state == ShooterState.INTAKE && this.state == ShooterState.INDEX) return;
         this.state = state;
     }
 
@@ -86,7 +87,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         }
         if (state == ShooterState.INTAKE_N_AIM){
             shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
-            shooter.setTrigerPercent(1.0);
+            if(!shooter.triggerSwitchTripped()) shooter.setTrigerPercent(1.0);
             return;
         }
 

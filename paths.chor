@@ -1956,6 +1956,15 @@
                     "translationConstrained": true,
                     "headingConstrained": true,
                     "controlIntervalCount": 40
+                },
+                {
+                    "x": 0.4496554136276245,
+                    "y": 4.597537517547607,
+                    "heading": 0,
+                    "isInitialGuess": false,
+                    "translationConstrained": true,
+                    "headingConstrained": true,
+                    "controlIntervalCount": 40
                 }
             ],
             "trajectory": [
@@ -2330,7 +2339,7 @@
             "usesDefaultFieldObstacles": true,
             "circleObstacles": []
         },
-        "center note to shoot": {
+        "centerline note to shoot": {
             "waypoints": [
                 {
                     "x": 8.118078231811523,

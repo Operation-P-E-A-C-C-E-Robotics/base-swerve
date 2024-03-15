@@ -24,8 +24,42 @@ public class AutoTakeTwo {
         end()
     );
 
+    public static final TimedAuto twoNoteAmpSide = new TimedAuto(
+        shoot(),
+        intakeAndFollowPath(Path.DRIVE_OFF_LINE_AMPSIDE),
+        shoot(),
+        end()
+    );
+
+    public static final TimedAuto twoNoteStageSide = new TimedAuto(
+        shoot(),
+        intakeAndFollowPath(Path.DRIVE_OFF_LINE_STAGESIDE),
+        shoot(),
+        end()
+    );
+
+    public static final TimedAuto fourNote = new TimedAuto(
+        shoot(),
+        intakeNShoot(Path.DRIVE_OFF_LINE_AMPSIDE),
+        intakeNShoot(Path.AMPSIDE_NOTE_TO_CENTER_NOTE),
+        intakeNShoot(Path.CENTERSIDE_NOTE_TO_STAGESIDE_NOTE),
+        end()
+    );
+
+    public static final TimedAuto threeNote = new TimedAuto(
+        shoot(),
+        intakeNShoot(Path.DRIVE_OFF_LINE_AMPSIDE),
+        intakeAndFollowPath(Path.AMPSIDE_NOTE_TO_CENTERLINE_NOTE),
+        followPathAndShoot(Path.CENTERLINE_NOTE_TO_SHOOT),
+        end()
+    );
+
     public static final TimedAuto layupOnly = new TimedAuto(
         layupShot(),
+        end()
+    );
+
+    public static final TimedAuto doNothing = new TimedAuto(
         end()
     );
 
@@ -40,6 +74,36 @@ public class AutoTakeTwo {
         return new Action[]{
             new Action(SuperstructureState.INTAKE_BACK, 0.5),
             new Action(SuperstructureState.INTAKE_BACK, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped())
+        };
+    }
+
+    private static Action[] followPathAndShoot(Path path) {
+        return new Action[] {
+            new Action(SuperstructureState.AUTO_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped()),
+            new Action(SuperstructureState.SHOOT, 0.25)
+        };
+    }
+
+    private static Action[] intakeNShoot(Path path) {
+        return new Action[] {
+            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped()),
+            new Action(SuperstructureState.INTAKE_N_AIM, 0.75),
+            new Action(SuperstructureState.INTAKE_N_SHOOT, 0.25)
+        };
+    }
+
+    private static Action[] intakeNAim(Path path) {
+        return new Action[] {
+            new Action(SuperstructureState.INTAKE_N_AIM, 0.5),
+            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped())
+        };
+    }
+
+    private static Action[] intakeNSotm(Path path) {
+        return new Action[] {
+            new Action(SuperstructureState.INTAKE_N_AIM, 0.5),
+            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped()),
+            // new Action(SuperstructureState.INTAKE_N_SOTM, 0.25)
         };
     }
 
@@ -207,7 +271,9 @@ public class AutoTakeTwo {
         DRIVE_OFF_LINE_AMPSIDE("drive off line ampside", 2.0),
         DRIVE_OFF_LINE_STAGESIDE("drive off line stageside", 1.8),
         AMPSIDE_NOTE_TO_CENTER_NOTE("ampside note to center note", 2.6),
-        CENTERSIDE_NOTE_TO_STAGESIDE_NOTE("center note to stageside note", 2.0);
+        CENTERSIDE_NOTE_TO_STAGESIDE_NOTE("center note to stageside note", 2.0),
+        AMPSIDE_NOTE_TO_CENTERLINE_NOTE("ampside note to centerline note", 3.5),
+        CENTERLINE_NOTE_TO_SHOOT("centerline note to shoot", 3.2);
     
         public final String pathName;
         public final Command command;
