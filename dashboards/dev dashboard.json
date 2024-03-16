@@ -37,19 +37,6 @@
         "vgap": 3.0,
         "titleType": 0,
         "tiles": {
-          "14,0": {
-            "size": [
-              5,
-              2
-            ],
-            "content": {
-              "_type": "Split Button Chooser",
-              "_source0": "network_table:///SmartDashboard/AUTO MODE",
-              "_title": "SmartDashboard/AUTO MODE",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "0,0": {
             "size": [
               14,
@@ -63,7 +50,8 @@
               "_showGlyph": false,
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false
+              "Visuals/Show Outside Circles": false,
+              "Colors/Path": "#FFFFFFFF"
             }
           },
           "0,8": {
@@ -100,22 +88,6 @@
               "Range/Center": 0.0,
               "Visuals/Orientation": "HORIZONTAL",
               "Visuals/Number of tick marks": 5
-            }
-          },
-          "14,4": {
-            "size": [
-              7,
-              4
-            ],
-            "content": {
-              "_type": "Simple Dial",
-              "_source0": "network_table:///Control System/Pneumatics/Pneumatic Pressure",
-              "_title": "Control System/Pneumatics/Pneumatic Pressure",
-              "_glyph": 484,
-              "_showGlyph": false,
-              "Range/Min": 0.0,
-              "Range/Max": 130.0,
-              "Visuals/Show value": true
             }
           },
           "19,0": {
@@ -188,6 +160,19 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "14,0": {
+            "size": [
+              5,
+              2
+            ],
+            "content": {
+              "_type": "ComboBox Chooser",
+              "_source0": "network_table:///SmartDashboard/Auto Chooser",
+              "_title": "SmartDashboard/Auto Chooser",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -205,8 +190,8 @@
         "tiles": {
           "5,0": {
             "size": [
-              18,
-              10
+              19,
+              9
             ],
             "content": {
               "_type": "Field",
@@ -216,10 +201,11 @@
               "_showGlyph": false,
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false
+              "Visuals/Show Outside Circles": false,
+              "Colors/Path": "#FFFFFFFF"
             }
           },
-          "0,7": {
+          "0,0": {
             "size": [
               5,
               3
@@ -234,35 +220,43 @@
               "Colors/Color when false": "#008000FF"
             }
           },
-          "0,0": {
+          "0,3": {
             "size": [
               5,
               2
             ],
             "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///Control System/Pneumatics/Compressor Enabled",
-              "_title": "Control System/Pneumatics/Compressor Enabled",
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Robot State",
+              "_title": "SmartDashboard/Robot State",
               "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#CC8033FF",
-              "Colors/Color when false": "#669966FF"
+              "_showGlyph": false
             }
           },
-          "0,2": {
+          "0,5": {
             "size": [
               5,
-              5
+              2
             ],
             "content": {
-              "_type": "Simple Dial",
-              "_source0": "network_table:///Control System/Pneumatics/Pneumatic Pressure",
-              "_title": "Control System/Pneumatics/Pneumatic Pressure",
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Teleop Mode",
+              "_title": "SmartDashboard/Teleop Mode",
               "_glyph": 148,
-              "_showGlyph": false,
-              "Range/Min": 0.0,
-              "Range/Max": 120.0,
-              "Visuals/Show value": true
+              "_showGlyph": false
+            }
+          },
+          "0,7": {
+            "size": [
+              5,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Note Location",
+              "_title": "SmartDashboard/Note Location",
+              "_glyph": 148,
+              "_showGlyph": false
             }
           }
         }
@@ -684,7 +678,8 @@
               "_showGlyph": false,
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false
+              "Visuals/Show Outside Circles": false,
+              "Colors/Path": "#FFFFFFFF"
             }
           },
           "6,4": {

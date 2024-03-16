@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.motion.Trajectory;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.AllianceFlipUtil;
@@ -187,6 +188,10 @@ public class PeaccyRequest implements SwerveRequest {
             Heading = Swerve.getInstance().getPose().getRotation().getRadians();
             if(AllianceFlipUtil.shouldFlip()) Heading += Math.PI;
         }
+
+        SmartDashboard.putNumber("Requested X Velocity", toApplyTranslation.getX());
+        SmartDashboard.putNumber("Requested Y Velocity", toApplyTranslation.getY());
+        
 
         //very standard ChassisSpeeds blah blah blah.
         ChassisSpeeds speeds = ChassisSpeeds.discretize(

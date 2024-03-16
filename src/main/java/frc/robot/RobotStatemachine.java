@@ -235,6 +235,12 @@ public class RobotStatemachine extends StateMachine<RobotStatemachine.Superstruc
             ShooterState.INTAKE_N_AIM,
             PivotState.INTAKE
         ),
+        INTAKE_N_PIVOT_AIM(
+            FlywheelIntakeState.RETRACT,
+            TriggerIntakeState.INTAKE,
+            ShooterState.INTAKE_N_AIM,
+            PivotState.AUTO_AIM
+        ),
         INTAKE_N_SHOOT(
             FlywheelIntakeState.RETRACT,
             TriggerIntakeState.INTAKE,

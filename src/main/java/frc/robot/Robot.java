@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.telemetry.ControlSystemTelemetry;
 import frc.lib.telemetry.MultiTracers;
+import frc.robot.auto.AutoTakeTwo;
 import frc.robot.subsystems.Swerve;
 
 public class Robot extends TimedRobot {
@@ -56,10 +57,12 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     RobotContainer.getInstance().zeroAutoHeading();
     Swerve.getInstance().periodic();
+    AutoTakeTwo.fourNote.reset();
   }
 
   @Override
   public void autonomousInit() {
+    RobotContainer.getInstance().resetAuto();
     DataLogManager.logNetworkTables(true); //start logging network tables data when the robot is enabled
     System.out.println("Robot Autonomous");
     System.out.println("EVERYBODY PANIC PEACCY IS RUNNING AUTONOMOUS AND HE DOESN'T KNOW WHAT HE'S DOING");

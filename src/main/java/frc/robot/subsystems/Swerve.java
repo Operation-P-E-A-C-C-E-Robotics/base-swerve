@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.RobotCentric;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.VecBuilder;
@@ -28,6 +29,8 @@ import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.OI;
+import frc.robot.RobotContainer;
+import frc.robot.planners.AimPlanner;
 
 import static frc.robot.Constants.Swerve.*;
 
@@ -129,7 +132,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void characterizeSteer(){
-        swerve.setControl(new SwerveRequest.SysIdSwerveSteerGains());
+        swerve.setControl(new SwerveRequest.SysIdSwerveSteerGains().withVolts(null));
     }
 
     public void characterizeTranslation(){
@@ -238,6 +241,7 @@ public class Swerve extends SubsystemBase {
 
         var leftPose = leftPoseEstimator.update();
         var rightPose = rightPoseEstimator.update();
+        var llPose = frontLLPose.pose;
 
         if(leftPose.isPresent()) {
             var pose = leftPose.get().estimatedPose;
@@ -246,9 +250,9 @@ public class Swerve extends SubsystemBase {
                 pose2d, 
                 leftPose.get().timestampSeconds,
                 VecBuilder.fill(
-                    0.05/leftPose.get().targetsUsed.size(),
-                    0.05/leftPose.get().targetsUsed.size(),
-                    10.0/leftPose.get().targetsUsed.size()
+                    (RobotContainer.getInstance().getDistanceToTarget() * 0.05)/leftPose.get().targetsUsed.size(),
+                    (RobotContainer.getInstance().getDistanceToTarget() * 0.05)/leftPose.get().targetsUsed.size(),
+                    (RobotContainer.getInstance().getDistanceToTarget() * 5.0)/leftPose.get().targetsUsed.size()
                 ));
         }
 
