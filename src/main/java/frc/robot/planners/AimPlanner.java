@@ -16,7 +16,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.LinearInterpolate;
-import frc.lib.vision.LimelightHelpers;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.Pivot;
@@ -50,9 +49,9 @@ public class AimPlanner {
         FieldConstants.aprilTags.getTagPose(7).get().getTranslation().getY()
     );
 
-    private final double TARGET_HEIGHT = Units.inchesToMeters(57.5); //TODO: get actual height
-    private final double CAMERA_HEIGHT = Units.inchesToMeters(6.5); //TODO: get actual height
-    private final double CAMERA_ANGLE = Units.degreesToRadians(34.311); //TODO: get actual angle
+    // private final double TARGET_HEIGHT = Units.inchesToMeters(57.5); //TODO: get actual height
+    // private final double CAMERA_HEIGHT = Units.inchesToMeters(6.5); //TODO: get actual height
+    // private final double CAMERA_ANGLE = Units.degreesToRadians(34.311); //TODO: get actual angle
 
     private final double[][] distanceCalibrationData = {
         {54, 41, 29.5, 27, 24}, // pivot angles (deg)

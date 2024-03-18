@@ -92,21 +92,6 @@ public class AutoTakeTwo {
         };
     }
 
-    private static Action[] intakeNAim(Path path) {
-        return new Action[] {
-            new Action(SuperstructureState.INTAKE_N_AIM, 0.5),
-            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped())
-        };
-    }
-
-    private static Action[] intakeNSotm(Path path) {
-        return new Action[] {
-            new Action(SuperstructureState.INTAKE_N_AIM, 0.5),
-            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped()),
-            // new Action(SuperstructureState.INTAKE_N_SOTM, 0.25)
-        };
-    }
-
     private static Action[] shoot() {
         return new Action[]{
             new Action(SuperstructureState.REST, 0.5), //allow the shooter to index
