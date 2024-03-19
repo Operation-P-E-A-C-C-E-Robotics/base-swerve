@@ -106,13 +106,17 @@ public class RobotContainer {
         if(!shooter.flywheelAtTargetVelocity()) return false;
         if(!pivot.atSetpoint()) return false;
         if(!swerveStatemachine.transitioning()) return false;
-        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.01 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.01) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
+        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.001 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.001) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
         if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
         return true;
         // return OI.Inputs.wantsPlace.getAsBoolean();
     }
 
     public boolean readyToShoot(){
+        if(OI.Inputs.wantsPlace.getAsBoolean()) {
+            readyTimer.reset();
+            readyTimer.stop();
+        }
         if(kindaReadyToShoot()) {
             readyTimer.start();
         }
