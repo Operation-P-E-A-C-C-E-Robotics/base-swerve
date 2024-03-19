@@ -24,7 +24,7 @@ public class PeaccyVision {
     private static final double DISTANCE_DRIVEN_ERROR_WEIGHT = 1;
     private static final double TAG_ERROR_REDUCTION = 0.5;
     private static final double ACCELERATION_PENALTY = 100;
-    private static final double ACCELERATION_PENALTY_THRESHOLD = 0.5;
+    private static final double ACCELERATION_PENALTY_THRESHOLD = 500;
     private static final double VISION_DISTANCE_FROM_CURRENT_ERROR_WEIGHT = 0.5;
 
     private static final double MIN_STDEV = 0.1;
@@ -76,7 +76,8 @@ public class PeaccyVision {
         odometryError += visionDiscrepancy * VISION_DISTANCE_FROM_CURRENT_ERROR_WEIGHT;
         odometryError *= TAG_ERROR_REDUCTION * numTags;
 
-        stDev = odometryError * STDEV_ERROR_WEIGHT;
+        if(odometryError < 0.01) odometryError = 0.01; //prevent division by zero
+        stDev = 1/(odometryError * STDEV_ERROR_WEIGHT);
         stDev = Util.limit(acceleration, MIN_STDEV, MAX_STDEV);
 
         hasUpdated = true;
