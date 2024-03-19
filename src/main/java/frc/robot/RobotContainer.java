@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.MultiTracers;
 import frc.lib.telemetry.StrategyTelemetry;
+import frc.lib.vision.ApriltagCamera;
+import frc.lib.vision.PeaccyVision;
 import frc.robot.auto.Autonomous;
 import frc.robot.auto.Autonomous.AutoMode;
 import frc.robot.planners.AimPlanner;
@@ -41,6 +43,12 @@ public class RobotContainer {
     private final Shooter shooter = Shooter.getInstance();
     private final Diverter diverter = Diverter.getInstance();
     private final Climber climber = Climber.getInstance();
+
+    private final PeaccyVision vision = new PeaccyVision(
+        new ApriltagCamera.ApriltagPhotonvision(Constants.Cameras.primaryPhotonvision, Constants.Cameras.robotToPrimaryPhotonvision, FieldConstants.aprilTags, 1),
+        new ApriltagCamera.ApriltagPhotonvision(Constants.Cameras.secondaryPhotonvision, Constants.Cameras.robotToSecondaryPhotonvision, FieldConstants.aprilTags, 0.9),
+        new ApriltagCamera.ApriltagLimelight(Constants.Cameras.frontLimelight, 0.2)
+    );
 
     /* PLANNERS */
     private final MotionPlanner motionPlanner = new MotionPlanner();
@@ -183,5 +191,9 @@ public class RobotContainer {
         NoteTracker.update(teleopStatemachine.getState());
 
         MultiTracers.print("RobotContainer::run (end)");
+    }
+
+    public PeaccyVision getEyes() {
+        return vision;
     }
 }

@@ -2,8 +2,12 @@ package frc.lib.vision;
 
 import java.util.Optional;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.util.Util;
 import frc.lib.vision.ApriltagCamera.*;
@@ -26,6 +30,8 @@ public class PeaccyVision {
     private static final double MIN_STDEV = 0.1;
     private static final double MAX_STDEV = 5.0;
     private static final double STDEV_ERROR_WEIGHT = 0.1;
+    
+    private static final double STDEV_YAW_MULTIPLIER = 15;
 
 
     private ApriltagCamera[] cameras;
@@ -33,6 +39,7 @@ public class PeaccyVision {
     private double odometryError = INITIALIZE_ERROR;
 
     private Pose2d visionPose = new Pose2d();
+    private Pose2d prevOdometryPose = new Pose2d();
     private double stDev = MAX_STDEV;
     private double timestamp = Timer.getFPGATimestamp();
 
@@ -48,8 +55,10 @@ public class PeaccyVision {
         this.cameras = cameras;
     }
 
-    public void update(Pose2d odometryPose, double deltaDistance, double acceleration) {
-        var visionResult = getMeasurement();
+    public void update(Pose2d odometryPose, double acceleration) {
+        var visionResult = getMeasurement(odometryPose);
+        var deltaDistance = odometryPose.getTranslation().getDistance(prevOdometryPose.getTranslation());
+        prevOdometryPose = odometryPose;
         if(visionResult.isEmpty()) {
             hasUpdated = false;
             return;
@@ -77,8 +86,8 @@ public class PeaccyVision {
         return visionPose;
     }
 
-    public double getStDev(){
-        return stDev;
+    public Matrix<N3, N1> getStDev(){
+        return VecBuilder.fill(stDev, stDev, stDev * STDEV_YAW_MULTIPLIER);
     }
 
     public double getTimestamp(){
@@ -89,10 +98,10 @@ public class PeaccyVision {
         return hasUpdated;
     }
 
-    private Optional<ApriltagPoseMeasurement> getMeasurement() {
+    private Optional<ApriltagPoseMeasurement> getMeasurement(Pose2d odoPose) {
         var results = new VisionResults[cameras.length];
         for (int i = 0; i < cameras.length; i++) {
-            results[i] = cameras[i].getLatestResults(visionPose);
+            results[i] = cameras[i].getLatestResults(odoPose);
         }
         
         //calculate weighted average pose based on camera trust.
