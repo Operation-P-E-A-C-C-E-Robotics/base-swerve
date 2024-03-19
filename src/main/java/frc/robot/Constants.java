@@ -40,8 +40,8 @@ public final class Constants {
     public static final String frontLimelight = "limelight-front";
     public static final String rearLimelight = "limelight-rear";
 
-    public static final String primaryPhotonvision = "rightcamera";
-    public static final String secondaryPhotonvision = "leftcamera";
+    public static final String primaryPhotonvision = "leftcamera";
+    public static final String secondaryPhotonvision = "rightcamera";
 
     public static final Transform3d robotToPrimaryPhotonvision = new Transform3d(
         Units.inchesToMeters(10.5), 

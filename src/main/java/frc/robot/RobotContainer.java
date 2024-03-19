@@ -44,12 +44,6 @@ public class RobotContainer {
     private final Diverter diverter = Diverter.getInstance();
     private final Climber climber = Climber.getInstance();
 
-    private final PeaccyVision vision = new PeaccyVision(
-        new ApriltagCamera.ApriltagPhotonvision(Constants.Cameras.primaryPhotonvision, Constants.Cameras.robotToPrimaryPhotonvision, FieldConstants.aprilTags, 1),
-        new ApriltagCamera.ApriltagPhotonvision(Constants.Cameras.secondaryPhotonvision, Constants.Cameras.robotToSecondaryPhotonvision, FieldConstants.aprilTags, 0.9),
-        new ApriltagCamera.ApriltagLimelight(Constants.Cameras.frontLimelight, 0.2)
-    );
-
     /* PLANNERS */
     private final MotionPlanner motionPlanner = new MotionPlanner();
 
@@ -101,6 +95,7 @@ public class RobotContainer {
         if(!swerveStatemachine.transitioning()) return false;
         if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.01 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.01) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
         if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
+        if(swerve.getEyes().getOdometryError() > 0.5) return false;
         return true;
         // return OI.Inputs.wantsPlace.getAsBoolean();
     }
@@ -193,7 +188,7 @@ public class RobotContainer {
         MultiTracers.print("RobotContainer::run (end)");
     }
 
-    public PeaccyVision getEyes() {
-        return vision;
-    }
+    // public PeaccyVision getEyes() {
+    //     return vision;
+    // }
 }

@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.Util;
 import frc.lib.vision.ApriltagCamera.*;
 
@@ -20,18 +21,18 @@ import frc.lib.vision.ApriltagCamera.*;
  * feeding the results to a pose estimator.
  */
 public class PeaccyVision {
-    private static final double INITIALIZE_ERROR = 500;
+    private static final double INITIALIZE_ERROR = 3;
     private static final double DISTANCE_DRIVEN_ERROR_WEIGHT = 1;
-    private static final double TAG_ERROR_REDUCTION = 0.5;
-    private static final double ACCELERATION_PENALTY = 100;
-    private static final double ACCELERATION_PENALTY_THRESHOLD = 500;
-    private static final double VISION_DISTANCE_FROM_CURRENT_ERROR_WEIGHT = 0.5;
+    private static final double TAG_ERROR_REDUCTION = 0.8;
+    private static final double ACCELERATION_PENALTY = 5;
+    private static final double ACCELERATION_PENALTY_THRESHOLD = 3;
+    private static final double VISION_DISTANCE_FROM_CURRENT_ERROR_WEIGHT = 0.05;
 
-    private static final double MIN_STDEV = 0.1;
-    private static final double MAX_STDEV = 5.0;
-    private static final double STDEV_ERROR_WEIGHT = 0.1;
+    private static final double MIN_STDEV = 0.05;
+    private static final double MAX_STDEV = 6.0;
+    private static final double STDEV_ERROR_WEIGHT = 3;
     
-    private static final double STDEV_YAW_MULTIPLIER = 15;
+    private static final double STDEV_YAW_MULTIPLIER = 30;
 
 
     private ApriltagCamera[] cameras;
@@ -42,6 +43,7 @@ public class PeaccyVision {
     private Pose2d prevOdometryPose = new Pose2d();
     private double stDev = MAX_STDEV;
     private double timestamp = Timer.getFPGATimestamp();
+    private double velocity = 0.0;
 
     private boolean hasUpdated = false;
 
@@ -55,31 +57,37 @@ public class PeaccyVision {
         this.cameras = cameras;
     }
 
-    public void update(Pose2d odometryPose, double acceleration) {
+    public void update(Pose2d odometryPose, double acceleration, double swerveVelocity) {
         var visionResult = getMeasurement(odometryPose);
         var deltaDistance = odometryPose.getTranslation().getDistance(prevOdometryPose.getTranslation());
         prevOdometryPose = odometryPose;
+        var accelerationPenalty = acceleration > ACCELERATION_PENALTY_THRESHOLD ? ACCELERATION_PENALTY : 0;
+
+        odometryError += swerveVelocity;//deltaDistance * DISTANCE_DRIVEN_ERROR_WEIGHT;
+        odometryError += accelerationPenalty;
         if(visionResult.isEmpty()) {
             hasUpdated = false;
             return;
         }
-
+        
         this.visionPose = visionResult.get().pose;
+        SmartDashboard.putString("vision pose", visionPose.toString());
         this.timestamp = visionResult.get().timestamp;
         var numTags = visionResult.get().numTags;
 
-        var visionDiscrepancy = visionPose.getTranslation().getDistance(odometryPose.getTranslation());
-        var accelerationPenalty = acceleration > ACCELERATION_PENALTY_THRESHOLD ? ACCELERATION_PENALTY : 0;
+        SmartDashboard.putNumber("num tags", numTags);
 
-        odometryError += deltaDistance * DISTANCE_DRIVEN_ERROR_WEIGHT;
-        odometryError += accelerationPenalty;
+        var visionDiscrepancy = visionPose.getTranslation().getDistance(odometryPose.getTranslation());
         odometryError += visionDiscrepancy * VISION_DISTANCE_FROM_CURRENT_ERROR_WEIGHT;
-        odometryError *= TAG_ERROR_REDUCTION * numTags;
+        odometryError *= TAG_ERROR_REDUCTION;
 
         if(odometryError < 0.01) odometryError = 0.01; //prevent division by zero
         stDev = 1/(odometryError * STDEV_ERROR_WEIGHT);
-        stDev = Util.limit(acceleration, MIN_STDEV, MAX_STDEV);
+        stDev += swerveVelocity;
+        stDev = Util.limit(stDev, MIN_STDEV, MAX_STDEV);
 
+        SmartDashboard.putNumber("Odometry Error", odometryError);
+        SmartDashboard.putNumber("stdev", stDev);
         hasUpdated = true;
     }
 
@@ -97,6 +105,10 @@ public class PeaccyVision {
 
     public boolean hasUpdated(){
         return hasUpdated;
+    }
+
+    public double getOdometryError() {
+        return odometryError;
     }
 
     private Optional<ApriltagPoseMeasurement> getMeasurement(Pose2d odoPose) {
@@ -141,7 +153,7 @@ public class PeaccyVision {
             new Rotation2d(weightedPose.getRotation().getRadians() / totalWeight)
         );
 
-        return Optional.of(new ApriltagPoseMeasurement(visionPose, timestamp, numTags));
+        return Optional.of(new ApriltagPoseMeasurement(weightedPose, timestamp, numTags));
     }
 
     private static class ApriltagPoseMeasurement{

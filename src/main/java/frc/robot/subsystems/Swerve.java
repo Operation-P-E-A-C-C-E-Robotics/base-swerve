@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -21,8 +22,10 @@ import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.AllianceFlipUtil;
+import frc.lib.vision.ApriltagCamera;
 import frc.lib.vision.PeaccyVision;
 import frc.robot.Constants;
+import frc.robot.FieldConstants;
 import frc.robot.RobotContainer;
 
 import static frc.robot.Constants.Swerve.*;
@@ -132,6 +135,10 @@ public class Swerve extends SubsystemBase {
         swerve.seedFieldRelative();
     }
 
+    public PeaccyVision getEyes(){
+        return eyes;
+    }
+
     /**
      * Hopefully a potential workaround for CTRE's moronic zeroing behavior.
      */
@@ -168,7 +175,11 @@ public class Swerve extends SubsystemBase {
         swerve.applySteerConfigs(gains);
     }
 
-    PeaccyVision eyes = RobotContainer.getInstance().getEyes();
+    private static PeaccyVision eyes = new PeaccyVision(
+        new ApriltagCamera.ApriltagPhotonvision(Constants.Cameras.primaryPhotonvision, Constants.Cameras.robotToPrimaryPhotonvision, FieldConstants.aprilTags, 1),
+        new ApriltagCamera.ApriltagPhotonvision(Constants.Cameras.secondaryPhotonvision, Constants.Cameras.robotToSecondaryPhotonvision, FieldConstants.aprilTags, 0.5),
+        new ApriltagCamera.ApriltagLimelight(Constants.Cameras.frontLimelight, 0.1)
+    );
 
     @Override
     public void periodic() {
@@ -179,7 +190,7 @@ public class Swerve extends SubsystemBase {
 
         BaseStatusSignal.refreshAll(swerve.getPigeon2().getAccelerationX(), swerve.getPigeon2().getAccelerationY(), swerve.getPigeon2().getAccelerationZ());
         var acceleration = swerve.getPigeon2().getAccelerationX().getValue() + swerve.getPigeon2().getAccelerationY().getValue() + swerve.getPigeon2().getAccelerationZ().getValue();
-        eyes.update(getPose(), acceleration);
+        eyes.update(getPose(), acceleration, new Translation2d(getChassisSpeeds().vxMetersPerSecond, getChassisSpeeds().vyMetersPerSecond).getNorm());
 
         swerve.addVisionMeasurement(
             eyes.getPose(),
