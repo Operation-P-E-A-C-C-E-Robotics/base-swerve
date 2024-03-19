@@ -6,7 +6,6 @@ import frc.lib.state.StateMachine;
 import frc.lib.telemetry.MultiTracers;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
-import frc.robot.planners.NoteTracker;
 import frc.robot.statemachines.ClimberStatemachine;
 import frc.robot.statemachines.FlipperStatemachine;
 import frc.robot.statemachines.FlywheelIntakeStatemachine;

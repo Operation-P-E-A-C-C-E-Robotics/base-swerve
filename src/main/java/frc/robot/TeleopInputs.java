@@ -29,9 +29,9 @@ public class TeleopInputs {
     private boolean aiming = false;
 
     private final double AUTO_AIM_X = 7; // distance from left wall to start aiming.
-    private final double AMP_HANDOFF_X = 5; // distance from left wall to start handoff.
-    private final double AMP_ALIGN_X = 3; // distance from left wall to start aligning.
-    private final double AMP_ALIGN_Y = 3; // distance from bottom wall to start aligning.
+    // private final double AMP_HANDOFF_X = 5; // distance from left wall to start handoff.
+    // private final double AMP_ALIGN_X = 3; // distance from left wall to start aligning.
+    // private final double AMP_ALIGN_Y = 3; // distance from bottom wall to start aligning.
 
     //whether the joystick is overriding the pivot
     private boolean jogPivotMode = false;
@@ -236,15 +236,15 @@ public class TeleopInputs {
         return mode;
     }
 
-    private boolean wantsAlignAmp(Pose2d blueAlliancePose) {
-        if (blueAlliancePose.getX() < AMP_ALIGN_X && blueAlliancePose.getY() < AMP_ALIGN_Y) return true;
-        return false;
-    }
+    // private boolean wantsAlignAmp(Pose2d blueAlliancePose) {
+    //     if (blueAlliancePose.getX() < AMP_ALIGN_X && blueAlliancePose.getY() < AMP_ALIGN_Y) return true;
+    //     return false;
+    // }
 
-    private boolean wantsHandoff(Pose2d blueAlliancePose) {
-        if (blueAlliancePose.getX() < AMP_HANDOFF_X) return true;
-        return false;
-    }
+    // private boolean wantsHandoff(Pose2d blueAlliancePose) {
+    //     if (blueAlliancePose.getX() < AMP_HANDOFF_X) return true;
+    //     return false;
+    // }
 
     private boolean wantsAim(Pose2d blueAlliancePose) {
         if(NoteTracker.getLocation() != NoteLocation.SHOOTER) return false;
