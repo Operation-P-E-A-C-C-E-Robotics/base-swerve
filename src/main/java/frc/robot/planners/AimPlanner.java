@@ -54,7 +54,7 @@ public class AimPlanner {
     // private final double CAMERA_ANGLE = Units.degreesToRadians(34.311); //TODO: get actual angle
 
     private final double[][] distanceCalibrationData = {
-        {54, 41, 29.5, 27, 24}, // pivot angles (deg)
+        {54, 41, 31, 27, 24}, // pivot angles (deg)
         {40, 43, 47, 50, 53}, // flywheel speed rps
         {1, 2, 3, 4, 5}  //distances (m)
     };

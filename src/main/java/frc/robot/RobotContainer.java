@@ -9,7 +9,9 @@ import frc.lib.telemetry.MultiTracers;
 import frc.lib.telemetry.StrategyTelemetry;
 import frc.lib.vision.ApriltagCamera;
 import frc.lib.vision.PeaccyVision;
+import frc.robot.auto.AutoTakeTwo;
 import frc.robot.auto.Autonomous;
+import frc.robot.auto.AutoTakeTwo.TimedAuto;
 import frc.robot.auto.Autonomous.AutoMode;
 import frc.robot.planners.AimPlanner;
 import frc.robot.planners.MotionPlanner;
@@ -74,12 +76,25 @@ public class RobotContainer {
         aimPlanner
     );
 
-    private SendableChooser<AutoMode> autoChooser = new SendableChooser<>();
+    private SendableChooser<TimedAuto> autoChooser = new SendableChooser<>();
 
     private RobotContainer() {
-        autoChooser.setDefaultOption("do nothing", Autonomous.doNothing);
-        autoChooser.addOption("two-note center", Autonomous.twoNoteCenter);
-        autoChooser.addOption("layup only", Autonomous.layupOnly);
+        autoChooser.setDefaultOption("do nothing", AutoTakeTwo.doNothing);
+        autoChooser.addOption("LAYUP", AutoTakeTwo.layupOnly);
+        autoChooser.addOption("START 1 + WING 1", AutoTakeTwo.twoNoteStageSide);
+        autoChooser.addOption("START 2 + WING 2", AutoTakeTwo.twoNoteCenter);
+        autoChooser.addOption("START 3 + WING 3", AutoTakeTwo.twoNoteAmpSide);
+        autoChooser.addOption("START 3 + WING 3 + WING 2 + WING 1", AutoTakeTwo.fourNote);
+        autoChooser.addOption("START 3 + WING 3 + CENTER 5", AutoTakeTwo.start3ThreeNote);
+        autoChooser.addOption("START 1 + WING 1 + CENTER 2", AutoTakeTwo.start1ThreeNoteCenter2);
+        autoChooser.addOption("START 1 + WINT 1 + CENTER 3", AutoTakeTwo.start1ThreeNoteCenter3);
+        autoChooser.addOption("DEFENCE 1", AutoTakeTwo.defence1);
+        autoChooser.addOption("DEFENCE 2", AutoTakeTwo.defence2);
+        autoChooser.addOption("DEFENCE 3", AutoTakeTwo.defence3);
+        autoChooser.addOption("DEFENCE 4", AutoTakeTwo.defence4L);
+        autoChooser.addOption("DEFENCE 4 (start amp)", AutoTakeTwo.defence4R);
+        autoChooser.addOption("DEFENCE 5 (start amp)", AutoTakeTwo.defence5R);
+
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
@@ -93,7 +108,7 @@ public class RobotContainer {
         if(!shooter.flywheelAtTargetVelocity()) return false;
         if(!pivot.atSetpoint()) return false;
         if(!swerveStatemachine.transitioning()) return false;
-        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.01 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.01) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
+        if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.001 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.001) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
         if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
         if(swerve.getEyes().getOdometryError() > 0.5) return false;
         return true;
@@ -101,6 +116,10 @@ public class RobotContainer {
     }
 
     public boolean readyToShoot(){
+        if(OI.Inputs.wantsPlace.getAsBoolean()) {
+            readyTimer.reset();
+            readyTimer.stop();
+        }
         if(kindaReadyToShoot()) {
             readyTimer.start();
         }
@@ -120,6 +139,10 @@ public class RobotContainer {
         swerveStatemachine.zeroAutoHeading();
     }
 
+    public double getDistanceToTarget(){
+        return aimPlanner.getDistanceToTarget();
+    }
+
     /**
      * The main update loop of the robot.
      * This is called periodically by the main robot class.
@@ -137,6 +160,7 @@ public class RobotContainer {
 
         /* TEST DASHBOARD */
         if(RobotState.isTest()) {
+            Swerve.getInstance().characterizeSteer();
             return;
         }
 
@@ -175,20 +199,22 @@ public class RobotContainer {
 
         /* AUTONOMOUS */
         if(RobotState.isAutonomous()) {
-            autoChooser.getSelected().run(swerveStatemachine, teleopStatemachine);
+            autoChooser.getSelected().run(teleopStatemachine);
             teleopStatemachine.update();
             swerveStatemachine.update();
             // flywheelIntakeStatemachine.update();
             triggerIntakeStatemachine.update();
             pivotStatemachine.update();
             shooterStatemachine.update();
+        } else {
+            autoChooser.getSelected().reset();
         }
         NoteTracker.update(teleopStatemachine.getState());
 
         MultiTracers.print("RobotContainer::run (end)");
     }
 
-    // public PeaccyVision getEyes() {
-    //     return vision;
-    // }
+    public void resetAuto(){
+        autoChooser.getSelected().reset();
+    }
 }

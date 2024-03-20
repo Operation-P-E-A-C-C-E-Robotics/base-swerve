@@ -2,6 +2,9 @@ package frc.robot.statemachines;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.state.StateMachine;
 import frc.robot.OI;
@@ -18,6 +21,8 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
     private final BooleanSupplier alignedToShoot;
 
     private boolean hasNote = false;
+
+    private final Timer sketchyTimer = new Timer();
 
     public ShooterStatemachine(Shooter shooter, AimPlanner aimPlanner, BooleanSupplier alignedToShoot){
         this.shooter = shooter;
@@ -41,6 +46,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
             ||state == ShooterState.AIM_LAYUP
             ||state == ShooterState.AIM_PROTECTED)
             && alignedToShoot.getAsBoolean()
+            && DriverStation.isTeleop()
         ) {
             lastAimingState = state;
             state = ShooterState.SHOOT;
@@ -73,6 +79,10 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         if(shooter.triggerSwitchTripped() || shooter.flywheelSwitchTripped()) hasNote = true;
         if(shooter.shotDetected()) hasNote = false;
 
+        if(state == ShooterState.INTAKE && shooter.flywheelSwitchTripped() || shooter.triggerSwitchTripped()) {
+            state = ShooterState.INDEX;
+        }
+
         if(state == ShooterState.AUTO_AIM) {
             shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
             shooter.setTrigerPercent(0);
@@ -87,7 +97,11 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         }
         if (state == ShooterState.INTAKE_N_AIM){
             shooter.setFlywheelVelocity(aimPlanner.getTargetFlywheelVelocityRPS());
-            if(!shooter.triggerSwitchTripped()) shooter.setTrigerPercent(1.0);
+            if(shooter.triggerSwitchTripped()) sketchyTimer.restart();
+            if(!shooter.triggerSwitchTripped() || sketchyTimer.get() < 0.3) {
+                shooter.setTrigerPercent(1);
+            }
+            else shooter.setTrigerPercent(0);
             return;
         }
 
@@ -163,7 +177,7 @@ public class ShooterStatemachine extends StateMachine<ShooterStatemachine.Shoote
         AIM_PROTECTED(80.0,0.0),
         AUTO_AIM(0.0,0.0),
         SHOOT(0.0,1.0),
-        INTAKE_N_AIM(0.0,1.0);
+        INTAKE_N_AIM(0.0,0.0);
 
         private Double flywheelVelocity, triggerPercent;
 

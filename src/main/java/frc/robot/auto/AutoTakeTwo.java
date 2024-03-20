@@ -19,38 +19,96 @@ public class AutoTakeTwo {
 
     public static final TimedAuto twoNoteCenter = new TimedAuto(
         layupShot(),
-        intakeAndFollowPath(Path.DRIVE_OFF_LINE_CENTER),
+        intakeAndFollowPath(Path.START2_WING2),
         shoot(),
         end()
     );
 
     public static final TimedAuto twoNoteAmpSide = new TimedAuto(
         shoot(),
-        intakeAndFollowPath(Path.DRIVE_OFF_LINE_AMPSIDE),
+        intakeAndFollowPath(Path.START3_WING3),
         shoot(),
         end()
     );
 
     public static final TimedAuto twoNoteStageSide = new TimedAuto(
         shoot(),
-        intakeAndFollowPath(Path.DRIVE_OFF_LINE_STAGESIDE),
+        intakeAndFollowPath(Path.START1_WING1),
         shoot(),
         end()
     );
 
     public static final TimedAuto fourNote = new TimedAuto(
         shoot(),
-        intakeNShoot(Path.DRIVE_OFF_LINE_AMPSIDE),
-        intakeNShoot(Path.AMPSIDE_NOTE_TO_CENTER_NOTE),
-        intakeNShoot(Path.CENTERSIDE_NOTE_TO_STAGESIDE_NOTE),
+        intakeAndFollowPath(Path.START3_WING3),
+        shoot(),
+        intakeAndFollowPath(Path.WING3_WING2),
+        shoot(),
+        intakeAndFollowPath(Path.WING2_WING1),
+        shoot(),
         end()
     );
 
-    public static final TimedAuto threeNote = new TimedAuto(
+    public static final TimedAuto start3ThreeNote = new TimedAuto(
         shoot(),
-        intakeNShoot(Path.DRIVE_OFF_LINE_AMPSIDE),
-        intakeAndFollowPath(Path.AMPSIDE_NOTE_TO_CENTERLINE_NOTE),
-        followPathAndShoot(Path.CENTERLINE_NOTE_TO_SHOOT),
+        intakeAndFollowPath(Path.START3_WING3),
+        shoot(),
+        intakeAndFollowPath(Path.WING3_CENTER5),
+        wait(0.5),
+        followPath(Path.CENTER5_SHOOT),
+        shoot(),
+        end()
+    );
+
+    public static final TimedAuto start1ThreeNoteCenter2 = new TimedAuto(
+        shoot(),
+        intakeAndFollowPath(Path.START1_WING1),
+        shoot(),
+        intakeAndFollowPath(Path.WING1_CENTER2),
+        followPath(Path.CENTER2_SHOOT),
+        shoot(),
+        end()
+    );
+
+    public static final TimedAuto start1ThreeNoteCenter3 = new TimedAuto(
+        shoot(),
+        intakeAndFollowPath(Path.START1_WING1),
+        shoot(),
+        intakeAndFollowPath(Path.WING1_CENTER3),
+        wait(0.5),
+        followPath(Path.CENTER3_SHOOT),
+        shoot(),
+        end()
+    );
+
+    public static final TimedAuto defence1 = new TimedAuto(
+        shoot(),
+        followPath(Path.DEFENCE_1),
+        end()
+    );
+    public static final TimedAuto defence2 = new TimedAuto(
+        shoot(),
+        followPath(Path.DEFENCE_2),
+        end()
+    );
+    public static final TimedAuto defence3 = new TimedAuto(
+        shoot(),
+        followPath(Path.DEFENCE_3),
+        end()
+    );
+    public static final TimedAuto defence4R = new TimedAuto(
+        shoot(),
+        followPath(Path.DEFENCE_4_R),
+        end()
+    );
+    public static final TimedAuto defence4L = new TimedAuto(
+        shoot(),
+        followPath(Path.DEFENCE_4_L),
+        end()
+    );
+    public static final TimedAuto defence5R = new TimedAuto(
+        shoot(),
+        followPath(Path.DEFENCE_5_R),
         end()
     );
 
@@ -65,15 +123,15 @@ public class AutoTakeTwo {
 
     private static Action[] layupShot(){
         return new Action[]{
-            new Action(SuperstructureState.AIM_LAYUP, 0.75),
-            new Action(SuperstructureState.SHOOT, 0.25, () -> Shooter.getInstance().shotDetected())
+            new Action(SuperstructureState.AIM_LAYUP, 1),
+            new Action(SuperstructureState.SHOOT, 0.2, () -> Shooter.getInstance().shotDetected())
         };
     }
 
     private static Action[] intakeAndFollowPath(Path path){
         return new Action[]{
-            new Action(SuperstructureState.INTAKE_BACK, 0.5),
-            new Action(SuperstructureState.INTAKE_BACK, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped())
+            // new Action(SuperstructureState.INTAKE_BACK, 0.5),
+            new Action(SuperstructureState.INTAKE_BACK, path.command, path.duration)
         };
     }
 
@@ -84,24 +142,35 @@ public class AutoTakeTwo {
         };
     }
 
+    private static Action[] followPath(Path path) {
+        return new Action[] {
+            new Action(path.command, path.duration),
+        };
+    }
+
     private static Action[] intakeNShoot(Path path) {
         return new Action[] {
-            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration + 1, () -> Shooter.getInstance().flywheelSwitchTripped()),
-            new Action(SuperstructureState.INTAKE_N_AIM, 0.75),
-            new Action(SuperstructureState.INTAKE_N_SHOOT, 0.25)
+            new Action(SuperstructureState.INTAKE_N_AIM, path.command, path.duration),
+            new Action(SuperstructureState.INTAKE_N_AIM, 1),
+            new Action(SuperstructureState.INTAKE_N_PIVOT_AIM, 1),
+            new Action(SuperstructureState.INTAKE_N_SHOOT, 0.15)
         };
     }
 
     private static Action[] shoot() {
         return new Action[]{
-            new Action(SuperstructureState.REST, 0.5), //allow the shooter to index
-            new Action(SuperstructureState.AUTO_AIM, 3, RobotContainer.getInstance()::readyToShoot),
-            new Action(SuperstructureState.SHOOT, 0.5)
+            // new Action(SuperstructureState.REST, 0.5), //allow the shooter to index
+            new Action(SuperstructureState.AUTO_AIM, 1),
+            new Action(SuperstructureState.SHOOT, 0.15)
         };
     }
 
     private static Action[] end(){
         return new Action[]{new Action(15)};
+    }
+
+    private static Action[] wait(double timeout) {
+        return new Action[]{new Action(timeout)};
     }
 
     public static class TimedAuto {
@@ -131,7 +200,6 @@ public class AutoTakeTwo {
 
         public void reset() {
             timer.reset();
-            timer.start();
             currentAction = 0;
         }
 
@@ -194,7 +262,7 @@ public class AutoTakeTwo {
         }
 
         public Action(Command path, double timeout, BooleanSupplier endCondition) {
-            this(SuperstructureState.REST, SwerveState.LOCK_IN, path, timeout, endCondition);
+            this(SuperstructureState.REST, SwerveState.FOLLOW_PATH, path, timeout, endCondition);
         }
 
         public Action(Command path, double timeout) {
@@ -204,7 +272,7 @@ public class AutoTakeTwo {
         public Action(SuperstructureState state, double timeout, BooleanSupplier endCondition) {
             this(
                 state, 
-                state == SuperstructureState.AUTO_AIM || state == SuperstructureState.SHOOT ? SwerveState.AIM : SwerveState.LOCK_IN, 
+                state == SuperstructureState.AUTO_AIM || state == SuperstructureState.SHOOT || state == SuperstructureState.INTAKE_N_AIM || state == SuperstructureState.INTAKE_N_SHOOT ? SwerveState.AIM : SwerveState.LOCK_IN, 
                 new InstantCommand(), timeout, endCondition
             );
         }
@@ -252,13 +320,23 @@ public class AutoTakeTwo {
 
     public static enum Path {
         TEST_PATH("test path", 3),
-        DRIVE_OFF_LINE_CENTER("drive off line center", 2.1),
-        DRIVE_OFF_LINE_AMPSIDE("drive off line ampside", 2.0),
-        DRIVE_OFF_LINE_STAGESIDE("drive off line stageside", 1.8),
-        AMPSIDE_NOTE_TO_CENTER_NOTE("ampside note to center note", 2.6),
-        CENTERSIDE_NOTE_TO_STAGESIDE_NOTE("center note to stageside note", 2.0),
-        AMPSIDE_NOTE_TO_CENTERLINE_NOTE("ampside note to centerline note", 3.5),
-        CENTERLINE_NOTE_TO_SHOOT("centerline note to shoot", 3.2);
+        START2_WING2("start 2 wing 2", 2.1),
+        START3_WING3("start 3 wing 3", 2.3),
+        START1_WING1("start 1 wing 1", 1.8),
+        WING3_WING2("wing 3 wing 2", 2.3),
+        WING2_WING1("wing 2 wing 1", 2.1),
+        WING3_CENTER5("wing 3 center 5", 3.6),
+        CENTER5_SHOOT("center 5 shoot", 3.3),
+        WING1_CENTER2("wing 1 center 2", 4.4),
+        CENTER2_SHOOT("center 2 shoot", 3.6),
+        CENTER3_SHOOT("center 3 shoot", 3.4),
+        WING1_CENTER3("wing 1 center 3", 4.9),
+        DEFENCE_1("defence 1", 4.1),
+        DEFENCE_2("defence 2", 4.3),
+        DEFENCE_3("defence 3", 4.4),
+        DEFENCE_4_R("defence 4 R", 4.4),
+        DEFENCE_4_L("defence 4 L", 4.5),
+        DEFENCE_5_R("defence 5 R", 4.2);
     
         public final String pathName;
         public final Command command;

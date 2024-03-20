@@ -29,7 +29,7 @@ public class OI {
         public static final BooleanSupplier isZeroOdometry = () -> driverJoystick.getRawButton(8); //zero the odometry
         public static final BooleanSupplier isFastVisionReset = () -> driverJoystick.getRawButton(9); //reset pose from vision quickly
         public static final BooleanSupplier isAttemptProperZero = () -> driverJoystick.getRawButton(10); //zero field centric properly
-        public static final BooleanSupplier isOpenLoop = () -> true; //how hard should we try to actually follow the inputs (false = use the PID, which feels unnatural to me)
+        public static final BooleanSupplier isOpenLoop = () -> false; //how hard should we try to actually follow the inputs (false = use the PID, which feels unnatural to me)
     }
     
     public static class Modes {
@@ -111,13 +111,13 @@ public class OI {
             operatorJoystick.setRumble(RumbleType.kBothRumble, 0.5);
         } 
         else if(driveCurrent > swerveCurrentRumbleThreshold) {
-            var rumble = (driveCurrent - swerveCurrentRumbleThreshold) / swerveCurrentRumbleScalar;
-            //divide based on strafe amount
-            var left = rumble * (0.5 - (Swerve.strafe.getAsDouble() / 2));
-            var right = rumble * (0.5 + (Swerve.strafe.getAsDouble() / 2));
+            // var rumble = (driveCurrent - swerveCurrentRumbleThreshold) / swerveCurrentRumbleScalar;
+            // //divide based on strafe amount
+            // var left = rumble * (0.5 - (Swerve.strafe.getAsDouble() / 2));
+            // var right = rumble * (0.5 + (Swerve.strafe.getAsDouble() / 2));
 
-            driverJoystick.setRumble(RumbleType.kLeftRumble, left);
-            driverJoystick.setRumble(RumbleType.kRightRumble, right);
+            // driverJoystick.setRumble(RumbleType.kLeftRumble, left);
+            // driverJoystick.setRumble(RumbleType.kRightRumble, right);
         } else {
             driverJoystick.setRumble(RumbleType.kBothRumble, 0);
             operatorJoystick.setRumble(RumbleType.kBothRumble, 0);
