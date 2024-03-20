@@ -110,7 +110,7 @@ public class RobotContainer {
         if(!swerveStatemachine.transitioning()) return false;
         if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.001 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.001) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
         if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
-        if(swerve.getEyes().getOdometryError() > 0.5) return false;
+        if(swerve.getEyes().getOdometryError() > 1) return false;
         return true;
         // return OI.Inputs.wantsPlace.getAsBoolean();
     }
@@ -123,7 +123,7 @@ public class RobotContainer {
         if(kindaReadyToShoot()) {
             readyTimer.start();
         }
-        if(readyTimer.get() > aimPlanner.getDistanceToTarget()/3){
+        if(readyTimer.get() > aimPlanner.getDistanceToTarget()/6){
             readyTimer.stop();
             readyTimer.reset();
             return true;
