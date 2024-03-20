@@ -117,8 +117,8 @@ public class RobotContainer {
 
     public boolean readyToShoot(){
         if(OI.Inputs.wantsPlace.getAsBoolean()) {
-            readyTimer.reset();
-            readyTimer.stop();
+            if(OI.Inputs.enableShootWhileMoving.getAsBoolean()) return true;
+            else return false;
         }
         if(kindaReadyToShoot()) {
             readyTimer.start();
