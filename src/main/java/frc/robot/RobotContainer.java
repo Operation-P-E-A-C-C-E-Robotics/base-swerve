@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.telemetry.MultiTracers;
 import frc.lib.telemetry.StrategyTelemetry;
+import frc.lib.vision.ApriltagCamera;
+import frc.lib.vision.PeaccyVision;
 import frc.robot.auto.AutoTakeTwo;
 import frc.robot.auto.Autonomous;
 import frc.robot.auto.AutoTakeTwo.TimedAuto;
@@ -108,6 +110,7 @@ public class RobotContainer {
         if(!swerveStatemachine.transitioning()) return false;
         if((swerve.getChassisSpeeds().vxMetersPerSecond > 0.001 && swerve.getChassisSpeeds().vyMetersPerSecond > 0.001) && !OI.Inputs.enableShootWhileMoving.getAsBoolean()) return false;
         if(OI.Inputs.wantsPlace.getAsBoolean()) return false;
+        if(swerve.getEyes().getOdometryError() > 0.5) return false;
         return true;
         // return OI.Inputs.wantsPlace.getAsBoolean();
     }
