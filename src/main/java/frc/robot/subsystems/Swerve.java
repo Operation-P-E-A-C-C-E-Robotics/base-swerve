@@ -1,11 +1,14 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -15,9 +18,10 @@ import frc.lib.safety.Inspiration;
 import frc.lib.swerve.PeaccefulSwerve;
 import frc.lib.swerve.SwerveDescription;
 import frc.lib.swerve.SwerveDescription.PidGains;
-import frc.lib.telemetry.LimelightTelemetry;
 import frc.lib.telemetry.SwerveTelemetry;
-import frc.lib.vision.LimelightHelpers;
+import frc.lib.util.AllianceFlipUtil;
+import frc.lib.vision.ApriltagCamera;
+import frc.lib.vision.PeaccyVision;
 import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
@@ -30,6 +34,10 @@ public class Swerve extends SubsystemBase {
     private final SendableChooser<Pose2d> poseSeedChooser = new SendableChooser<>();
 
     // private LimelightHelper limelight;
+
+    private static PeaccyVision eyes = new PeaccyVision(
+        new ApriltagCamera.ApriltagLimelight(Constants.Swerve.primaryLLName, 0.1)
+    );
 
     public Swerve() {
         swerve = SwerveDescription.generateDrivetrain(
@@ -87,8 +95,9 @@ public class Swerve extends SubsystemBase {
      * @return the pose of the robot.
      */
     public Pose2d getPose () {
-        if(swerve.odometryIsValid()) return swerve.getState().Pose;
-        return new Pose2d();
+        var pose = swerve.getState().Pose;
+        if (pose == null) return new Pose2d();
+        return pose;
     }
 
     /**
@@ -115,41 +124,41 @@ public class Swerve extends SubsystemBase {
     public void resetOdometry(Pose2d pose) {
         swerve.seedFieldRelative(pose);
     }
-
+    
     /**
-     * drive in a straight line to a target pose. THIS IS DUMB BECAUSE
-     * THE RETURNED COMMAND ALWAYS FOLLOWS THE SAME PATH AND DOESN'T REGENERATE.
-     * @param target the goal pose
-     * @return the command to follow the path
+     * a workaround for CTRE's moronic zeroing behavior.
      */
-    // public Command driveToPose(Pose2d target){
-    //     //the target rotation is the angle of the curve, and we want to go in a straight line, so it
-    //     //needs to be the angle between the robot and the target
-    //     Rotation2d targetRotation = target.minus(getPose()).getRotation();
+    public void zeroFieldCentric() {
+        var cachedPose = getPose();
+        resetOdometry(AllianceFlipUtil.apply(new Pose2d()));
+        resetOdometry();
+        resetOdometry(cachedPose);
+    }
+    
+    public PeaccyVision getCameras(){
+        return eyes;
+    }
 
-    //     //bezier curve from the current pose to the target pose
-    //     List<Translation2d> waypoints = PathPlannerPath.bezierFromPoses(
-    //         getPose(), 
-    //         new Pose2d(target.getTranslation(), targetRotation)
-    //     );
-
-    //     PathPlannerPath path = new PathPlannerPath(
-    //         waypoints,
-    //         Constants.Swerve.autoMaxSpeed,
-    //         new GoalEndState(0.0, target.getRotation())
-    //     );
-
-    //     return AutoBuilder.followPathWithEvents(path);
-    // }
+    public Rotation3d getGyroAngle() {
+        return swerve.getRotation3d();
+    }
 
     public double getTotalDriveCurrent(){
         return swerve.getTotalDriveCurrent();
     }
 
+    /**
+     * DO NOT use this in normal operation. For calibration only
+     * @param gains the new gains to apply to the drive motors.
+     */
     public void updateDriveGains(PidGains gains){
         swerve.applyDriveConfigs(gains);
     }
 
+    /**
+     * DO NOT use this in normal operation. For calibration only
+     * @param gains the new gains to apply to the steer motors
+     */
     public void updateAngleGains(PidGains gains){
         swerve.applySteerConfigs(gains);
     }
@@ -157,19 +166,24 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         if(SmartDashboard.getBoolean("seed pose", false)) {
-            // swerve.tareEverything();
-            resetOdometry(poseSeedChooser.getSelected());
+            var startPose = poseSeedChooser.getSelected();
+            resetOdometry(new Pose2d(
+                AllianceFlipUtil.apply(startPose.getTranslation()),
+                startPose.getRotation()
+            ));;
             SmartDashboard.putBoolean("seed pose", false);
         }
 
-        //update odometry from limelight
-        var results = LimelightHelpers.getLatestResults(Constants.Swerve.primaryLLName).targetingResults;
-        if(results.botpose.length == 6) {
-            Pose2d pose = results.getBotPose2d_wpiBlue();
-            swerve.addVisionMeasurement(pose, results.timestamp_RIOFPGA_capture); //todo right timestamp?
+        BaseStatusSignal.refreshAll(swerve.getPigeon2().getAccelerationX(), swerve.getPigeon2().getAccelerationY(), swerve.getPigeon2().getAccelerationZ());
+        var acceleration = swerve.getPigeon2().getAccelerationX().getValue() + swerve.getPigeon2().getAccelerationY().getValue() + swerve.getPigeon2().getAccelerationZ().getValue();
+        eyes.update(getPose(), acceleration, new Translation2d(getChassisSpeeds().vxMetersPerSecond, getChassisSpeeds().vyMetersPerSecond).getNorm());
+        if(eyes.hasUpdated()){
+            swerve.addVisionMeasurement(
+                eyes.getPose(),
+                eyes.getTimestamp(),
+                eyes.getStDev()
+            );
         }
-
-        LimelightTelemetry.update(primaryLLName, swerve.getPose3d());
     }
 
     @Override
