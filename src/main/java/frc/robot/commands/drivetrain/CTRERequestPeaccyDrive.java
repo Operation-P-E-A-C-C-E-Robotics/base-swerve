@@ -12,13 +12,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
-import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Swerve;
 
 @Deprecated
 public class CTRERequestPeaccyDrive extends Command {
     private final DoubleSupplier xVelocitySup, yVelocitySup, angularVelocitySup, autoHeadingAngleSup;
     private final BooleanSupplier isAutoAngleSup, isFieldRelativeSup, isOpenLoopSup, isLockInSup;
-    private final DriveTrain driveTrain;
+    private final Swerve driveTrain;
 
     private final SwerveRequest.FieldCentric fieldCentricRequest = new SwerveRequest.FieldCentric();
     private final SwerveRequest.RobotCentric robotCentricRequest = new SwerveRequest.RobotCentric();
@@ -57,7 +57,7 @@ public class CTRERequestPeaccyDrive extends Command {
                       BooleanSupplier isOpenLoopSup,
                       BooleanSupplier isLockInSup,
                       BooleanSupplier isZeroOdometry,
-                      DriveTrain driveTrain) {
+                      Swerve driveTrain) {
         this.xVelocitySup = xVelocitySup;
         this.yVelocitySup = yVelocitySup;
         this.angularVelocitySup = angularVelocitySup;

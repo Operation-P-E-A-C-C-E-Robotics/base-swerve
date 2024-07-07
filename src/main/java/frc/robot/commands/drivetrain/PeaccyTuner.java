@@ -27,7 +27,7 @@ import frc.lib.telemetry.SwerveTelemetry;
 import frc.lib.util.JoystickCurves;
 import frc.lib.util.JoystickCurves.CurveType;
 import frc.robot.Constants;
-import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Swerve;
 
 /**
  * The organization / lack thereof of this file is a sin 
@@ -87,7 +87,7 @@ public class PeaccyTuner extends Command {
                             isLockInSup = () -> false,
                             isZeroOdometrySup = () -> false;
 
-    private DriveTrain driveTrain;
+    private Swerve driveTrain;
 
     /* "Swerve Requests" are what the drivetrain subsystem accepts. They figure out how to orient and drive the wheels. */
     private PeaccyRequest request; //custom fancy request than handles everything
@@ -277,7 +277,7 @@ public class PeaccyTuner extends Command {
      * - tons and tons of dashboard controls
      * @param driveTrain the swerve subsystem
      */
-    public PeaccyTuner(DriveTrain driveTrain) { 
+    public PeaccyTuner(Swerve driveTrain) { 
         this.driveTrain = driveTrain;
         updateLimiters();
         updatePeaccyRequest();

@@ -22,7 +22,7 @@ import frc.robot.Constants;
 
 import static frc.robot.Constants.Swerve.*;
 
-public class DriveTrain extends SubsystemBase {
+public class Swerve extends SubsystemBase {
     protected final PeaccefulSwerve swerve;
 
     private final SwerveRequest.ApplyChassisSpeeds autonomousRequest = new SwerveRequest.ApplyChassisSpeeds()
@@ -31,7 +31,7 @@ public class DriveTrain extends SubsystemBase {
 
     // private LimelightHelper limelight;
 
-    public DriveTrain() {
+    public Swerve() {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
             frontLeftIDs, 

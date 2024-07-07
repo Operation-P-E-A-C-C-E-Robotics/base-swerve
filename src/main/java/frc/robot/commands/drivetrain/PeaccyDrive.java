@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.swerve.PeaccyRequest;
 import frc.lib.telemetry.SwerveTelemetry;
 import frc.robot.Constants;
-import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Swerve;
 
 public class PeaccyDrive extends Command {
     /* Initialize the suppliers to default values */
@@ -29,7 +29,7 @@ public class PeaccyDrive extends Command {
                             isLockInSup = () -> false,
                             isZeroOdometrySup = () -> false;
 
-    private DriveTrain driveTrain;
+    private Swerve driveTrain;
 
     /* "Swerve Requests" are what the drivetrain subsystem accepts. They figure out how to orient and drive the wheels. */
     private final PeaccyRequest request; //custom fancy request than handles everything
@@ -56,7 +56,7 @@ public class PeaccyDrive extends Command {
      * and auto angle (automatic heading adjustment) modes.
      * @param driveTrain the swerve subsystem
      */
-    public PeaccyDrive(DriveTrain driveTrain) {
+    public PeaccyDrive(Swerve driveTrain) {
         this.driveTrain = driveTrain;
 
         request  = new PeaccyRequest(
