@@ -73,7 +73,7 @@ public class DriveTrainTuner extends SubsystemBase {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
             frontLeftIDs, 
-            frontRighIDs, 
+            frontRightIDs, 
             rearLeftIDs, 
             rearRightIDs, 
             gearing, 

@@ -246,15 +246,19 @@ public class PeaccyTuner extends Command {
 
     private void updatePeaccyRequest(){
         request  = new PeaccyRequest(
-            autoHeadingMaxVelocity, 
-            autoHeadingMaxAcceleration,
+            Constants.Swerve.autoHeadingMaxVelocity, 
+            Constants.Swerve.autoHeadingMaxAcceleration,
+            Constants.Swerve.lockHeadingMaxVelocity,
+            Constants.Swerve.lockHeadingMaxAcceleration,
             Constants.Swerve.teleopLinearMultiplier,
-            autoHeadingKP, 
-            autoHeadingKV, 
-            autoHeadingKA, 
+            Constants.Swerve.autoHeadingKP, 
+            Constants.Swerve.autoHeadingKV, 
+            Constants.Swerve.autoHeadingKA, 
+            Constants.Swerve.lockHeadingKP,
             driveTrain::getChassisSpeeds, 
             driveTrain::getTotalDriveCurrent, 
-            softHeadingCurrentLimit
+            Constants.Swerve.softHeadingCurrentLimit,
+            driveTrain
         ).withRotationalDeadband(teleopAngularVelocityDeadband)
         .withSoftHoldHeading(useSoftHoldHeading)
         .withPositionCorrectionIterations(teleopPositionCorrectionIters);

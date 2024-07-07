@@ -36,14 +36,15 @@ public class Swerve extends SubsystemBase {
     // private LimelightHelper limelight;
 
     private static PeaccyVision eyes = new PeaccyVision(
-        new ApriltagCamera.ApriltagLimelight(Constants.Swerve.primaryLLName, 0.1)
+        new ApriltagCamera.ApriltagLimelight(Constants.Cameras.exampleLimelight, 0.1),
+        Constants.Cameras.examplePhotonvision
     );
 
     public Swerve() {
         swerve = SwerveDescription.generateDrivetrain(
             dimensions, 
             frontLeftIDs, 
-            frontRighIDs, 
+            frontRightIDs, 
             rearLeftIDs, 
             rearRightIDs, 
             gearing, 

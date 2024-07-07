@@ -10,10 +10,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drivetrain.PeaccyDrive;
-import frc.robot.commands.drivetrain.PeaccyTuner;
 import frc.robot.subsystems.Swerve;
 
 
@@ -23,8 +21,6 @@ public class RobotContainer {
   private final int strafeAxis = 4;
   private final int rotationAxis = 0;
   private final int zeroButtonNo = 7;
-  private final int fallbackButtonNo = 7;
-  private final int fallbackResetButtonNo = 8;
 
   /* SENSORS */
 
@@ -37,12 +33,10 @@ public class RobotContainer {
   private final Joystick driverController = new Joystick(0);
   
   private final JoystickButton zeroButton = new JoystickButton(driverController, zeroButtonNo); //for debugging
-  private final JoystickButton driveFallbackButton = new JoystickButton(driverController, fallbackButtonNo);
-  private final JoystickButton driveFallbackResetButton = new JoystickButton(driverController, fallbackResetButtonNo);
 
 
   /* COMMANDS */
-  private final PeaccyTuner peaccyDrive = new PeaccyTuner(driveTrain);
+  private final PeaccyDrive peaccyDrive = new PeaccyDrive(driveTrain);
 
   private final SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -62,8 +56,6 @@ public class RobotContainer {
                .isZeroOdometry (() -> zeroButton.getAsBoolean())
                .isOpenLoop     (() -> false);
     driveTrain.setDefaultCommand(peaccyDrive);
-    driveFallbackButton.onTrue(new InstantCommand(peaccyDrive::fallback, driveTrain)); 
-    driveFallbackResetButton.onTrue(new InstantCommand(peaccyDrive::resetFallback, driveTrain));
     driveTrain.register(driverController);
   }
 

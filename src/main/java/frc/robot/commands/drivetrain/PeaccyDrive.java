@@ -5,9 +5,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotController;
@@ -37,15 +35,9 @@ public class PeaccyDrive extends Command {
 
     /* Acceleration limiters for a consistent feel and to reduce power draw. */
     private final SlewRateLimiter linearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearSpeedLimit); //limit the change in speed
-    private final SlewRateLimiter lowBatteryLinearSpeedLimiter = new SlewRateLimiter(Constants.Swerve.teleopLowBatteryLinearSpeedLimit); //more aggresive to prevent brownouts
+    private final SlewRateLimiter aggresiveLimiter = new SlewRateLimiter(Constants.Swerve.teleopLowBatteryLinearSpeedLimit); //more aggresive to prevent brownouts
     private final SlewRateLimiter linearAngleLimiter = new SlewRateLimiter(Constants.Swerve.teleopLinearAngleLimit); //limit the change in direction
     private final SlewRateLimiter angularVelocityLimiter = new SlewRateLimiter(Constants.Swerve.teleopAngularRateLimit); //limit the change in angular velocity
-
-    /* Debounce the deadband to prevent jitter when the joystick is near the edge of the deadband */
-    private final Debouncer linearDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
-    private final Debouncer angularDeadbandDebouncer = new Debouncer(Constants.Swerve.teleopDeadbandDebounceTime, DebounceType.kBoth);
-
-    private FallbackMode fallback = FallbackMode.Normal; //disable risky features
 
     /**
      * PeaccyDrive is a swerve drive command designed to handle all the different
@@ -62,13 +54,17 @@ public class PeaccyDrive extends Command {
         request  = new PeaccyRequest(
             Constants.Swerve.autoHeadingMaxVelocity, 
             Constants.Swerve.autoHeadingMaxAcceleration,
+            Constants.Swerve.lockHeadingMaxVelocity,
+            Constants.Swerve.lockHeadingMaxAcceleration,
             Constants.Swerve.teleopLinearMultiplier,
             Constants.Swerve.autoHeadingKP, 
             Constants.Swerve.autoHeadingKV, 
             Constants.Swerve.autoHeadingKA, 
+            Constants.Swerve.lockHeadingKP,
             driveTrain::getChassisSpeeds, 
             driveTrain::getTotalDriveCurrent, 
-            Constants.Swerve.softHeadingCurrentLimit
+            Constants.Swerve.softHeadingCurrentLimit,
+            driveTrain
         ).withRotationalDeadband(Constants.Swerve.teleopAngularVelocityDeadband)
         .withSoftHoldHeading(Constants.Swerve.useSoftHoldHeading)
         .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
@@ -236,22 +232,12 @@ public class PeaccyDrive extends Command {
                //true will use pid control to maintain heading, or set to "isAutoHeading" if you want to only turn to specified headings 
                //rather than holding whatever direction you're facing :)
                .withHoldHeading(true)
+               .withLockHeading(false)
                .withPositionCorrectionIterations(Constants.Swerve.teleopPositionCorrectionIters);
 
         //update the robot's target heading if we're using auto heading
         if(isAutoHeading) {
             request.withHeading(Rotation2d.fromDegrees(autoHeadingAngle).getRadians());
-        }
-
-        //disable risky features if we're in fallback mode
-        if(fallback != FallbackMode.Normal){
-            request.withPositionCorrectionIterations(0); //position correction depends on odometry
-        }
-        if(fallback == FallbackMode.PigeonFailure){
-            //these depend on the robot's angle
-            request.withIsFieldCentric(false);
-            request.withHoldHeading(false);
-            request.withSoftHoldHeading(false);
         }
 
         //yay peaccyrequest,
@@ -280,16 +266,16 @@ public class PeaccyDrive extends Command {
      */
     private Translation2d smoothAndDeadband (Translation2d linearVelocity) {
         //handle deadband and reset the rate limiter if we're in the deadband
-        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,0.03,linearVelocity.getNorm(), linearDeadbandDebouncer);
+        double rawLinearSpeed = handleDeadbandFixSlope(Constants.Swerve.teleopLinearSpeedDeadband,0.03,linearVelocity.getNorm());
         if(Math.abs(rawLinearSpeed) < Constants.Swerve.teleopLinearSpeedDeadband) linearSpeedLimiter.reset(0);
         rawLinearSpeed = Constants.Swerve.teleopLinearSpeedCurve.apply(rawLinearSpeed);
 
-        boolean useLowBetteryLimiter = RobotController.getBatteryVoltage() < 10.5;
+        boolean useAggresiveLimiter = RobotController.getBatteryVoltage() < 10.5;
 
-        double lowBatSpeed = lowBatteryLinearSpeedLimiter.calculate(rawLinearSpeed);
+        double lowBatSpeed = aggresiveLimiter.calculate(rawLinearSpeed);
         //limit the linear acceleration
         double linearSpeed = linearSpeedLimiter.calculate(rawLinearSpeed);
-        if(useLowBetteryLimiter) linearSpeed = lowBatSpeed;
+        if(useAggresiveLimiter) linearSpeed = lowBatSpeed;
 
         //limit the change in direction
         double rawLinearAngle = linearVelocity.getAngle().getRadians();
@@ -313,7 +299,7 @@ public class PeaccyDrive extends Command {
      */
     private double smoothAndDeadband (double angularVelocity) {
         //apply deadband to angular velocity
-        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, 0.3, angularVelocity, angularDeadbandDebouncer);
+        angularVelocity = handleDeadbandFixSlope(Constants.Swerve.teleopAngularVelocityDeadband, 0.3, angularVelocity);
 
         angularVelocity = Constants.Swerve.teleopAngularVelocityCurve.apply(angularVelocity);
 
@@ -333,24 +319,9 @@ public class PeaccyDrive extends Command {
      * @param value the value to apply the deadband to
      * @return the value with the deadband applied (like magic)
      */
-    private double handleDeadbandFixSlope (double modband, double deadband, double value, Debouncer debounce) {
-        if (debounce.calculate(Math.abs(value) < deadband)) return 0;
+    private double handleDeadbandFixSlope (double modband, double deadband, double value) {
+        if(Math.abs(value) < deadband) return 0;
         var mod = (value - (deadband * Math.signum(value)))/(1 - deadband);
         return Math.abs(mod) > deadband ? mod : 0;
-    }
-
-    public void fallback(){
-        if(fallback == FallbackMode.Normal) fallback = FallbackMode.OdmetryFailure;
-        if(fallback == FallbackMode.OdmetryFailure) fallback = FallbackMode.PigeonFailure;
-    }
-
-    public void resetFallback(){
-        fallback = FallbackMode.Normal;
-    }
-    
-    public enum FallbackMode{
-        Normal,
-        OdmetryFailure,
-        PigeonFailure
     }
 }
