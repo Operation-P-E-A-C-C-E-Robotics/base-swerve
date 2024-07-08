@@ -54,7 +54,21 @@ Now, use git to clone the new repo. We'll go over this in detail in Section 04, 
 **It will clone into the folder that's open in VS Code, so make sure it's a folder you want the project in!**
 
 # Vendor Libraries
-A vendor library is a bunch of code written by a company to make our lives easier. A lot of FRC devices, like motor controllers, use special protocols that *no one* wants to deal with. For example, to actually implement the CAN bus protocol that we use 
+A vendor library is a bunch of code written by some one else to make our lives easier. A lot of FRC devices, like motor controllers, use special protocols that *no one* wants to deal with. For example, the CAN Bus protocol that connects nearly all the devices on our robot. Implementing it requires some very complicated low-level code that I do not understand. Forunately this is handled by our wonderful libraries.
+
+Most vendor libraries are from manufacturers of the hardware we use, like CTRE and Rev. They write libraries that make it incredibly easy to use their devices without needing to understand a single thing about the protocol. CTRE's library is called Phoenix and Rev's library is called REVLib.
+
+There are also libraries that aren't for a physical product but simply help *do stuff*. The most common of these is PathPlannerLib which helps with autos.
+
+**To install vendor libraries** open the command pallate, type in "vendor libraries", and press enter. Choose "install new libraries (online)" and then paste in the url for the library. 
+
+Here is where to find the URLs for common libraries:
+- [Phoenix 6](https://v6.docs.ctr-electronics.com/en/latest/docs/installation/installation-frc.html) (choose "online" instead of offline)
+- [REVLib](https://docs.revrobotics.com/ion-control-system/sw/revlib#c-and-java-installation)
+- [PathPlannerLib](https://pathplanner.dev/pplib-getting-started.html)
+- [photonlib](https://docs.photonvision.org/en/latest/docs/programming/photonlib/adding-vendordep.html)
+
+These libraries are already installed in this project, but will probably need to be updated.
 
 # Project Migration
 Each year, the new version of WPILib is slightly different from the old version. You ***MUST*** import any older project you want to use to the new version. If you don't, you won't be able to deploy code to any up-to-date RoboRIO. Additionally, vendor libraries sometimes are only compatible with current firmware. In general it's best to make sure that everything is up to date on both the hardware and software side, to minimize headaches and wasted time. This is really the worst part of FRC programming
