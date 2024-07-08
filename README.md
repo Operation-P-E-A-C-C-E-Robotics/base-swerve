@@ -24,6 +24,9 @@ Let's start with that now
 5. [Our 2017 Code](https://github.com/nateblinux/OperationPeacce2017Code/tree/master/src/org/usfirst/frc/team3461/robot) From a time before I did software; much, much simpler than any of the garbage I've done. Don't do a separate subsystem for the left and right half of a tank drive though, that's silly.
 6. [Our 2022 Code](https://github.com/Operation-P-E-A-C-C-E-Robotics/frc-2022/blob/main/src/main/java/frc/robot/RobotContainer.java) The first robot I programmed that actually competed (ahem, COVID). Garbage code, I didn't know what I was doing. Worked good.
 
+## Before we get started, look through [this google slide](https://docs.google.com/presentation/d/1DMgxi79YGgkeb51lSAVAxEkoKkov6m2Ys2Yr7qAGM9I/edit?usp=sharing) 
+It should give the requisite knowledge of robot hardware to get started. I'm sorry about how terrible it is, that's cause I made it.
+
 # WITHOUT FURTHER ADO
 ## Here is the guide index:
 1. [Setting up your driver station](GUIDE/01DriverStation.md)
@@ -39,5 +42,7 @@ Let's start with that now
 11. [Kinematics 101](GUIDE/11Kinematics101.md)
 12. [Creating good OIs & automation](GUIDE/12Automation&OI.md)
 13. [Creating an autonomous](GUIDE/13Autonomous.md)
-14. Telemetry & Useful Data Sources
-15. Programming Using State Machines
+14. [Telemetry & Useful Data Sources](GUIDE/14Telemetry&Data.md)
+15. [Programming Using State Machines](GUIDE/15StateMachines.md)
+16. [Available debugging resources.](GUIDE/16Debugging.md)
+17. [Competitions and Sanity](GUIDE/17Competition.md)
