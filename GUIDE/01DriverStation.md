@@ -1,4 +1,5 @@
 # Setting up your driver station
+## a.k.a the worst part of programming
 The driver station needs to be treated very carefully. Any issue with the driver station connection to the field makes you unable to compete. This is pretty rare thanks to CSAs and other field staff, but to be successful we need to ***Optimize Everything***. Even a single match where we can't perform removes us from high-level play. Additionally, causing delays on the field trying to sort out issues makes us look unreliable and will hurt us in alliance selections.
 
 **ALL FRC-specific software gets major updates for each season**, so everything **absolutely must** be upgraded at least once after kickoff. It's also smart to update before each competition. Do it around week in advance though, to make sure you can fix anything the update broke.
@@ -42,6 +43,22 @@ Most important takeaways:
     - Press the physical reset button on the RoboRIO (so you don't have to wait for the radio to reboot)
 
 I've seen a bug where the robot E-Stops every time you enable it (which is infuriating). If that happens, try closing and reopening the driver station program, or restarting the computer.
+
+## Updating Hardware
+Each season, all the hardware will need to be updated with new firmware. **New firmware is not backwards compatible with old projects, the projects must be migrated.** We'll talk abou that in the next section. 
+
+Here are links that describe how to update each device:
+- [The RoboRIO](https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-3/roborio2-imaging.html)
+- [CTRE Devices (motors, encoders, etc.)](https://pro.docs.ctr-electronics.com/en/stable/docs/tuner/device-list.html#batch-field-upgrade)
+- [REV Motor Controllers](https://docs.revrobotics.com/rev-hardware-client/ion/spark-max/update)
+- [Power Distribution Hub (non-essential)](https://docs.revrobotics.com/rev-hardware-client/ion/power-distribution-hub/updating-a-power-distribution-hub)
+- [Pneumatic Hub (non-essential)](https://docs.revrobotics.com/rev-hardware-client/ion/pneumatic-hub/updating-a-pneumatic-hub)
+- [Limelight](https://docs.limelightvision.io/docs/docs-limelight/getting-started/imaging)
+
+Note: 2024 limelight firmware didn't come out until very late in the season, which was really annoying.
+
+## Programming at Home
+The setup is the similar for any other computer you want to program. You **DO NOT** need the FRC Game Tools, Phoenix Tuner, Rev Hardware Client, or Limelight Hardware Manager unless you plan on using your computer with those parts of the physical robot. With only WPILib, you can still work on robot code and even deploy it, you just can't enable the robot.
 
 # Make sure you have WPILib installed on *your computer* before proceeding
 

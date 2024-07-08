@@ -1,7 +1,7 @@
 # Setting up your robot project
 First I'll introduce you to Visual Studio Code, then I'll go over creating a blank project from scratch, then we'll talk about creating a project based on this project. Finally, we'll go over vendor libraries.
 ## Your New Home, a.k.a. VS Code
-It's important to get comfortable in Visual Studio Code - you'll be spending hundreds of hours there in the upcoming months. Foundationally, VS Code is a text editor, but it integrates a lot of other features. I'm going to go over them just enough in this section to hurt your brain.
+It's important to get comfortable in Visual Studio Code - you'll be spending hundreds of hours there in the upcoming months. Foundationally, VS Code is a text editor, but it integrates a lot of other features. I'm going to go over them just enough in this section to make your brain hurt.
 
 The key elements of VS Code is text editor in the middle, the file explorer, the command palatte, source control, and the terminal. VS Code also supports thousands of extensions - it's the current industry standard, and can be used for just about anything programming related.
 
@@ -45,3 +45,20 @@ To create a project, just open the command pallate and type "create a new projec
 Click on Select a project type. Choose template>java>Command Robot. Choose a folder, name your project, and type in your team number. Click Generate Project. That's it!
 
 While we're here, let's talk about naming projects. For official robot code, our team uses the simple standard of "frc-\<year>". For personal projects while you're learning, name it whatever you want (as long as it's valid of course).
+
+## Using this Project!
+The best way to build code off of this project is to use a git feature called "Forking". To do this, just go to the [home page of this repository](https://github.com/Operation-P-E-A-C-C-E-Robotics/base-swerve), then click the fork button. Name the new repository either "frc-\<year>" for official code, or whatever you want for unofficial code.
+
+Now, use git to clone the new repo. We'll go over this in detail in Section 04, but here's how to do it. Open the command pallate with ctrl+shift+p, type in "clone", and press enter. Then, copy the url to the new github repo you created, and paste it into the bar that pops up. Press enter. That's it!
+
+**It will clone into the folder that's open in VS Code, so make sure it's a folder you want the project in!**
+
+# Vendor Libraries
+A vendor library is a bunch of code written by a company to make our lives easier. A lot of FRC devices, like motor controllers, use special protocols that *no one* wants to deal with. For example, to actually implement the CAN bus protocol that we use 
+
+# Project Migration
+Each year, the new version of WPILib is slightly different from the old version. You ***MUST*** import any older project you want to use to the new version. If you don't, you won't be able to deploy code to any up-to-date RoboRIO. Additionally, vendor libraries sometimes are only compatible with current firmware. In general it's best to make sure that everything is up to date on both the hardware and software side, to minimize headaches and wasted time. This is really the worst part of FRC programming
+
+Occasionally there will be changes to the libraries that actually affect how you are able to write code, so you'll have to change a few things in a project you migrate.
+
+I'll probably handle moving this codebase from 2024 wpilib to 2025.
