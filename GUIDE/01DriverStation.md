@@ -1,5 +1,5 @@
 # Setting up your driver station
-The driver station needs to be treated very carefully. Any issue with the driver station connection to the field makes you unable to compete. Thanks to CSAs and other field staff, this is pretty rare, but to be successful we need to ***Optimize Everything***. Any match where we can't perform removes us from high-level play. Additionally, causing delays on the field trying to sort out issues makes us look unfavorable for alliance selections.
+The driver station needs to be treated very carefully. Any issue with the driver station connection to the field makes you unable to compete. This is pretty rare thanks to CSAs and other field staff, but to be successful we need to ***Optimize Everything***. Even a single match where we can't perform removes us from high-level play. Additionally, causing delays on the field trying to sort out issues makes us look unreliable and will hurt us in alliance selections.
 
 **ALL FRC-specific software gets major updates for each season**, so everything **absolutely must** be upgraded at least once after kickoff. It's also smart to update before each competition. Do it around week in advance though, to make sure you can fix anything the update broke.
 
@@ -14,6 +14,7 @@ Software I reccommend you install is:
 - [AdvantageScope](https://github.com/Mechanical-Advantage/AdvantageScope/releases/)
 - [PathPlanner](https://github.com/mjansen4857/pathplanner/releases)
 - [Choreo](https://github.com/SleipnirGroup/Choreo/releases)
+- [Limelight Hardware Manager](https://docs.limelightvision.io/docs/resources/downloads)
 
 Also, *uninstall all unnecessary software*
 
@@ -41,6 +42,8 @@ Most important takeaways:
     - Press the physical reset button on the RoboRIO (so you don't have to wait for the radio to reboot)
 
 I've seen a bug where the robot E-Stops every time you enable it (which is infuriating). If that happens, try closing and reopening the driver station program, or restarting the computer.
+
+# Make sure you have WPILib installed on *your computer* before proceeding
 
 
 ## 0<<---[1][--->>2](02RobotProject.md)
