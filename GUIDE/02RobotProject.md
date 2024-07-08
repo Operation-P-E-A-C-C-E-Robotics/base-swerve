@@ -1,14 +1,14 @@
 # Setting up your robot project
 First I'll introduce you to Visual Studio Code, then I'll go over creating a blank project from scratch, then we'll talk about creating a project based on this project. Finally, we'll go over vendor libraries.
 ## Your New Home, a.k.a. VS Code
-It's important to get comfortable in Visual Studio Code - you'll be spending hundreds of hours there in the upcoming months. Foundationally, VS Code is a text editor, but it integrates a lot of other features. I'm going to go over them just enough in this section to make your brain hurt.
+It's important to get comfortable in Visual Studio Code - you'll be spending hundreds of hours there in the upcoming months. Foundationally, VS Code is a text editor, but it integrates a lot of other features. I'm going to go over them just enough to make your brain hurt.
 
-The key elements of VS Code is text editor in the middle, the file explorer, the command palatte, source control, and the terminal. VS Code also supports thousands of extensions - it's the current industry standard, and can be used for just about anything programming related.
+The key elements of VS Code is the text editor in the middle, the file explorer, the command palatte, source control, and the terminal. VS Code also supports thousands of extensions - it's the current industry standard, and can be used for just about anything programming related.
 
 ### Text Editor:
 The VS Code editor has several helpful features. Firstly, all the colors! This is called syntax highlighting. It just colors each type of word differently based on the language your using. Once you're used to it, this helps you focus on the important parts when you're reading code. It doesn't do anything else.
 
-Secondly, autocomplete. This is your best freind. It shows you two things. One is available variable names based on what you've already typed. This way, you don't need to remember exactly what your variables are called. The even more helpful thing is this: it will show you every possible variable and function that is available in objects you reference. This won't make sense until you have an understanding of object oriented programming. Basically, though, it shows you everything the software library you're using is capable of. Once you get to writing code, scroll all the way through some of the autocomplete lists. It's actually a good way to learn.
+Secondly, autocomplete. This is your best freind. It shows you two things. One is to show all the variable names you've defined based on what you've already typed. This way, you don't need to remember exactly what your variables are called. Even more helpful is this: it will show you every possible variable and function that is available in objects you reference. This won't really make sense until you have an understanding of object oriented programming. Basically, though, it shows you everything the software library you're using is capable of. Once you get to writing code, scroll all the way through some of the autocomplete lists. It's actually a good way to learn.
 
 An honourable mention is CTRL+click. In our robot code, there are lots of places where we reference other files in the project. In Java, a "class" and a "file" are the same thing - classes are files. You can simply control+click on the name of a class, and it will take you right to the file the class is defined in. **This works for EXTERNAL LIBRARIES TOO!** That means that you can just control+click on a class your interested in and look at *WPILib's internal workings*. Ignore this for now, but come back to it! It's an awesome way to learn what is actually happening at a deeper level, instead of having WPILib be a black box that you don't known anything about.
 
@@ -32,9 +32,20 @@ You can also pass information into commands by putting it after the command name
 
 **DON'T PANIC!** ALL of the command line stuff for FRC is automatically handled by WPILib. I just don't want you to be completely in the dark on what happens when you press *deploy*.
 
-Since the terminal is an integral part of programming, there is one built directly into VS Code in the bottom pane. You can close this pane, and it will re-appear when you deploy code since it is used for the deployment process.
+Since the terminal is an integral part of programming, there is one built directly into VS Code in the bottom pane. You can close this pane, and it will re-appear when it is used by WPILib, like when deploying code.
 
-***If anything goes wrong, error details will be displayed in the terminal***
+***If anything goes wrong when deploying your code, error details will be displayed in the terminal***
+
+### Errors
+VS Code automatically detects syntax errors (things your programming language doesn't allow) in your software. This is immensly useful. In the status bar at the very bototm of VS Code, there is an indicator that shows the number of errors, warnings, and information messages. **If there are any errors, you won't be able to deploy your code!** Most warnings can be ignored till the end of the development process; usually they point to useless code that can be removed.
+
+Errors are marked in the editor with a sqiggly underline, like a misspelled word in normal text editors. If you hover your mouse over the error, you'll get an explanation of what the error is for. If you do not understand the message, google it.
+
+For some errors, there are "quick fix" options where the editor tries to figure out how to fix the issue. You can access them by putting the cursor on the error and either pressing Ctrl+. or clicking the little lightbulb that appears to the left.
+
+***Don't use a quick fix unless you know what it will do!***
+
+The thing quick fix is awesome for is finding imports - we'll get to that later.
 
 ### GET COMFORTABLE
 Before you go on, I strongly reccomend that you spend some time messing around in VS Code. Download this robot project's source code (as a zip) from [here](https://github.com/Operation-P-E-A-C-C-E-Robotics/base-swerve/releases). Unzip it, and open it in VS Code (File>Open Folder). Do whatever you want, you won't hurt anything. There's a lot I haven't gone over here, like the (non-command) pallate, outline view, searching, etc.
