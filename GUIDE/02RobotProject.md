@@ -45,7 +45,7 @@ For some errors, there are "quick fix" options where the editor tries to figure 
 
 ***Don't use a quick fix unless you know what it will do!***
 
-The thing quick fix is awesome for is finding imports - we'll get to that later.
+The thing quick fix is best at is finding imports - we'll get to that later.
 
 ### GET COMFORTABLE
 Before you go on, I strongly reccomend that you spend some time messing around in VS Code. Download this robot project's source code (as a zip) from [here](https://github.com/Operation-P-E-A-C-C-E-Robotics/base-swerve/releases). Unzip it, and open it in VS Code (File>Open Folder). Do whatever you want, you won't hurt anything. There's a lot I haven't gone over here, like the (non-command) pallate, outline view, searching, etc.
