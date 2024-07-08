@@ -76,3 +76,23 @@ Each year, the new version of WPILib is slightly different from the old version.
 Occasionally there will be changes to the libraries that actually affect how you are able to write code, so you'll have to change a few things in a project you migrate.
 
 I'll probably handle moving this codebase from 2024 wpilib to 2025.
+
+## [1<<---](01DriverStation.md)[2][--->>3](03ProgrammingSkills.md)
+# [INDEX](/README.md)
+1. [Setting up your driver station](/GUIDE/01DriverStation.md)
+2. [Setting up your robot project](/GUIDE/02RobotProject.md)
+3. [Basic programming skills](/GUIDE/03ProgrammingSkills.md)
+4. [Using GIT & GitHub](/GUIDE/04GIT&Github.md)
+5. [Getting a swerve running (using this project)](/GUIDE/05Swerve.md)
+6. [End Effectors, Intakes, and Pneumatics](/GUIDE/06BasicMechs.md)
+7. [Motion control 101](/GUIDE/07MotionControl101.md)
+8. [How to program an elevator](/GUIDE/08Elevator.md)
+9. [How to program an arm](/GUIDE/09Arm.md)
+10. [How to program a shooter](/GUIDE/10Shooter.md)
+11. [Kinematics 101](/GUIDE/11Kinematics101.md)
+12. [Creating good OIs & automation](/GUIDE/12Automation&OI.md)
+13. [Creating an autonomous](/GUIDE/13Autonomous.md)
+14. [Telemetry & Useful Data Sources](/GUIDE/14Telemetry&Data.md)
+15. [Programming Using State Machines](/GUIDE/15StateMachines.md)
+16. [Available debugging resources.](/GUIDE/16Debugging.md)
+17. [Competitions and Sanity](/GUIDE/17Competition.md)
