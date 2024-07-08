@@ -1,7 +1,7 @@
 # Setting up your driver station
-The driver station needs to be treated very carefully. An issue with the driver station, or driver station connection to the field, then you are out of the match.
+The driver station needs to be treated very carefully. Any issue with the driver station connection to the field makes you unable to compete. Thanks to CSAs and other field staff, this is pretty rare, but to be successful we need to ***Optimize Everything***. Any match where we can't perform removes us from high-level play. Additionally, causing delays on the field trying to sort out issues makes us look unfavorable for alliance selections.
 
-**ALL FRC-specific software gets major updates for each season**, so everything needs to get updated at least once after kickoff. It's best to update again around a week before each competition to get the least buggy software, but still have time to fix anything the update might have broken.
+**ALL FRC-specific software gets major updates for each season**, so everything **absolutely must** be upgraded at least once after kickoff. It's also smart to update before each competition. Do it around week in advance though, to make sure you can fix anything the update broke.
 
 ## Installing Software
 The required software is:
@@ -26,8 +26,9 @@ When you run the WPILib installer for a new season, it will install the new vers
 
 The most important things are:
 1. Make sure windows firewall is off
-2. Make sure windows update is off during competitions
-3. Make sure power settings don't automatically put the computer to sleep
+2. Force windows to update around a week before competition.
+3. Make sure windows update is off during competitions
+4. Make sure power settings don't automatically put the computer to sleep
 
 ## How to Use the Driver Station
 ***PLEASE Read the [WPILib docs on it yo](https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station.html)***

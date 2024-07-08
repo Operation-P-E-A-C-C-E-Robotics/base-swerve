@@ -31,7 +31,7 @@ It should give the requisite knowledge of robot hardware to get started. I'm sor
 ## Here is the guide index:
 1. [Setting up your driver station](GUIDE/01DriverStation.md)
 2. [Setting up your robot project](GUIDE/02RobotProject.md)
-3. [Basic programming skills](GUIDE/03ProgrammingSkills.md)
+3. [Basic programming skills & The Command Based Structure](GUIDE/03ProgrammingSkills.md)
 4. [Using GIT & GitHub](GUIDE/04GIT&Github.md)
 5. [Getting a swerve running (using this project)](GUIDE/05Swerve.md)
 6. [End Effectors, Intakes, and Pneumatics](GUIDE/06BasicMechs.md)
