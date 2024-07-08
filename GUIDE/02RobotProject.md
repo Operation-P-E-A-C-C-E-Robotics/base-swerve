@@ -50,6 +50,8 @@ The thing quick fix is best at is finding imports - we'll get to that later.
 ### GET COMFORTABLE
 Before you go on, I strongly reccomend that you spend some time messing around in VS Code. Download this robot project's source code (as a zip) from [here](https://github.com/Operation-P-E-A-C-C-E-Robotics/base-swerve/releases). Unzip it, and open it in VS Code (File>Open Folder). Do whatever you want, you won't hurt anything. There's a lot I haven't gone over here, like the (non-command) pallate, outline view, searching, etc.
 
+#### [Here's a video to get you started](https://youtu.be/B-s71n0dHUk?si=-Z4AxjM0ObeeTxMy)
+
 ## Creating a Project!
 To create a project, just open the command pallate and type "create a new project" and press enter. (you don't have to type the whole thing, as soon as it's at the top of the list you can press enter). It will open a little form to fill out. 
 
@@ -65,7 +67,7 @@ Now, use git to clone the new repo. We'll go over this in detail in Section 04, 
 **It will clone into the folder that's open in VS Code, so make sure it's a folder you want the project in!**
 
 # Vendor Libraries
-A vendor library is a bunch of code written by some one else to make our lives easier. A lot of FRC devices, like motor controllers, use special protocols that *no one* wants to deal with. For example, the CAN Bus protocol that connects nearly all the devices on our robot. Implementing it requires some very complicated low-level code that I do not understand. Forunately this is handled by our wonderful libraries.
+A vendor library is a bunch of code written by someone else to make our lives easier. A lot of FRC devices, like motor controllers, use special protocols that *no one* wants to deal with. For example, the CAN Bus protocol that connects nearly all the devices on our robot. Implementing it requires some very complicated low-level code that I do not understand. Forunately this is handled by our wonderful libraries.
 
 Most vendor libraries are from manufacturers of the hardware we use, like CTRE and Rev. They write libraries that make it incredibly easy to use their devices without needing to understand a single thing about the protocol. CTRE's library is called Phoenix and Rev's library is called REVLib.
 

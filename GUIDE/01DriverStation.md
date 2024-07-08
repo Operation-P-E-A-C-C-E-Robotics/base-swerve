@@ -63,7 +63,7 @@ The setup is the similar for any other computer you want to program. You **DO NO
 # Make sure you have WPILib installed on *your computer* before proceeding
 
 
-## 0<<---[1][--->>2](02RobotProject.md)
+## [0<<---](/README.md)[1][--->>2](02RobotProject.md)
 # [INDEX](/README.md)
 1. [Setting up your driver station](/GUIDE/01DriverStation.md)
 2. [Setting up your robot project](/GUIDE/02RobotProject.md)
