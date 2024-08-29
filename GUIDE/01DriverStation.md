@@ -2,7 +2,7 @@
 ## a.k.a the worst part of programming
 The driver station needs to be treated very carefully. Any issue with the driver station connection to the field makes you unable to compete. This is pretty rare thanks to CSAs and other field staff, but to be successful we need to ***Optimize Everything***. Even a single match where we can't perform removes us from high-level play. Additionally, causing delays on the field trying to sort out issues makes us look unreliable and will hurt us in alliance selections.
 
-**ALL FRC-specific software gets major updates for each season**, so everything **absolutely must** be upgraded at least once after kickoff. It's also smart to update before each competition. Do it around week in advance though, to make sure you can fix anything the update broke.
+**(almost) ALL FRC-specific software gets major updates for each season**, so everything **absolutely must** be upgraded at least once after kickoff. It's also smart to update before each competition. Do it around week in advance though, to make sure you can fix anything the update breaks.
 
 ## Installing Software
 The required software is:

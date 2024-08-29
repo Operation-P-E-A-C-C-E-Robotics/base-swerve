@@ -21,10 +21,10 @@ All the things VS Code is capable of are defined as "commands" that you can acce
 **In WPILib VS Code, there is a little WPILib icon in the top right.** This brings up a command pallate that is filtered to only WPILib commands.
 
 ### Source Control:
-We will go over this in depth in Section 4. For now, remember that it's a very good "undo" button. It makes sure you always have a working version of the code.
+We will go over this in depth in Section 4. For now, remember that it's the ultimate "undo" button. It makes sure you always have a working version of the code.
 
 ### The Terminal:
-The terminal is foundational to programming. In the Windows operating system there are two different terminals, Command Prompt and PowerShell (which adds additional functionality). Either is fine for us. **The terminal is the *Non-graphical* part of the operating system**. Old computers had no mouse - all they had was a keyboard. The text-only software that was available for those old computers is still on **every computer**. The graphical part of the operating system is built *on top* of the text-based part. Using the terminal lets you tap into the core functionality of your computer that isn't always accessible through the graphical side.
+The terminal is foundational to programming. In the Windows operating system there are two different terminals, Command Prompt and PowerShell (which adds additional functionality). Either is fine for us. **The terminal is the *Non-graphical* part of the operating system**. Old computers had no mouse - all they had was a keyboard. The text-only software that was available for those old computers is still on **every computer**. The graphical part of the operating system is built on top of the text-based part. Using the terminal lets you tap into some core functions of your computer that aren't always accessible through the graphical side.
 
 How does that work? Well, it's like a simple programming language. It revolves around running text based applications called commands. For example, the "ls" command prints out all the files in the current directory. Or the "mkdir" command creates a new *directory* (folder). To run a command you just type the name of the command and press enter: "ls\<enter\>". 
 
@@ -35,17 +35,18 @@ You can also pass information into commands by putting it after the command name
 Since the terminal is an integral part of programming, there is one built directly into VS Code in the bottom pane. You can close this pane, and it will re-appear when it is used by WPILib, like when deploying code.
 
 ***If anything goes wrong when deploying your code, error details will be displayed in the terminal***
+Read these errors very, very carefully. They will usually be 99% unhelpful nonsense, and 1% helpful message. I've read over the helpful message more times than I can count.
 
 ### Errors
 VS Code automatically detects syntax errors (things your programming language doesn't allow) in your software. This is immensly useful. In the status bar at the very bototm of VS Code, there is an indicator that shows the number of errors, warnings, and information messages. **If there are any errors, you won't be able to deploy your code!** Most warnings can be ignored till the end of the development process; usually they point to useless code that can be removed.
 
-Errors are marked in the editor with a sqiggly underline, like a misspelled word in normal text editors. If you hover your mouse over the error, you'll get an explanation of what the error is for. If you do not understand the message, google it.
+Errors are marked in the editor with a red sqiggly underline. If you hover your mouse over the error, you'll get an explanation of what the error is for. If you do not understand the message, google it.
 
 For some errors, there are "quick fix" options where the editor tries to figure out how to fix the issue. You can access them by putting the cursor on the error and either pressing Ctrl+. or clicking the little lightbulb that appears to the left.
 
 ***Don't use a quick fix unless you know what it will do!***
 
-The thing quick fix is best at is finding imports - we'll get to that later.
+The thing quick fix is best for is finding imports.
 
 ### GET COMFORTABLE
 Before you go on, I strongly reccomend that you spend some time messing around in VS Code. Download this robot project's source code (as a zip) from [here](https://github.com/Operation-P-E-A-C-C-E-Robotics/base-swerve/releases). Unzip it, and open it in VS Code (File>Open Folder). Do whatever you want, you won't hurt anything. There's a lot I haven't gone over here, like the (non-command) pallate, outline view, searching, etc.
